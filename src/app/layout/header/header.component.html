@@ -1,0 +1,53 @@
+<header class="navbar">
+  <!-- Sección Izquierda: Logo y Enlaces -->
+  <div class="nav-left">
+    <a routerLink="/" class="brand">
+      <div class="brand-icon">
+        <!-- Icono Chip/CPU -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="4" width="16" height="16" rx="2" />
+          <rect x="9" y="9" width="6" height="6" />
+          <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+        </svg>
+      </div>
+      <span class="brand-name">TecnoCommerce</span>
+    </a>
+
+    <nav class="nav-links">
+      <a routerLink="/productos" class="nav-link active">Productos</a>
+      <a routerLink="/comparador" class="nav-link">Comparador</a>
+      <a routerLink="/arma-tu-pc" class="nav-link">Armá tu PC</a>
+    </nav>
+  </div>
+
+  <!-- Sección Derecha: Carrito y Perfil -->
+  <div class="nav-right">
+    <!-- Botón Carrito -->
+    <button class="cart-btn" aria-label="Carrito de compras">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="8" cy="21" r="1" />
+        <circle cx="19" cy="21" r="1" />
+        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+      </svg>
+      <span class="cart-badge">{{ cartCount }}</span>
+    </button>
+
+    <!-- Perfil de Usuario -->
+    <div class="user-profile">
+      <div class="user-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ userName }}</span>
+        <span class="user-sub">Mi Cuenta</span>
+      </div>
+      <!-- Flecha desplegable -->
+      <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </div>
+  </div>
+</header>

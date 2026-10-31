@@ -30,6 +30,9 @@ yarn-error.log
 .history/*
 
 # Miscellaneous
+.agents*
+.claude*
+.windsurf*
 /.angular/cache
 .sass-cache/
 /connect.lock
@@ -42,3 +45,5 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+/generated/prisma

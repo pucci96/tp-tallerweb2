@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Login {
+    id              Int     @id @default(autoincrement())
+    email           String  @unique
+    password        String
+    id_rol          Int
+    rol             Rol     @relation(fields: [id_rol], references: [id])
+    usuario         Usuario?
+}
+
+model Usuario {
+    id              Int     @id @default(autoincrement())
+    email           String  @unique
+    nombre          String
+    apellido        String
+    direccion       String
+    login           Login   @relation(fields: [email], references: [email])
+}
+
+model Rol {
+    id              Int     @id @default(autoincrement())
+    nombre          String  @unique
+    login           Login[]
+}
+
+model Categoria {
+    id              Int     @id @default(autoincrement())
+    nombre          String  @unique
+    imagen          String
+    subcategorias   Subcategoria[]
+    Producto        Producto[]
+}
+
+model Subcategoria {
+    id              Int     @id @default(autoincrement())
+    id_categoria    Int     @unique
+    nombre          String  
+    Producto        Producto[]
+    categoria       Categoria @relation(fields: [id_categoria], references: [id])
+}
+
+model Producto {
+    id              Int     @id @default(autoincrement())
+    id_categoria    Int     @unique
+    id_subcategoria Int     @unique
+    nombre          String
+    stock           Int
+    precio          Decimal
+    categoria       Categoria @relation(fields: [id_categoria], references: [id], map:"deProductoACategoria")
+    subcategoria    Subcategoria @relation(fields: [id_categoria], references: [id])
+    estilo          Producto_estilo[]
+    detalle         Producto_detalles[]
+}
+
+model Producto_estilo {
+    id              Int     @id @default(autoincrement())
+    id_producto     Int 
+    producto        Producto @relation(fields: [id_producto], references: [id])
+    nombre          String
+    descripcion     String
+}
+
+model Producto_detalles {
+    id              Int     @id @default(autoincrement())
+    id_producto     Int 
+    producto        Producto @relation(fields: [id_producto], references: [id])
+    nombre          String
+    descripcion     String
+}
+
+model Pedido {
+    id              Int     @id @default(autoincrement())
+    fecha           DateTime
+    estado          String
+    productos       Pedido_productos[]
+}
+
+model Pedido_productos {
+    id              Int     @id @default(autoincrement())
+    id_pedido       Int 
+    producto        String
+    categoria       String
+    subcategoria    String
+    precio          Decimal
+    pedido          Pedido @relation(fields: [id_pedido], references: [id])
+}

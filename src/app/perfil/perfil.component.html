@@ -1,0 +1,259 @@
+<div class="perfil-container">
+  <!-- Migas de pan y encabezado principal -->
+  <header class="page-header">
+    <div class="header-left">
+      <nav class="breadcrumb">
+        <a routerLink="/"><i class="icon-home">⌂</i> Inicio</a>
+        <span>›</span>
+        <span>Mi cuenta</span>
+        <span>›</span>
+        <span class="active">Mi perfil</span>
+      </nav>
+      <h1 class="page-title">Mi Perfil</h1>
+      <p class="page-subtitle">Gestioná tu información personal, dirección de entrega y seguridad.</p>
+    </div>
+
+    <div class="header-right">
+      <div class="verified-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+        <span>Cuenta activa y verificada</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner de alerta de éxito -->
+  <div class="alert-success" *ngIf="mostrarAlertaExito">
+    <div class="alert-content">
+      <div class="alert-icon">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      </div>
+      <div>
+        <strong>Datos actualizados correctamente</strong>
+        <p>Los cambios en tu información de cuenta y domicilio fueron guardados con éxito.</p>
+      </div>
+    </div>
+    <button class="btn-close-alert" (click)="cerrarAlerta()" aria-label="Cerrar">✕</button>
+  </div>
+
+  <!-- Contenido en 2 columnas -->
+  <div class="perfil-layout">
+    <!-- Columna Izquierda: Tarjeta de Perfil y Menú -->
+    <aside class="sidebar">
+      <!-- Tarjeta superior de usuario -->
+      <div class="user-card">
+        <div class="user-avatar-wrapper">
+          <div class="avatar-box">LG</div>
+          <button class="avatar-edit-btn" aria-label="Cambiar foto">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </button>
+        </div>
+
+        <h2 class="user-card-name">{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+        <span class="user-card-email">{{ usuario.email }}</span>
+        
+        <div class="client-badge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+          <span>Cliente verificado</span>
+        </div>
+      </div>
+
+      <!-- Menú de navegación lateral -->
+      <nav class="side-nav">
+        <a class="nav-item active">
+          <div class="nav-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Mis datos</span>
+          </div>
+          <span class="chevron">›</span>
+        </a>
+
+        <a class="nav-item">
+          <div class="nav-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+            <span>Mis pedidos</span>
+          </div>
+          <span class="counter-badge">3</span>
+        </a>
+
+        <a class="nav-item">
+          <div class="nav-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span>Direcciones guardadas</span>
+          </div>
+        </a>
+
+        <a class="nav-item">
+          <div class="nav-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+            <span>Tarjetas y pagos</span>
+          </div>
+        </a>
+
+        <a class="nav-item">
+          <div class="nav-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Seguridad</span>
+          </div>
+        </a>
+
+        <div class="nav-divider"></div>
+
+        <button class="nav-item logout-btn">
+          <div class="nav-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            <span>Cerrar sesión</span>
+          </div>
+        </button>
+      </nav>
+
+      <!-- Barra de progreso Nivel Hardware -->
+      <div class="level-card">
+        <div class="level-header">
+          <span class="level-title">NIVEL HARDWARE</span>
+          <span class="level-tag">Nivel {{ usuario.nivelHardware }}</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill"></div>
+        </div>
+        <p class="level-footer-text">{{ usuario.puntosHardware | number }} puntos acumulados para canjes en compras de componentes.</p>
+      </div>
+    </aside>
+
+    <!-- Columna Derecha: Formulario de Datos Personales -->
+    <main class="main-panel">
+      <div class="form-card">
+        <h2 class="form-title">Mis datos personales</h2>
+        <p class="form-subtitle">Actualizá tus datos para agilizar el proceso de compra, emisión de factura y seguimiento de envíos.</p>
+
+        <form (ngSubmit)="guardarCambios()" class="profile-form">
+          <!-- Fila Nombre y Apellido -->
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon"></span>
+                <input type="text" [(ngModel)]="usuario.nombre" name="nombre" required />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Apellido <span class="required">*</span></label>
+              <div class="input-wrapper">
+                <span class="input-icon"></span>
+                <input type="text" [(ngModel)]="usuario.apellido" name="apellido" required />
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label>Email / Correo electrónico <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon"></span>
+              <input type="email" [(ngModel)]="usuario.email" name="email" required />
+            </div>
+            <span class="helper-text"> Utilizado para confirmaciones de compras y seguimiento de envíos.</span>
+          </div>
+
+          <!-- Dirección de entrega -->
+          <div class="form-group">
+            <label>Dirección de entrega <span class="required">*</span></label>
+            <div class="input-wrapper">
+              <span class="input-icon"></span>
+              <input type="text" [(ngModel)]="usuario.direccion" name="direccion" required />
+            </div>
+            <span class="helper-text"> Dirección principal predeterminada para el cálculo de flete vía Andreani / OCA.</span>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="form-group">
+            <label>Contraseña (o nueva contraseña)</label>
+            <div class="input-wrapper">
+              <span class="input-icon"></span>
+              <input [type]="mostrarPassword ? 'text' : 'password'" [(ngModel)]="usuario.password" name="password" />
+              <button type="button" class="btn-toggle-eye" (click)="toggleMostrarPassword()" aria-label="Ver contraseña">
+                👁
+              </button>
+            </div>
+            <span class="helper-text">🛡 Dejá este campo en blanco si no deseás cambiar tu clave actual.</span>
+          </div>
+
+          <!-- Card de Switch de Notificaciones -->
+          <div class="switch-card">
+            <div class="switch-left">
+              <div class="switch-icon-box"></div>
+              <div>
+                <strong class="switch-title">Notificaciones por WhatsApp y SMS</strong>
+                <p class="switch-desc">Recibir avisos de estado de despacho y despacho en camino ({{ usuario.telefono }})</p>
+              </div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" [(ngModel)]="usuario.notificacionesWhatsapp" name="notificaciones" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="form-actions">
+            <button type="button" class="btn-secondary">Cancelar</button>
+            <button type="submit" class="btn-primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              Guardar cambios
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tarjeta de Privacidad y Seguridad Garantizada -->
+      <div class="info-banner-card">
+        <div class="shield-icon-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+        </div>
+        <div class="info-banner-text">
+          <strong>Privacidad y seguridad garantizada</strong>
+          <p>Tu información está protegida bajo estándares SSL/TLS y regulaciones de protección de datos personales de la República Argentina (Ley 25.326). Nunca compartimos tus claves ni tus datos de facturación con terceros no autorizados.</p>
+        </div>
+      </div>
+
+    
+    </main>
+  </div>
+</div>

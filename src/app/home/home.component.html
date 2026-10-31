@@ -1,0 +1,52 @@
+<section class="banner-wrapper" (mouseenter)="stopAutoSlide()" (mouseleave)="startAutoSlide()">
+  <div class="carousel-container">
+    @for (slide of slides; track slide.title; let i = $index) {
+      <div class="carousel-slide" [class.active]="i === currentIndex">
+        <!-- Columna de texto -->
+        <div class="slide-content">
+          <span class="badge" [ngClass]="slide.badgeType === 'success' ? 'badge-success' : 'badge-primary'">
+            {{ slide.badge }}
+          </span>
+          <h2 class="slide-title">{{ slide.title }}</h2>
+          <p class="slide-desc">{{ slide.description }}</p>
+          <a [routerLink]="slide.link" class="btn-action">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="btn-icon">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon>
+            </svg>
+            {{ slide.buttonText }}
+          </a>
+        </div>
+
+        <!-- Columna de imagen -->
+        <div class="slide-image-wrapper">
+          <img [src]="slide.imageUrl" [alt]="slide.title" class="slide-image" />
+        </div>
+      </div>
+    }
+
+    <!-- Flechas de navegación manual -->
+    <button class="nav-arrow prev" (click)="prevSlide()" aria-label="Anterior">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <button class="nav-arrow next" (click)="nextSlide()" aria-label="Siguiente">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Indicadores inferiores -->
+    <div class="dots-wrapper">
+      @for (slide of slides; track slide.title; let i = $index) {
+        <button 
+          class="dot" 
+          [class.active]="i === currentIndex" 
+          (click)="goToSlide(i)" 
+          [attr.aria-label]="'Ir a diapositiva ' + (i + 1)">
+        </button>
+      }
+    </div>
+  </div>
+</section>

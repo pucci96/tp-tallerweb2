@@ -1,0 +1,429 @@
+<div class="product-detail">
+  <!-- Toast de notificación (estilo Bootstrap 5 floating toast) -->
+  @if (showToast()) {
+    <div class="toast-container">
+      <div class="toast toast-success" role="alert" aria-live="assertive" aria-atomic="true">
+        <svg class="toast-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.6,16.6l7.05-7.05l-1.4-1.4L10.6,13.8L7.75,10.95l-1.4,1.4L10.6,16.6ZM12,22q-2.07,0-3.9-0.79q-1.82-0.79-3.17-2.14Q3.58,17.73 2.79,15.9T2,12Q2,9.92 2.79,8.1Q3.58,6.27 4.93,4.93Q6.28,3.57 8.1,2.79Q9.93,2 12,2t3.9,0.79t3.17,2.14q1.35,1.35 2.14,3.17Q22,9.92 22,12t-0.79,3.9t-2.14,3.17q-1.35,1.35-3.17,2.14T12,22Zm0-2q3.35,0 5.68-2.32T20,12T17.68,6.32T12,4T6.33,6.32T4,12t2.33,5.68T12,20Zm0-8Z"/>
+        </svg>
+        <div class="toast-body">
+          <div class="toast-header-row">
+            <p class="toast-title">¡Producto agregado al carrito!</p>
+            <button class="toast-close" (click)="closeToast()" aria-label="Cerrar">
+              <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6.4,19L5,17.6L10.6,12L5,6.4L6.4,5L12,10.6L17.6,5L19,6.4L13.4,12L19,17.6L17.6,19L12,13.4L6.4,19Z"/>
+              </svg>
+            </button>
+          </div>
+          <p class="toast-message">
+            1x {{ title }} añadido con éxito
+          </p>
+          <div class="toast-actions">
+            <a class="toast-link">Ver carrito (3)</a>
+            <span class="toast-divider">•</span>
+            <a class="toast-link muted">Finalizar compra</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Breadcrumb -->
+  <nav aria-label="Breadcrumb" class="breadcrumb">
+    <ol class="breadcrumb-list">
+      <li class="breadcrumb-item">
+        <a routerLink="/" class="breadcrumb-link">
+          <svg class="breadcrumb-icon" viewBox="0 0 24 24" fill="black" stroke="none" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6,19H9V13h6v6h3V10L12,5.5L6,10v9ZM4,21V9l8-6l8,6V21H13V15H11v6H4Zm8-8.75Z"/>
+          </svg>
+          <span>Inicio</span>
+        </a>
+      </li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-item">
+        <a routerLink="/productos" class="breadcrumb-link">Productos</a>
+      </li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-item">
+        <a routerLink="/categorias/teclados" class="breadcrumb-link">Teclados</a>
+      </li>
+      <li class="breadcrumb-separator">/</li>
+      <li class="breadcrumb-item current" aria-current="page">
+        <span class="breadcrumb-current">{{ title }}</span>
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Grid principal: 2 columnas en desktop (galería / compra) -->
+  <div class="product-grid">
+    <!-- Columna izquierda: Galería y descripción -->
+    <div class="gallery-column">
+      <!-- Tarjeta de imagen principal -->
+      <div class="image-card">
+        <div class="image-badges">
+          <span class="badge badge-primary">
+            <svg class="badge-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.55,18.2L15.73,12h-4l0.72-5.68L7.83,13H11.3l-0.75,5.2ZM8,22l1-7H4L13,2h2l-1,8h6L10,22H8Zm3.78-9.75Z"/>
+          </svg>
+            Switch Red Lineal
+          </span>
+          <span class="badge badge-tertiary">Envío Gratis</span>
+        </div>
+        <button class="favorite-btn" [class.active]="isFavorite()" (click)="isFavorite.update((value) => !value)" aria-label="Guardar en favoritos">
+          <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12,21l-1.45-1.3q-2.53-2.27-4.18-3.92q-1.65-1.65-2.63-2.96Q2.78,11.5 2.39,10.4T2,8.15Q2,5.8 3.58,4.22T7.5,2.65q1.3,0 2.48,0.55T12,4.75q0.85-1 2.03-1.55T16.5,2.65q2.35,0 3.93,1.57T22,8.15q0,1.15-0.39,2.25t-1.36,2.41q-0.97,1.31-2.63,2.96q-1.65,1.65-4.17,3.92L12,21Zm0-2.7q2.4-2.15 3.95-3.69t2.45-2.67t1.25-2.03Q20,9.02 20,8.15q0-1.5-1-2.5t-2.5-1q-1.17,0-2.17,0.66q-1,0.66-1.38,1.69h-1.9Q10.68,5.97 9.68,5.31T7.5,4.65q-1.5,0-2.5,1T4,8.15Q4,9.02 4.35,9.91T5.6,11.94t2.45,2.67T12,18.3Zm0-6.83Z"/>
+          </svg>
+        </button>
+        <div class="main-image-wrapper">
+          <img [src]="activeImage().src" [alt]="activeImage().alt" class="main-image" />
+        </div>
+        <div class="image-hint">
+          <svg class="hint-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.48,22q-0.7,0-1.31-0.3T8.13,20.85L2.68,13.93l0.48-0.5q0.5-0.53 1.2-0.63t1.3,0.28L7.5,14.2V6q0-0.43 0.29-0.71T8.5,5Q8.93,5 9.23,5.29Q9.53,5.57 9.53,6V17.8L7.1,16.3l2.6,3.32q0.15,0.18 0.35,0.27T10.48,20H16q0.82,0 1.41-0.59T18,18V14q0-0.43-0.29-0.71T17,13H11.53V11H17q1.25,0 2.13,0.88T20,14v4q0,1.65-1.18,2.82T16,22H10.48ZM4.18,8.5Q3.85,7.95 3.68,7.31T3.5,6q0-2.08 1.46-3.54T8.5,1t3.54,1.46T13.5,6q0,0.68-0.17,1.31T12.83,8.5l-1.72-1q0.2-0.35 0.3-0.71Q11.5,6.43 11.5,6q0-1.25-0.88-2.13T8.5,3T6.38,3.88T5.5,6q0,0.43 0.1,0.79T5.9,7.5l-1.73,1Zm8.38,7Z"/>
+          </svg>
+          <span class="hint-text">Clic sobre miniaturas para alternar vista</span>
+          <span class="hint-resolution">Resolución HD 4K</span>
+        </div>
+      </div>
+
+      <!-- Banda de miniaturas -->
+      <div class="thumbnails">
+        @for (thumb of thumbnails; track thumb.label; let i = $index) {
+          <button
+            class="thumbnail-btn"
+            [class.active]="selectedThumbnail() === i"
+            (click)="selectThumbnail(i)"
+            type="button"
+          >
+            <div class="thumbnail-img">
+              <img [src]="thumb.src" [alt]="thumb.alt" class="thumbnail-image" />
+            </div>
+            <span class="thumbnail-label">{{ thumb.label }}</span>
+          </button>
+        }
+      </div>
+
+      <!-- Tarjetas de confianza / garantía -->
+      <div class="trust-badges">
+        <div class="trust-item">
+          <div class="trust-icon trust-tertiary">
+            <svg class="trust-symbol" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.95,15.55L16.6,9.9L15.18,8.48L10.95,12.7l-2.1-2.1L7.43,12.02l3.53,3.53ZM12,22q-3.47-0.88-5.74-3.99T4,11.1V5l8-3l8,3v6.1q0,3.8-2.26,6.91T12,22Zm0-2.1q2.6-0.82 4.3-3.3T18,11.1V6.38L12,4.13L6,6.38V11.1q0,3.03 1.7,5.5T12,19.9ZM12,12Z"/>
+            </svg>
+          </div>
+          <div class="trust-text">
+            <p class="trust-title">Garantía Oficial</p>
+            <p class="trust-sub">12 meses directa TecnoCommerce</p>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon trust-tertiary">
+            <svg class="trust-symbol" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.88,19.13Q3,18.25 3,17H1V6Q1,5.18 1.59,4.59T3,4H17V8h3l3,4v5H21q0,1.25-0.88,2.13T18,20t-2.13-0.88T15,17H9q0,1.25-0.88,2.13T6,20T3.88,19.13Zm2.84-1.41Q7,17.43 7,17T6.71,16.29T6,16q-0.42,0-0.71,0.29T5,17t0.29,0.71T6,18t0.71-0.29ZM3,15H3.8q0.43-0.45 0.98-0.73T6,14t1.23,0.27T8.2,15H15V6H3v9Zm15.71,2.71Q19,17.43 19,17t-0.29-0.71T18,16t-0.71,0.29T17,17t0.29,0.71T18,18t0.71-0.29ZM17,13h4.25L19,10H17v3ZM9,10.5Z"/>
+            </svg>
+          </div>
+          <div class="trust-text">
+            <p class="trust-title">Envío Express</p>
+            <p class="trust-sub">Gratis a todo el país (Correo/Andreani)</p>
+          </div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-icon trust-secondary">
+            <svg class="trust-symbol" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11,21.95q-1.9-0.2-3.54-1.04T4.61,18.74T2.7,15.68T2,12Q2,9.73 2.91,7.8T5.4,4.5H3v-2H9v6H7V5.77Q5.63,6.88 4.81,8.49T4,12q0,3.07 2.01,5.31T11,19.93v2.02ZM10.58,16.6L6.35,12.35l1.4-1.4l2.83,2.82L16.25,8.1l1.4,1.42L10.58,16.6ZM15,21.5v-6h2v2.73q1.38-1.13 2.19-2.73T20,12q0-3.08-2.01-5.31T13,4.07V2.05q3.8,0.38 6.4,3.2Q22,8.07 22,12q0,2.27-0.91,4.2T18.6,19.5H21v2H15Z"/>
+            </svg>
+          </div>
+          <div class="trust-text">
+            <p class="trust-title">Cambio Simple</p>
+            <p class="trust-sub">30 días de satisfacción garantizada</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Descripción y características -->
+      <div class="description-section">
+        <div class="section-header">
+          <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8,18h8V16H8v2Zm0-4h8V12H8v2ZM6,22q-0.82,0-1.41-0.59T4,20V4Q4,3.17 4.59,2.59T6,2h8l6,6V20q0,0.82-0.59,1.41T18,22H6ZM13,9V4H6V20H18V9H13ZM6,4V9V4V9V20V4Z"/>
+          </svg>
+          <h2 class="section-title">Descripción y Características</h2>
+        </div>
+        <p class="section-text">
+          Diseñado para deportistas electrónicos y programadores exigentes, el
+          <strong class="text-strong">TecnoCommerce Pro TKL</strong> combina un formato compacto sin teclado numérico (80% Tenkeyless) con una estructura reforzada en chasis de aluminio de grado aeronáutico anodizado.
+        </p>
+
+        <div class="features-grid">
+          @for (feature of features; track feature.title) {
+            <div class="feature-item">
+              <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+                <path [attr.d]="getIconPath(feature.icon)"></path>
+              </svg>
+              <div class="feature-body">
+                <h4 class="feature-title">{{ feature.title }}</h4>
+                <p class="feature-desc">{{ feature.description }}</p>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Tabla de especificaciones técnicas -->
+        <div class="specs-section">
+          <h3 class="specs-title">
+            <svg class="specs-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8.71,16.71Q9,16.43 9,16T8.71,15.29T8,15q-0.42,0-0.71,0.29T7,16t0.29,0.71T8,17t0.71-0.29Zm0-4Q9,12.43 9,12T8.71,11.29T8,11q-0.42,0-0.71,0.29T7,12t0.29,0.71T8,13t0.71-0.29Zm0-4Q9,8.42 9,8Q9,7.57 8.71,7.29T8,7Q7.58,7 7.29,7.29T7,8Q7,8.42 7.29,8.71T8,9T8.71,8.71ZM11,17h6V15H11v2Zm0-4h6V11H11v2Zm0-4h6V7H11V9ZM5,21q-0.83,0-1.41-0.59T3,19V5Q3,4.17 3.59,3.59T5,3H19q0.83,0 1.41,0.59T21,5V19q0,0.82-0.59,1.41T19,21H5Zm0-2H19V5H5V19ZM5,5V19V5Z"/>
+            </svg>
+            Especificaciones Técnicas Detalladas
+          </h3>
+          <div class="table-wrapper">
+            <table class="specs-table">
+              <thead>
+                <tr>
+                  <th class="specs-th">Parámetro</th>
+                  <th class="specs-th">Detalle</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (spec of specs; track spec.parameter) {
+                  <tr class="specs-row">
+                    <td class="specs-td specs-param">{{ spec.parameter }}</td>
+                    <td class="specs-td">{{ spec.detail }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha: Caja de compra, precio, acciones y stock -->
+    <div class="buy-column">
+      <div class="buy-box">
+        <!-- Cabecera: categoría y SKU -->
+        <div class="buy-header">
+          <span class="category-pill">{{ category }}</span>
+          <span class="sku-text">SKU: {{ sku }}</span>
+        </div>
+
+        <!-- Título del producto -->
+        <h1 class="product-title">{{ title }}</h1>
+
+        <!-- Bloque de reseñas / puntuación -->
+        <div class="reviews-block">
+          <div class="stars">
+          @for (star of stars; track star) {
+            <svg class="star filled" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/>
+            </svg>
+          }
+        </div>
+          <span class="rating-value">{{ rating }}</span>
+          <span class="reviews-divider">•</span>
+          <a class="reviews-link" routerLink="#opiniones">
+            {{ reviewsCount }} opiniones verificadas
+          </a>
+        </div>
+
+        <!-- Precio -->
+        <div class="price-card">
+          <div class="price-row">
+            <span class="price-value">$</span>
+            <span class="price-value">{{ price | number }}</span>
+            <span class="price-currency">{{ currency }}</span>
+            <div class="divPrecioOriginal">
+              <span class="price-original">$</span>
+              <span class="price-original">{{ originalPrice | number }}</span>
+            </div>
+          </div>
+          <div class="installment">
+            <svg class="installment-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22,6V18q0,0.82-0.59,1.41T20,20H4q-0.82,0-1.41-0.59T2,18V6Q2,5.18 2.59,4.59T4,4H20q0.83,0 1.41,0.59Q22,5.18 22,6ZM4,8H20V6H4V8Zm0,4v6H20V12H4Zm0,6V6V18Z"/>
+            </svg>
+            <span class="installment-text">En 3 y 6 cuotas fijas con bancos adheridos</span>
+          </div>
+          <div class="cash-pill">
+            <span class="cash-label">10% OFF pagando por transferencia:</span>
+            <div class="cash-price">
+              <span>$ </span>
+              <span>{{ transferPrice() | number }} {{ currency }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Disponibilidad / stock -->
+        <div class="stock-indicator">
+          <svg class="stock-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5,22q-0.83,0-1.41-0.59T3,20V8.73Q2.55,8.45 2.28,8.01T2,7V4Q2,3.17 2.59,2.59T4,2H20q0.83,0 1.41,0.59T22,4V7q0,0.57-0.27,1.01T21,8.73V20q0,0.82-0.59,1.41T19,22H5ZM5,9V20H19V9H5ZM4,7H20V4H4V7Zm5,7h6V12H9v2Zm3,0.5Z"/>
+          </svg>
+          <span class="stock-text">{{ stockText }}</span>
+          <span class="stock-detail">{{ stockDetail }}</span>
+        </div>
+
+        <!-- Selector de switch / distribución -->
+        <div class="switch-selection">
+          <label class="selection-label">Switch Mecánico</label>
+          <div class="switch-options">
+            <button class="switch-option switch-selected" type="button">
+              <span class="option-name">Red Lineal</span>
+              <span class="option-sub">Silencioso</span>
+            </button>
+            <button class="switch-option" type="button">
+              <span class="option-name">Blue Táctil</span>
+              <span class="option-sub">Clicky</span>
+            </button>
+            <button class="switch-option" type="button">
+              <span class="option-name">Brown Táctil</span>
+              <span class="option-sub">Equilibrado</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de cantidad -->
+        <div class="quantity-selector">
+          <label class="selection-label">Cantidad</label>
+          <div class="quantity-controls">
+            <button class="qty-btn" (click)="changeQuantity(-1)" aria-label="Disminuir cantidad" type="button">
+              −
+            </button>
+            <input
+              class="qty-input"
+              type="number"
+              [value]="quantity()"
+              min="1"
+              [max]="maxQuantity"
+              readonly
+            />
+            <button class="qty-btn" (click)="changeQuantity(1)" aria-label="Aumentar cantidad" type="button">
+              +
+            </button>
+          </div>
+          <span class="qty-hint">Máx. {{ maxQuantity }} unidades por usuario</span>
+        </div>
+
+        <!-- Acciones de compra -->
+        <div class="actions-block">
+          <button class="btn-add" (click)="triggerAddToCart()" [disabled]="isAddingToCart()" type="button">
+            <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5.59,21.41Q5,20.83 5,20t0.59-1.41T7,18q0.83,0 1.41,0.59Q9,19.18 9,20T8.41,21.41Q7.83,22 7,22T5.59,21.41Zm10,0Q15,20.83 15,20t0.59-1.41T17,18t1.41,0.59Q19,19.18 19,20t-0.59,1.41T17,22t-1.41-0.59ZM6.15,6l2.4,5h7L18.3,6H6.15ZM5.2,4H19.95q0.57,0 0.88,0.51t0.02,1.04l-3.55,6.4q-0.27,0.5-0.74,0.78T15.55,13H8.1L7,15H19v2H7q-1.13,0-1.7-0.99q-0.58-0.99-0.05-1.96L6.6,11.6L3,4H1V2H4.25L5.2,4Zm3.35,7h7h-7Z"/>
+            </svg>
+            <span class="action-text">{{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}</span>
+          </button>
+          <button class="btn-buy" type="button">
+            <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12,15.6L15.2,11H12.35l2-7H9v8h3v3.6ZM10,22V14H7V2H17L15,9h4L10,22Zm2-10H9h3Z"/>
+            </svg>
+            <span class="action-text">Comprar ahora</span>
+          </button>
+        </div>
+
+        <!-- Calculador de envío por código postal -->
+        <div class="shipping-card">
+          <div class="shipping-header">
+            <svg class="shipping-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12,16.48q2.48-2 3.74-3.85Q17,10.77 17,9.15q0-2.25-1.4-3.7T12,4T8.4,5.45T7,9.15q0,1.63 1.26,3.48T12,16.48ZM12,19q-3.53-2.6-5.26-5.05T5,9.15Q5,6.02 6.95,4.01T12,2t5.05,2.01T19,9.15q0,2.35-1.74,4.8Q15.53,16.4 12,19Zm0-8q0.83,0 1.41-0.59T14,9q0-0.83-0.59-1.41T12,7T10.59,7.59T10,9q0,0.82 0.59,1.41T12,11ZM5,22V20H19v2H5ZM12,9Z"/>
+            </svg>
+            <span class="shipping-title">Calcular tiempos y costo de envío</span>
+          </div>
+          <div class="shipping-inputs">
+            <input
+              class="shipping-input"
+              type="text"
+              maxlength="8"
+              placeholder="Código Postal (ej: 1425)"
+            />
+            <button class="shipping-btn" (click)="simulateShipping()" type="button">
+              Calcular
+            </button>
+          </div>
+          <p class="shipping-feedback" [class.hidden]="!showShippingFeedback()">
+            <svg class="feedback-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/>
+            </svg>
+            Llega gratis entre el 2 y 4 de abril a tu domicilio.
+          </p>
+        </div>
+
+        <!-- Información de seguridad de pago -->
+        <div class="security-info">
+          <div class="security-item">
+            <svg class="security-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6,22q-0.82,0-1.41-0.59T4,20V10Q4,9.17 4.59,8.59T6,8H7V6Q7,3.92 8.46,2.46T12,1t3.54,1.46T17,6V8h1q0.82,0 1.41,0.59T20,10V20q0,0.82-0.59,1.41T18,22H6Zm0-2H18V10H6V20Zm7.41-3.59Q14,15.83 14,15t-0.59-1.41T12,13t-1.41,0.59Q10,14.18 10,15t0.59,1.41T12,17t1.41-0.59ZM9,8h6V6q0-1.25-0.88-2.13T12,3T9.88,3.88T9,6V8ZM6,20V10V20Z"/>
+            </svg>
+            <span>Pago 100% encriptado SSL</span>
+          </div>
+          <div class="security-item">
+            <svg class="security-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6,22q-1.25,0-2.13-0.88T3,19V16H6V2L7.5,3.5L9,2l1.5,1.5L12,2l1.5,1.5L15,2l1.5,1.5L18,2l1.5,1.5L21,2V19q0,1.25-0.88,2.13T18,22H6Zm12-2q0.43,0 0.71-0.29Q19,19.43 19,19V5H8V16h9v3q0,0.43 0.29,0.71T18,20ZM9,9V7h6V9H9Zm0,3V10h6v2H9Zm8-3q-0.43,0-0.71-0.29T16,8q0-0.43 0.29-0.71T17,7t0.71,0.29T18,8q0,0.42-0.29,0.71T17,9Zm0,3q-0.43,0-0.71-0.29Q16,11.43 16,11t0.29-0.71T17,10t0.71,0.29T18,11t-0.29,0.71T17,12ZM6,20h9V18H5v1q0,0.43 0.29,0.71T6,20ZM5,20q0,0 0-0.29Q5,19.43 5,19V18v2Z"/>
+            </svg>
+            <span>Emitimos Factura A y B</span>
+          </div>
+        </div>
+
+        <!-- Combo recomendado -->
+        <div class="combo-card">
+          <div class="combo-img">
+            <img
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGh5k8bBALraWMKG4FnNA6OgAYBleta5sAfsoUlG4dulr4ByawlRHwJTxg2XiNnsCVSzlXeTHe93sNSMKNbcUKQpPE5POL8QfbnXPNge1yLQsHlU3OPS8WmE2iAuqoUTqDX3G0jRTF9kHxo2wozKQWvC75ADyQEFHHQsUnIch-kV7YkTFR412FOuaAq6vTTJj9rTjR7RB0GBsDwTSVikKW-sj0T1LkyeaQysvAbyU"
+              alt="Reposamuñecas Ergonómico Memory Foam TKL"
+              class="combo-image"
+            />
+          </div>
+          <div class="combo-info">
+            <p class="combo-tag">Combo recomendado</p>
+            <p class="combo-title">Reposamuñecas Ergonómico Memory Foam TKL</p>
+            <p class="combo-price">+ $ 14.200 ARS (15% OFF)</p>
+          </div>
+          <button class="combo-btn" title="Agregar combo" type="button">
+            <svg class="combo-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11,13H5V11h6V5h2v6h6v2H13v6H11V13Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Productos relacionados -->
+  <section class="related-products">
+    <div class="related-header">
+      <div>
+        <span class="related-tag">Catálogo TecnoCommerce</span>
+        <h3 class="related-title">Productos complementarios recomendados</h3>
+      </div>
+      <a class="related-view-all" routerLink="/perifericos">
+        <span>Ver todos los periféricos</span>
+        <svg class="related-arrow" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16.18,13H4V11H16.18l-5.6-5.6L12,4l8,8l-8,8l-1.42-1.4l5.6-5.6Z"/>
+        </svg>
+      </a>
+    </div>
+    <div class="related-grid">
+      @for (item of related; track item.title) {
+        <div class="related-card">
+          <div class="related-img-wrap">
+            <img [src]="item.image" [alt]="item.title" class="related-image" />
+            @if (item.badge) {
+              <span class="related-badge">{{ item.badge }}</span>
+            }
+          </div>
+          <div class="related-body">
+            <span class="related-category">{{ item.label }}</span>
+            <h4 class="related-name">{{ item.title }}</h4>
+            <div class="related-price-row">
+              <span class="related-price">$ </span>
+              <span class="related-price">{{ item.price | number }}</span>
+              <span class="related-currency">{{ currency }}</span>
+            </div>
+          </div>
+          <button class="related-add" type="button">
+            <svg class="related-cart-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11,9V6H8V4h3V1h2V4h3V6H13V9H11ZM5.59,21.41Q5,20.83 5,20t0.59-1.41T7,18q0.83,0 1.41,0.59Q9,19.18 9,20T8.41,21.41Q7.83,22 7,22T5.59,21.41Zm10,0Q15,20.83 15,20t0.59-1.41T17,18t1.41,0.59Q19,19.18 19,20t-0.59,1.41T17,22t-1.41-0.59ZM1,4V2H4.28l4.25,9h7l3.9-7H21.7l-4.4,7.95q-0.27,0.5-0.74,0.78T15.55,13H8.1L7,15H19v2H7q-1.13,0-1.71-0.98T5.25,14.05L6.6,11.6L3,4H1Z"/>
+            </svg>
+            <span class="related-cart-text">Agregar</span>
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+</div>

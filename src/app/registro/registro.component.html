@@ -1,0 +1,540 @@
+<div class="registro-page">
+  <div class="registro-wrapper">
+    <!-- Educational Simulation Pill Notice -->
+    <div class="notice-pill">
+      <div class="notice-left">
+        <svg
+          class="notice-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          <path d="M9 12l2 2 4-4"></path>
+        </svg>
+        <span>Formulario con validación interactiva en vivo</span>
+      </div>
+      <span class="notice-badge">Demo</span>
+    </div>
+
+    <!-- Main Registration Card -->
+    <div class="registro-card">
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="card-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+        </div>
+        <h1 class="card-title">Crear cuenta</h1>
+        <p class="card-subtitle">
+          Completá tus datos para comprar y seguir el estado de tus pedidos de hardware en
+          Argentina.
+        </p>
+      </div>
+
+      @if (isError()) {
+        <div class="alert-error">Revisá los campos obligatorios e intentá nuevamente.</div>
+      }
+
+      <form class="registro-form" (ngSubmit)="handleRegisterSubmit()">
+        <!-- Row: Nombre & Apellido -->
+        <div class="form-row">
+          <!-- Nombre -->
+          <div class="form-group">
+            <label class="field-label" for="nombre">
+              <span>Nombre</span>
+              @if (nombre && isNombreValid()) {
+                <span class="status status-valid">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 6L9 17l-5-5"></path>
+                  </svg>
+                  Válido
+                </span>
+              } @else if (nombre && !isNombreValid()) {
+                <span class="status status-error">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  Requerido
+                </span>
+              }
+            </label>
+            <div class="input-wrapper">
+              <input
+                id="nombre"
+                name="nombre"
+                type="text"
+                [(ngModel)]="nombre"
+                (ngModelChange)="clearError()"
+                required
+                placeholder="Tu nombre"
+                [class.input-valid]="nombre && isNombreValid()"
+                [class.input-invalid]="nombre && !isNombreValid()"
+              />
+              @if (nombre && isNombreValid()) {
+                <svg
+                  class="input-icon icon-valid"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+              } @else if (nombre && !isNombreValid()) {
+                <svg
+                  class="input-icon icon-error"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              }
+            </div>
+            @if (nombre && isNombreValid()) {
+              <p class="feedback feedback-valid">¡Se ve bien!</p>
+            }
+          </div>
+
+          <!-- Apellido -->
+          <div class="form-group">
+            <label class="field-label" for="apellido">
+              <span>Apellido</span>
+              @if (apellido && isApellidoValid()) {
+                <span class="status status-valid">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 6L9 17l-5-5"></path>
+                  </svg>
+                  Válido
+                </span>
+              } @else if (apellido && !isApellidoValid()) {
+                <span class="status status-error">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  Requerido
+                </span>
+              }
+            </label>
+            <div class="input-wrapper">
+              <input
+                id="apellido"
+                name="apellido"
+                type="text"
+                [(ngModel)]="apellido"
+                (ngModelChange)="clearError()"
+                required
+                placeholder="Tu apellido"
+                [class.input-valid]="apellido && isApellidoValid()"
+                [class.input-invalid]="apellido && !isApellidoValid()"
+              />
+              @if (apellido && isApellidoValid()) {
+                <svg
+                  class="input-icon icon-valid"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+              } @else if (apellido && !isApellidoValid()) {
+                <svg
+                  class="input-icon icon-error"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              }
+            </div>
+            @if (apellido && isApellidoValid()) {
+              <p class="feedback feedback-valid">¡Se ve bien!</p>
+            }
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label class="field-label" for="userEmail">
+            <span>Correo electrónico</span>
+            @if (email && isEmailValid()) {
+              <span class="status status-valid">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+                Válido
+              </span>
+            } @else if (email && !isEmailValid()) {
+              <span class="status status-error">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                Error de formato
+              </span>
+            }
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="userEmail"
+              name="email"
+              type="email"
+              [(ngModel)]="email"
+              (ngModelChange)="clearError()"
+              required
+              placeholder="tunombre@correo.com"
+              [class.input-valid]="email && isEmailValid()"
+              [class.input-invalid]="email && !isEmailValid()"
+            />
+            @if (email && isEmailValid()) {
+              <svg
+                class="input-icon icon-valid"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+            } @else if (email && !isEmailValid()) {
+              <svg
+                class="input-icon icon-error"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+              </svg>
+            }
+          </div>
+          @if (email && !isEmailValid()) {
+            <p class="feedback feedback-error">
+              Ingresá un correo electrónico válido (ej: nombre@dominio.com)
+            </p>
+          }
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label class="field-label" for="direccion">
+            <span>Dirección de entrega</span>
+            @if (direccion && isDireccionValid()) {
+              <span class="status status-valid">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Cobertura activa
+              </span>
+            }
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="direccion"
+              name="direccion"
+              type="text"
+              [(ngModel)]="direccion"
+              (ngModelChange)="clearError()"
+              required
+              placeholder="Av. Corrientes 2450, CABA"
+              [class.input-valid]="direccion && isDireccionValid()"
+            />
+            @if (direccion && isDireccionValid()) {
+              <svg
+                class="input-icon icon-valid"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M20 6L9 17l-5-5"></path>
+              </svg>
+            }
+          </div>
+          @if (direccion && isDireccionValid()) {
+            <p class="feedback feedback-valid">Dirección verificada para envíos</p>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label class="field-label" for="userPassword">
+            <span>Contraseña</span>
+            @if (password && passwordScore() < 40) {
+              <span class="status status-error">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Insegura
+              </span>
+            } @else if (password && passwordScore() >= 80) {
+              <span class="status status-valid">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                Segura
+              </span>
+            }
+          </label>
+          <div class="input-wrapper">
+            <input
+              id="userPassword"
+              name="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              [(ngModel)]="password"
+              (ngModelChange)="clearError()"
+              required
+              placeholder="••••••••"
+              [class.input-invalid]="password && passwordScore() < 40"
+              [class.input-valid]="password && passwordScore() >= 80"
+            />
+            <div class="input-actions">
+              <button
+                type="button"
+                class="btn-toggle-eye"
+                (click)="togglePasswordVisibility()"
+                aria-label="Mostrar u ocultar contraseña"
+              >
+                @if (showPassword()) {
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"
+                    ></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                } @else {
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                }
+              </button>
+              @if (password && passwordScore() < 40) {
+                <svg
+                  class="input-icon icon-error"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+              }
+            </div>
+          </div>
+          @if (password && passwordScore() < 40) {
+            <p class="feedback feedback-error">
+              La contraseña debe tener al menos 8 caracteres e incluir letras y números
+            </p>
+          }
+
+          <!-- Strength bar -->
+          @if (password) {
+            <div class="strength-box">
+              <div class="strength-head">
+                <span>Fortaleza de contraseña:</span>
+                <span
+                  class="strength-label"
+                  [class.strength-weak]="passwordScore() < 40"
+                  [class.strength-mid]="passwordScore() >= 40 && passwordScore() < 80"
+                  [class.strength-strong]="passwordScore() >= 80"
+                >
+                  {{ passwordLabel() }} ({{ passwordScore() }}%)
+                </span>
+              </div>
+              <div class="strength-track">
+                <div
+                  class="strength-fill"
+                  [style.width.%]="passwordScore()"
+                  [class.fill-weak]="passwordScore() < 40"
+                  [class.fill-mid]="passwordScore() >= 40 && passwordScore() < 80"
+                  [class.fill-strong]="passwordScore() >= 80"
+                ></div>
+              </div>
+              <div class="req-grid">
+                <div
+                  class="req-item"
+                  [class.req-ok]="hasMinLength()"
+                  [class.req-bad]="password && !hasMinLength()"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    @if (hasMinLength()) {
+                      <path d="M20 6L9 17l-5-5"></path>
+                    } @else {
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    }
+                  </svg>
+                  <span>Mínimo 8 caracteres</span>
+                </div>
+                <div class="req-item" [class.req-ok]="hasNumber()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    @if (hasNumber()) {
+                      <path d="M20 6L9 17l-5-5"></path>
+                    } @else {
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    }
+                  </svg>
+                  <span>Contiene números</span>
+                </div>
+                <div
+                  class="req-item"
+                  [class.req-ok]="hasLetter()"
+                  [class.req-bad]="password && !hasLetter()"
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    @if (hasLetter()) {
+                      <path d="M20 6L9 17l-5-5"></path>
+                    } @else {
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    }
+                  </svg>
+                  <span>Al menos una letra</span>
+                </div>
+                <div class="req-item" [class.req-neutral]="!hasSpecial()">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    @if (hasSpecial()) {
+                      <path d="M20 6L9 17l-5-5"></path>
+                    } @else {
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    }
+                  </svg>
+                  <span>Símbolo especial (opc.)</span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Términos -->
+        <div class="terms-row">
+          <div class="checkbox-wrap">
+            <input
+              id="terminos"
+              name="terminos"
+              type="checkbox"
+              [(ngModel)]="terminos"
+              (ngModelChange)="clearError()"
+              class="checkbox-input"
+            />
+          </div>
+          <label class="terms-label" for="terminos">
+            Acepto los
+            <a class="link" href="#">Términos y Condiciones</a>
+            y la
+            <a class="link" href="#">Política de Privacidad</a>.
+          </label>
+        </div>
+
+        <!-- Submit -->
+        <div class="submit-wrap">
+          <button type="submit" class="btn-submit" [disabled]="isSubmitting()">
+            <span>{{
+              isSubmitting() && !isSuccess()
+                ? 'Creando cuenta...'
+                : isSuccess()
+                  ? '¡Cuenta creada!'
+                  : 'Crear cuenta'
+            }}</span>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </form>
+
+      <!-- Card Footer Link -->
+      <div class="card-footer">
+        <p>
+          ¿Ya tenés cuenta?
+          <a class="link" routerLink="/login">Iniciá sesión</a>
+        </p>
+      </div>
+    </div>
+
+    <!-- Trust & Security Badges -->
+    <div class="trust-row">
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        <span>Encriptación SSL de 256 bits</span>
+      </div>
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="1" y="3" width="15" height="13"></rect>
+          <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+          <circle cx="5.5" cy="18.5" r="2.5"></circle>
+          <circle cx="18.5" cy="18.5" r="2.5"></circle>
+        </svg>
+        <span>Envíos a todo el país</span>
+      </div>
+      <div class="trust-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+        <span>Garantía Oficial</span>
+      </div>
+    </div>
+  </div>
+</div>

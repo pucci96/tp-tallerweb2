@@ -8,6 +8,7 @@
 
 # Node
 /node_modules
+**/node_modules/
 npm-debug.log
 yarn-error.log
 
@@ -47,3 +48,9 @@ __screenshots__/
 Thumbs.db
 
 /generated/prisma
+
+.env
+**/.env
+.angular/
+generated/
+**/generated/

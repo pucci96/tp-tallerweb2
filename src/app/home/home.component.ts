@@ -1,6 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { ProductCardComponent, Product } from '../productCard/productCard.component';
+import { ProductService } from '../services/product.service';
 
 interface Slide {
   badge: string;
@@ -12,14 +15,25 @@ interface Slide {
   imageUrl: string;
 }
 
+export interface Categoria {
+  id: number;
+  nombre: string;
+  imagen: string;
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ProductCardComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  // Inyecciones de dependencias
+  private http = inject(HttpClient);
+  private productService = inject(ProductService);
+
+
   slides: Slide[] = [
     {
       badge: 'Lanzamiento Exclusivo',
@@ -49,23 +63,30 @@ export class HomeComponent implements OnInit, OnDestroy {
       imageUrl: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=900&q=80'
     }
   ];
-
   currentIndex: number = 0;
   private intervalId: any;
 
+  // Estado para datos desde la API
+  protected readonly categorias = signal<Categoria[]>([]);
+  productosDestacados: Product[] = [];
+
+  // Ciclo de vida
   ngOnInit(): void {
     this.startAutoSlide();
+    this.obtenerCategorias();
+    this.obtenerProductos();
   }
 
   ngOnDestroy(): void {
     this.stopAutoSlide();
   }
 
+  //  slider
   startAutoSlide(): void {
     this.stopAutoSlide();
     this.intervalId = setInterval(() => {
       this.nextSlide();
-    }, 4500); // Rota cada 4.5 segundos
+    }, 4500);
   }
 
   stopAutoSlide(): void {
@@ -85,5 +106,25 @@ export class HomeComponent implements OnInit, OnDestroy {
   goToSlide(index: number): void {
     this.currentIndex = index;
     this.startAutoSlide();
+  }
+
+  // Llamadas al Backend
+  obtenerCategorias(): void {
+    this.http.get<Categoria[]>('http://localhost:3000/api/categorias')
+      .subscribe({
+        next: (data) => this.categorias.set(data),
+        error: (err) => console.error('Error al obtener categorías:', err)
+      });
+  }
+
+  obtenerProductos(): void {
+    this.productService.getProductosDestacados().subscribe({
+      next: (data) => {
+        this.productosDestacados = data;
+      },
+      error: (err) => {
+        console.error('Error al conectar con la API:', err);
+      }
+    });
   }
 }

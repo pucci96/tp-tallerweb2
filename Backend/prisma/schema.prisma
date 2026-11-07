@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  
   provider = "prisma-client-js"
   
 }
@@ -62,6 +61,7 @@ model Producto {
     estilo          Producto_estilo[]
     detalle         Producto_detalles[]
     imagen           String?
+    destacado     Boolean      @default(false)
 }
 
 model Producto_estilo {

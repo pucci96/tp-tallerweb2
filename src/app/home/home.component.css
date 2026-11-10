@@ -188,7 +188,42 @@
   width: 24px;
   background-color: #0d6efd;
 }
+.products-section {
+  width: 92%;
+  margin: 2rem auto 3.5rem auto;
+  box-sizing: border-box;
+}
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+}
+
+.see-more-link {
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.see-more-link:hover {
+  text-decoration: underline;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 1.5rem;
+}
 /* Ajustes Responsive */
 @media (max-width: 768px) {
   .carousel-slide {

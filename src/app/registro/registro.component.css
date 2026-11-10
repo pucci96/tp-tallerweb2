@@ -1,0 +1,517 @@
+:host {
+  display: block;
+  background-color: #f7f9ff;
+  min-height: 100%;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  color: #181c20;
+}
+
+.registro-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 2rem 1rem 3rem;
+  display: flex;
+  justify-content: center;
+}
+
+.registro-wrapper {
+  width: 100%;
+  max-width: 540px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Notice pill */
+.notice-pill {
+  width: 100%;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0.75rem;
+  background: #e5e8ee;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.notice-left {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  color: #424655;
+  font-size: 0.75rem;
+}
+
+.notice-icon {
+  width: 18px;
+  height: 18px;
+  color: #0057cd;
+}
+
+.notice-badge {
+  background: #ffffff;
+  color: #0057cd;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Card */
+.registro-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.075);
+  padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .registro-card {
+    padding: 2rem;
+  }
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #dae2ff;
+  color: #0057cd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.card-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #181c20;
+  margin: 0;
+}
+
+.card-subtitle {
+  font-size: 0.875rem;
+  color: #424655;
+  margin: 0.25rem 0 0;
+  max-width: 24rem;
+}
+
+/* Alert */
+.alert-error {
+  background: #ffdad6;
+  color: #93000a;
+  border: 1px solid #fecaca;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+}
+
+/* Form */
+.registro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #181c20;
+  margin-bottom: 0.25rem;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status svg {
+  width: 15px;
+  height: 15px;
+}
+
+.status-valid {
+  color: #006c40;
+}
+.status-error {
+  color: #ba1a1a;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 1.5px #c2c6d8;
+  transition: box-shadow 0.2s ease;
+}
+
+.input-wrapper:focus-within {
+  box-shadow: 0 0 0 3px rgba(0, 87, 205, 0.25);
+}
+
+.input-wrapper input {
+  width: 100%;
+  height: 2.5rem;
+  border: none;
+  background: transparent;
+  padding: 0 0.75rem;
+  padding-right: 2.25rem;
+  font-size: 1rem;
+  color: #181c20;
+  outline: none;
+  border-radius: 0.5rem;
+}
+
+.input-wrapper input.input-valid {
+  box-shadow: none;
+}
+
+.input-wrapper:has(.input-valid) {
+  box-shadow: 0 0 0 1.5px #198754;
+}
+
+.input-wrapper:has(.input-invalid) {
+  box-shadow: 0 0 0 1.5px #ba1a1a;
+}
+
+.input-icon {
+  position: absolute;
+  right: 0.75rem;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.icon-valid {
+  color: #006c40;
+}
+.icon-error {
+  color: #ba1a1a;
+}
+
+.input-actions {
+  position: absolute;
+  right: 0.625rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.btn-toggle-eye {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: #424655;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-toggle-eye svg {
+  width: 19px;
+  height: 19px;
+}
+
+.btn-toggle-eye:hover {
+  color: #181c20;
+}
+
+.feedback {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.feedback-valid {
+  color: #006c40;
+}
+.feedback-error {
+  color: #ba1a1a;
+  font-weight: 500;
+}
+
+/* Strength */
+.strength-box {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #ebeef3;
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.strength-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: #424655;
+}
+
+.strength-label {
+  font-weight: 700;
+}
+
+.strength-weak {
+  color: #ba1a1a;
+}
+.strength-mid {
+  color: #b45309;
+}
+.strength-strong {
+  color: #006c40;
+}
+
+.strength-track {
+  width: 100%;
+  height: 6px;
+  background: #e0e3e8;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+.fill-weak {
+  background: #ba1a1a;
+}
+.fill-mid {
+  background: #d97706;
+}
+.fill-strong {
+  background: #198754;
+}
+
+.req-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 0.5rem;
+  margin-top: 0.25rem;
+  color: #424655;
+  font-size: 0.75rem;
+}
+
+.req-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.req-item svg {
+  width: 15px;
+  height: 15px;
+}
+
+.req-ok {
+  color: #006c40;
+}
+.req-bad {
+  color: #ba1a1a;
+}
+.req-neutral {
+  color: #424655;
+  opacity: 0.7;
+}
+
+/* Terms */
+.terms-row {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.checkbox-wrap {
+  display: flex;
+  align-items: center;
+  height: 1.25rem;
+}
+
+.checkbox-input {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  accent-color: #0057cd;
+  cursor: pointer;
+}
+
+.terms-label {
+  font-size: 0.875rem;
+  color: #424655;
+  line-height: 1.25;
+  cursor: pointer;
+}
+
+.link {
+  color: #0057cd;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Submit */
+.submit-wrap {
+  margin-top: 0.25rem;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  background: #0057cd;
+  color: #ffffff;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease,
+    box-shadow 0.2s ease;
+}
+
+.btn-submit:hover {
+  background: #0d6efd;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-submit svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Card footer */
+.card-footer {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 0;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.card-footer p {
+  font-size: 0.875rem;
+  color: #424655;
+  margin: 0;
+}
+
+/* Trust badges */
+.trust-row {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #424655;
+  font-size: 0.75rem;
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: #ffffff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.trust-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.trust-badge:nth-child(1) svg {
+  color: #006c40;
+}
+.trust-badge:nth-child(2) svg {
+  color: #0057cd;
+}
+.trust-badge:nth-child(3) svg {
+  color: #424655;
+}

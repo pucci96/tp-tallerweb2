@@ -1,10 +1,12 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  
+  provider = "prisma-client-js"
+  
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Login {
@@ -41,7 +43,7 @@ model Categoria {
 
 model Subcategoria {
     id              Int     @id @default(autoincrement())
-    id_categoria    Int     @unique
+    id_categoria    Int     
     nombre          String  
     Producto        Producto[]
     categoria       Categoria @relation(fields: [id_categoria], references: [id])
@@ -49,15 +51,17 @@ model Subcategoria {
 
 model Producto {
     id              Int     @id @default(autoincrement())
-    id_categoria    Int     @unique
-    id_subcategoria Int     @unique
+    id_categoria    Int     
+    id_subcategoria Int     
     nombre          String
     stock           Int
     precio          Decimal
     categoria       Categoria @relation(fields: [id_categoria], references: [id], map:"deProductoACategoria")
-    subcategoria    Subcategoria @relation(fields: [id_categoria], references: [id])
+    subcategoria    Subcategoria @relation(fields: [id_subcategoria], references: [id])
     estilo          Producto_estilo[]
     detalle         Producto_detalles[]
+    imagen           String?
+    destacado     Boolean      @default(false)
 }
 
 model Producto_estilo {

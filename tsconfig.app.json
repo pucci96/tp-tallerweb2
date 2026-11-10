@@ -7,7 +7,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "Backend/src/prisma.config.ts"  ],
   "exclude": [
     "src/**/*.spec.ts"
   ]

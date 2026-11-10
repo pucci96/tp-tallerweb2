@@ -1,0 +1,28 @@
+<article class="card">
+ 
+  <div class="card-image-box">
+    <span class="category-badge">{{ product.category }}</span>
+    <img [src]="product.imageUrl" [alt]="product.title" class="product-img" />
+  </div>
+
+  
+  <div class="card-content">
+    <h3 class="product-title" [title]="product.title">{{ product.title }}</h3>
+    <p class="product-description">{{ product.description }}</p>
+
+   
+    <div class="card-footer">
+      <div class="price-box">
+        <span class="price-label">Precio contado</span>
+        <strong class="price-value">$ {{ product.price | number:'1.0-0' }} ARS</strong>
+      </div>
+
+      <button class="btn-detail" type="button" aria-label="Ver detalle del producto">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
+    </div>
+  </div>
+</article>

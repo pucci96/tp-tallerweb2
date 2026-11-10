@@ -1,0 +1,154 @@
+<div class="catalogo-wrapper">
+  <!-- Breadcrumb superior -->
+  <div class="top-nav-bar">
+    <div class="breadcrumb">
+      <a routerLink="/">Inicio</a> / <span>Productos</span>
+    </div>
+    <div class="stock-status">
+      <span class="pulse-dot"></span> Stock en tiempo real para envíos a toda Argentina
+    </div>
+  </div>
+
+  <!-- Barra de búsqueda y controles -->
+  <div class="search-controls-bar">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        placeholder="Buscar por nombre, modelo o marca..." 
+      />
+      <button class="btn-search">Buscar</button>
+    </div>
+
+    <div class="results-stats">
+      <span class="count-badge">{{ productosFiltrados.length }}</span> productos encontrados
+    </div>
+
+    <div class="sort-box">
+      <label>Ordenar por:</label>
+      <select [(ngModel)]="ordenSeleccionado">
+        <option value="asc">Precio menor a mayor</option>
+        <option value="desc">Precio mayor a menor</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Contenedor principal: Sidebar + Grid -->
+  <div class="catalogo-layout">
+    
+    <!-- Sidebar de Filtros -->
+    <aside class="filters-sidebar">
+      <div class="filter-card">
+        <div class="filter-header">
+          <h3>
+            <svg class="cat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            Categorías
+          </h3>
+          <span class="meta-count">{{ categorias.length }} ramas</span>
+        </div>
+
+        <ul class="category-list">
+          <li [class.active]="categoriaSeleccionadaId === null" (click)="seleccionarCategoria(null)">
+            <span class="cat-label">Todas</span>
+            <span class="badge-pill">{{ productos.length }}</span>
+          </li>
+          @for (cat of categorias; track cat.id) {
+            <li [class.active]="categoriaSeleccionadaId === cat.id" (click)="seleccionarCategoria(cat.id)">
+              <span class="cat-label">{{ cat.nombre }}</span>
+            </li>
+          }
+        </ul>
+
+        <div class="divider"></div>
+
+        <!-- Rango de Precio -->
+        <div class="price-filter">
+          <div class="price-header">
+            <label>Rango de precio ($ ARS)</label>
+            <span class="current-price">${{ precioMax | number:'1.0-0' }}</span>
+          </div>
+          <input 
+            type="range" 
+            min="50000" 
+            max="1500000" 
+            step="10000" 
+            [(ngModel)]="precioMax" 
+            class="range-slider"
+          />
+          <div class="range-limits">
+            <span>$50.000</span>
+            <span>$1.500.000</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Checkboxes de filtro -->
+        <div class="checkbox-group">
+          <label class="custom-checkbox">
+            <input type="checkbox" [(ngModel)]="soloStock" />
+            <span>Solo con stock inmediato</span>
+          </label>
+          <label class="custom-checkbox">
+            <input type="checkbox" [(ngModel)]="envioGratis" />
+            <span>Envío gratis</span>
+          </label>
+        </div>
+
+        <button class="btn-clean-filters" (click)="limpiarFiltros()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="icon-refresh">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+          </svg>
+          Limpiar filtros
+        </button>
+      </div>
+
+      <!-- Banner izquieras "cuotas sin interes" -->
+      <div class="promo-banner-card">
+        <div class="promo-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+            <line x1="1" y1="10" x2="23" y2="10"></line>
+          </svg>
+          Cuotas sin interés
+        </div>
+        <p>3 y 6 cuotas fijas con bancos adheridos en hardware seleccionado de alta gama.</p>
+      </div>
+    </aside>
+
+    <!-- Grilla de Productos -->
+    <main class="products-grid-container">
+      <div class="catalog-grid">
+  @for (prod of productosFiltrados; track prod.id) {
+    <app-product-card [product]="prod"></app-product-card>
+  } @empty {
+    <div class="empty-state">
+      <p>No se encontraron productos con los filtros seleccionados.</p>
+    </div>
+  }
+</div>
+
+      <!-- Paginador decorativo inferior -->
+      <div class="pagination-wrapper">
+        <span class="pagination-info">Mostrando 1 a {{ productosFiltrados.length }} productos</span>
+        <div class="pagination-controls">
+          <button class="page-nav" disabled>&lt; Anterior</button>
+          <button class="page-num active">1</button>
+          <button class="page-num">2</button>
+          <button class="page-num">3</button>
+          <button class="page-nav">Siguiente &gt;</button>
+        </div>
+      </div>
+    </main>
+
+  </div>
+</div>

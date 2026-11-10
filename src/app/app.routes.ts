@@ -4,12 +4,16 @@ import {PerfilComponent} from './perfil/perfil.component';
 import { LoginComponent } from './login/login.component';
 import { RegistroComponent } from './registro/registro.component';
 import { DetallesProductoComponent } from './detalles-producto/detalles-producto.component';
+import { CatalogoProductoComponent } from './catalogo-producto/catalogo-producto.component';
 
 export const routes: Routes = [
 {
     path:'',
     component: HomeComponent
 },
+{ 
+    path: 'productos', 
+    component: CatalogoProductoComponent },
 {
     path: 'home',
     component: HomeComponent
@@ -34,5 +38,6 @@ export const routes: Routes = [
     path: '**',
     redirectTo:'home'
 }
+
 
 ];

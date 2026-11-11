@@ -1,0 +1,79 @@
+<div class="form-wrapper">
+  <div class="form-header">
+    <a routerLink="/admin/productos" class="back-link">← Volver al inventario</a>
+    <h2>{{ esModoEdicion ? 'Editar Producto #' + productoId : 'Crear Nuevo Producto' }}</h2>
+  </div>
+
+  @if (mensajeError) {
+    <div class="error-banner">{{ mensajeError }}</div>
+  }
+
+  <form [formGroup]="productoForm" (ngSubmit)="guardar()" class="main-form">
+    <div class="form-field">
+      <label for="nombre">Nombre del Producto *</label>
+      <input id="nombre" type="text" formControlName="nombre" placeholder="Ej: Teclado Logitech Pop Icon" />
+    </div>
+
+    <!-- Fila con Categoría y Subcategoría en cascada -->
+    <div class="form-grid-2">
+      <div class="form-field">
+        <label for="id_categoria">1. Categoría Principal *</label>
+        <select id="id_categoria" formControlName="id_categoria">
+          <option value="" disabled>Seleccionar categoría...</option>
+          @for (cat of categorias; track cat.id) {
+            <option [value]="cat.id">{{ cat.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label for="id_subcategoria">2. Subcategoría *</label>
+        <select id="id_subcategoria" formControlName="id_subcategoria">
+          <option value="" disabled>
+            {{ subcategoriasFiltradas.length === 0 ? 'Primero elija categoría' : 'Seleccionar subcategoría...' }}
+          </option>
+          @for (sub of subcategoriasFiltradas; track sub.id) {
+            <option [value]="sub.id">{{ sub.nombre }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Fila de Precio y Stock -->
+    <div class="form-grid-2">
+      <div class="form-field">
+        <label for="precio">Precio ($ ARS) *</label>
+        <input id="precio" type="number" formControlName="precio" placeholder="Ej: 120000" />
+      </div>
+
+      <div class="form-field">
+        <label for="stock">Stock Inicial *</label>
+        <input id="stock" type="number" formControlName="stock" placeholder="0" />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="imagen">URL de Imagen</label>
+      <input id="imagen" type="url" formControlName="imagen" placeholder="https://..." />
+    </div>
+
+    <div class="form-field">
+      <label for="descripcion">Especificaciones / Detalles</label>
+      <textarea id="descripcion" rows="3" formControlName="descripcion" placeholder="Detalles de switches, conectividad..."></textarea>
+    </div>
+
+    <div class="form-checkbox">
+      <label>
+        <input type="checkbox" formControlName="destacado" />
+        <span>Destacar este producto en la página principal</span>
+      </label>
+    </div>
+
+    <div class="form-actions">
+      <a routerLink="/admin/productos" class="btn-cancel">Cancelar</a>
+      <button type="submit" class="btn-submit" [disabled]="cargando">
+        {{ cargando ? 'Guardando...' : (esModoEdicion ? 'Actualizar Producto' : 'Guardar Producto') }}
+      </button>
+    </div>
+  </form>
+</div>

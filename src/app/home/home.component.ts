@@ -29,11 +29,10 @@ export interface Categoria {
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  // Inyecciones de dependencias
   private http = inject(HttpClient);
   private productService = inject(ProductService);
 
-
+  // Sliders
   slides: Slide[] = [
     {
       badge: 'Lanzamiento Exclusivo',
@@ -66,22 +65,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   currentIndex: number = 0;
   private intervalId: any;
 
-  // Estado para datos desde la API
+  
   protected readonly categorias = signal<Categoria[]>([]);
   productosDestacados: Product[] = [];
 
-  // Ciclo de vida
   ngOnInit(): void {
     this.startAutoSlide();
     this.obtenerCategorias();
-    this.obtenerProductos();
+    this.obtenerProductosDestacados();
   }
 
   ngOnDestroy(): void {
     this.stopAutoSlide();
   }
 
-  //  slider
+  // Slider
   startAutoSlide(): void {
     this.stopAutoSlide();
     this.intervalId = setInterval(() => {
@@ -108,22 +106,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.startAutoSlide();
   }
 
-  // Llamadas al Backend
+ 
   obtenerCategorias(): void {
-    this.http.get<Categoria[]>('http://localhost:3000/api/categorias')
-      .subscribe({
-        next: (data) => this.categorias.set(data),
-        error: (err) => console.error('Error al obtener categorías:', err)
-      });
+    this.http.get<Categoria[]>('http://localhost:3000/api/categorias').subscribe({
+      next: (data) => this.categorias.set(data),
+      error: (err) => console.error('Error al obtener categorías:', err)
+    });
   }
 
-  obtenerProductos(): void {
-    this.productService.getProductosDestacados().subscribe({
-      next: (data) => {
-        this.productosDestacados = data;
+  obtenerProductosDestacados(): void {
+    
+    const stream$ = typeof this.productService.getProductosDestacados === 'function'
+      ? this.productService.getProductosDestacados()
+      : this.productService.obtenerProductos();
+
+    stream$.subscribe({
+      next: (data: Product[]) => {
+        const destacados = data.filter((p: any) => p.destacado);
+        this.productosDestacados = destacados.length > 0 ? destacados : data.slice(0, 4);
       },
-      error: (err) => {
-        console.error('Error al conectar con la API:', err);
+      error: (err: any) => {
+        console.error('Error al cargar productos destacados:', err);
       }
     });
   }

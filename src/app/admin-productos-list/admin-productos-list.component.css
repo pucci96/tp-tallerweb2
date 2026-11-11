@@ -1,0 +1,152 @@
+.admin-page {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.header-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.header-toolbar h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.header-toolbar p {
+  color: #6b7280;
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0 0;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.table-container {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.admin-table th {
+  background: #f9fafb;
+  padding: 0.85rem 1.25rem;
+  font-weight: 600;
+  color: #4b5563;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+}
+
+.cell-product {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.prod-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.sub-text {
+  display: block;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.badge-cat {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.badge-stock {
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.stock-ok { background: #dcfce7; color: #15803d; }
+.stock-low { background: #fef9c3; color: #854d0e; }
+.stock-empty { background: #fee2e2; color: #b91c1c; }
+
+.pill-badge.destacado {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.text-right { text-align: right; }
+
+.cell-actions {
+  text-align: right;
+}
+
+.btn-action {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1px solid #d1d5db;
+  text-decoration: none;
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
+.btn-action.edit {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.btn-action.delete {
+  background: #fff;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+
+.btn-action.delete:hover {
+  background: #fef2f2;
+}
+
+.empty-cell {
+  text-align: center;
+  padding: 2.5rem;
+  color: #6b7280;
+}

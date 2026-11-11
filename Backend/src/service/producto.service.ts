@@ -1,5 +1,7 @@
 import { ProductoRepository } from '../repository/producto.repository';
-import { ProductoCardDTO, CrearProductoDTO } from '../models/producto.dto';
+import { ProductoCardDTO, CrearProductoDTO, GuardarProductoDTO,ProductoAdminDTO } from '../models/producto.dto';
+
+
 
 export class ProductoService {
   private productoRepo = new ProductoRepository();
@@ -34,5 +36,53 @@ export class ProductoService {
       throw new Error('El stock no puede ser negativo');
     }
     return this.productoRepo.crear(dto);
+  }
+
+  private formatearAdminDTO(p: any): ProductoAdminDTO {
+    return {
+      id: p.id,
+      nombre: p.nombre,
+      precio: Number(p.precio),
+      stock: p.stock,
+      imagen: p.imagen,
+      destacado: p.destacado,
+      id_categoria: p.id_categoria,
+      categoriaNombre: p.categoria?.nombre || 'General',
+      id_subcategoria: p.id_subcategoria,
+      subcategoriaNombre: p.subcategoria?.nombre || 'General',
+      descripcion: p.detalle?.[0]?.descripcion || ''
+    };
+  }
+
+  async listarAdmin(): Promise<ProductoAdminDTO[]> {
+    const lista = await this.productoRepo.obtenerTodos();
+    return lista.map(p => this.formatearAdminDTO(p));
+  }
+
+  async obtenerPorId(id: number): Promise<ProductoAdminDTO> {
+    const p = await this.productoRepo.obtenerPorId(id);
+    if (!p) throw new Error('Producto no encontrado');
+    return this.formatearAdminDTO(p);
+  }
+
+  async crear(dto: GuardarProductoDTO) {
+    if (!dto.nombre || dto.nombre.trim().length === 0) throw new Error('El nombre es obligatorio');
+    if (dto.precio <= 0) throw new Error('El precio debe ser mayor a 0');
+    if (dto.stock < 0) throw new Error('El stock no puede ser negativo');
+    if (!dto.id_categoria) throw new Error('Debe seleccionar una categoría');
+    if (!dto.id_subcategoria) throw new Error('Debe seleccionar una subcategoría');
+
+    return this.productoRepo.crear(dto);
+  }
+
+  async actualizar(id: number, dto: GuardarProductoDTO) {
+    if (dto.precio <= 0) throw new Error('El precio debe ser mayor a 0');
+    if (dto.stock < 0) throw new Error('El stock no puede ser negativo');
+
+    return this.productoRepo.actualizar(id, dto);
+  }
+
+  async eliminar(id: number) {
+    return this.productoRepo.eliminar(id);
   }
 }

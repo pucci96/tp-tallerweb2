@@ -13,7 +13,7 @@
 
     @if (isError()) {
       <div class="alert-error">
-        Email o contraseña incorrectos. Verificá las credenciales e intentá nuevamente.
+        {{mensajeError() || 'Email o contraseña incorrectos. Verificá las credenciales e intentá nuevamente.'}}
       </div>
     }
 

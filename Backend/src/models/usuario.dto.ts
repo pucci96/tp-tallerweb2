@@ -1,29 +1,34 @@
 export interface UsuarioDTO {
     id: number;
-//TODO: Agregar campos necesarios
+    email: string;
+    nombre: string;
+    apellido: string;
+    direccion: string;
+    rol: string;
 }
 
 export interface LoginDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+    token: string;
+    usuario: UsuarioDTO;
 }
 
 export interface RolDTO {
     id: number;
-//TODO: Agregar campos necesarios
+    nombre: string;
 }
 
 export interface CrearUsuarioDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+    nombre: string;
+    apellido: string;
+    email: string;
+    direccion: string;
 }
 
 export interface CrearLoginDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+    email: string;
+    password: string;
 }
 
 export interface CrearRolDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+    nombre: string;
 }

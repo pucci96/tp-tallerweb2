@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { prisma } from './src/config/prisma';
 import productoRoutes from './src/routes/producto.routes';
+import usuarioRoutes from './src/routes/usuario.routes';
 
 const app = express();
 const PORT = 3000;
@@ -11,6 +12,7 @@ app.use(express.json());
 
 
 app.use('/api/productos', productoRoutes);
+app.use('/api/usuarios', usuarioRoutes);
 
 app.get('/api/categorias', async (_req, res) => {
   try {

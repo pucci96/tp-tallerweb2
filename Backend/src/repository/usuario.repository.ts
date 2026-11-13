@@ -1,28 +1,98 @@
 import { prisma } from '../config/prisma';
 import { CrearUsuarioDTO , CrearRolDTO , CrearLoginDTO } from '../models/usuario.dto';
+import { Usuario } from '../../../src/generated/prisma/browser';
 
 export class UsuarioRepository {
-    async obtenerDatosUsuario(id_usuario: number) {
-        //TODO: Implementar la lógica para obtener datos del usuario por su ID
+    async login(email: string) {
+        return prisma.login.findUnique({
+            where: {email},
+            include: {
+                rol: true,
+                usuario: true,
+            },
+        });
     }
 
-    async login(email: string, password: string) {
-        //TODO: Implementar la lógica para el inicio de sesión
+    async existeEmail(email: string) : Promise<boolean> {
+        const login = await prisma.login.findUnique({
+          where: {email},
+          select: {id: true},
+        });
+        return login !== null;
+    }
+
+    async buscarRolPorNombre(nombre: string) {
+        return prisma.rol.findUnique({
+            where: {nombre},
+        });
+    }
+
+    async crearUsuario(dataUsuario: CrearUsuarioDTO, dataLogin: CrearLoginDTO, id_rol: number){
+        return prisma.$transaction(async (tx) => {
+          const login = await tx.login.create({
+            data: {
+              email: dataLogin.email,
+              password: dataLogin.password,
+              id_rol: id_rol,
+            },
+          });
+
+          const usuario = await tx.usuario.create({
+            data: {
+              email: dataUsuario.email,
+              nombre: dataUsuario.nombre,
+              apellido: dataUsuario.apellido,
+              direccion: dataUsuario.direccion,
+            },
+          });
+
+          return {login, usuario};
+        });
+    }
+
+    async obtenerDatosUsuario(id_usuario: number) {
+      return prisma.usuario.findUnique({
+        where: {id: id_usuario},
+        include: {
+          login: {
+            include: {rol: true},
+          },
+        },
+      });
     }
 
     async obtenerRol(id_usuario: number) {
-        //TODO: Implementar la lógica para obtener el rol del usuario por su ID
+      const usuario = await prisma.usuario.findUnique({
+        where: {id: id_usuario},
+        select: {
+          login: {
+            select: {rol: true},
+          },
+        },
+      });
+
+      return usuario?.login.rol ?? null;
     }
 
-    async crearUsuario(dataUsuario: CrearUsuarioDTO, dataLogin: CrearLoginDTO) {
-        //TODO: Implementar la lógica para crear un nuevo usuario
-    }
-
-    async crearRol(data: CrearRolDTO) {
-        //TODO: Implementar la lógica para crear un nuevo rol
+    async crearRol(data: CrearRolDTO){
+      return prisma.rol.create({
+        data: {nombre: data.nombre},
+      });
     }
 
     async asignarRol(id_usuario: number, id_rol: number) {
-        //TODO: Implementar la lógica para asignar un rol a un usuario
+      const usuario = await prisma.usuario.findUnique({
+        where: {id: id_usuario},
+        select: {email: true},
+      });
+
+      if(!usuario) {
+        throw new Error('El usuario no fue encontrado');
+      }
+
+      return prisma.login.update({
+        where: {email: usuario.email},
+        data: {id_rol},
+      });
     }
 }

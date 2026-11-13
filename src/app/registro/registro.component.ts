@@ -1,6 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-registro',
@@ -9,6 +11,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.css'],
 })
+
 export class RegistroComponent {
   nombre = '';
   apellido = '';
@@ -21,6 +24,12 @@ export class RegistroComponent {
   readonly isSuccess = signal(false);
   readonly isError = signal(false);
   readonly showPassword = signal(false);
+  readonly mensajeError = signal('');
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   togglePasswordVisibility(): void {
     this.showPassword.update((value) => !value);
@@ -28,6 +37,7 @@ export class RegistroComponent {
 
   clearError(): void {
     if (this.isError()) {
+      this.mensajeError.set('');
       this.isError.set(false);
     }
   }
@@ -99,19 +109,33 @@ export class RegistroComponent {
       return;
     }
 
+    if (!this.isFormValid()) {
+      this.isError.set(true);
+      return;
+    }
+
     this.isSubmitting.set(true);
     this.isSuccess.set(false);
     this.isError.set(false);
+    this.mensajeError.set('');
 
-    setTimeout(() => {
-      this.isSubmitting.set(false);
-
-      if (this.isFormValid()) {
+    this.authService.registrar({
+      nombre: this.nombre.trim(),
+      apellido: this.apellido.trim(),
+      email: this.email.trim().toLowerCase(),
+      direccion: this.direccion.trim(),
+      password: this.password,
+    }).subscribe({
+      next: () => {
+        this.isSubmitting.set(false);
         this.isSuccess.set(true);
-        setTimeout(() => this.isSuccess.set(false), 1800);
-      } else {
+        setTimeout(() => this.router.navigate(['/login']), 1500);
+      },
+      error: (error) => {
+        this.isSubmitting.set(false);
         this.isError.set(true);
-      }
-    }, 1000);
+        this.mensajeError.set(error?.error?.error || 'No se pudo crear la cuenta');
+      },
+    });
   }
 }

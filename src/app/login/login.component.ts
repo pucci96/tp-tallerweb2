@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -18,6 +19,12 @@ export class LoginComponent {
   readonly isSuccess = signal(false);
   readonly isError = signal(false);
   readonly showPassword = signal(false);
+  readonly mensajeError = signal('');
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   togglePasswordVisibility(): void {
     this.showPassword.update((value) => !value);
@@ -26,6 +33,7 @@ export class LoginComponent {
   clearError(): void {
     if (this.isError()) {
       this.isError.set(false);
+      this.mensajeError.set('');
     }
   }
 
@@ -38,19 +46,18 @@ export class LoginComponent {
     this.isSuccess.set(false);
     this.isError.set(false);
 
-    setTimeout(() => {
-      const isValid =
-        this.email.trim().toLowerCase() === 'admin@tecno.com' &&
-        this.password === 'admin123';
-
-      this.isSubmitting.set(false);
-
-      if (isValid) {
+    this.authService.login(this.email.trim().toLowerCase(), this.password).subscribe({
+      next: (respuesta) => {
+        this.authService.guardarSesion(respuesta);
+        this.isSubmitting.set(false);
         this.isSuccess.set(true);
-        setTimeout(() => this.isSuccess.set(false), 1800);
-      } else {
+        setTimeout(() => this.router.navigate(['/']), 800);
+      },
+      error: (error) => {
+        this.isSubmitting.set(false);
         this.isError.set(true);
-      }
-    }, 1000);
+        this.mensajeError.set(error?.error?.error || 'Credenciales inválidas');
+      },
+    });
   }
 }

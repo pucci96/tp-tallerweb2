@@ -1,19 +1,29 @@
 export interface PedidoDTO {
     id: number;
-//TODO: Agregar campos necesarios
+    fecha: Date;
+    estado: string;
+    productos?: PedidoProductoDTO[];
 }
 
 export interface PedidoProductoDTO {
     id: number;
-//TODO: Agregar campos necesarios
+    id_pedido: number;
+    producto: string;
+    categoria: string;
+    subcategoria: string;
+    precio: number;
+
 }
 
 export interface CrearPedidoDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+   estado?: string;
+
 }
 
 export interface CrearPedidoProductoDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+   id_pedido: number;
+    producto: string;
+    categoria: string;
+    subcategoria: string;
+    precio: number;
 }

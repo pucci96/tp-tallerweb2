@@ -6,7 +6,8 @@ export class PedidoController {
 
     obtenerPedidosDelUsuario = async (req: Request, res: Response) => {
         try {
-            const idUsuario = parseInt(req.params.idUsuario, 10);
+            //  agregar el "as string" o el signo "!" para asegurar que es un string
+            const idUsuario = parseInt(req.params.idUsuario as string, 10);
             const pedidos = await this.pedidoService.obtenerPedidosDelUsuario(idUsuario);
             res.json(pedidos);
         } catch (error) {
@@ -17,7 +18,8 @@ export class PedidoController {
 
     obtenerProductosDelPedido = async (req: Request, res: Response) => {
         try {
-            const idPedido = parseInt(req.params.idPedido, 10);
+            // verificar que req.params.idPedido se trate como string
+            const idPedido = parseInt(req.params.idPedido as string, 10);
             const productos = await this.pedidoService.obtenerProductosDelPedido(idPedido);
             res.json(productos);
         } catch (error) {

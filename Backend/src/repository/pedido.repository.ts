@@ -1,20 +1,41 @@
 import { prisma } from '../config/prisma';
-import { CrearPedidoDTO , CrearPedidoProductoDTO } from '../models/pedido.dto';
+import { CrearPedidoDTO, CrearPedidoProductoDTO } from '../models/pedido.dto';
 
 export class PedidoRepository {
+
     async obtenerPedidosDelUsuario(idUsuario: number) {
-        //TODO: Implementar la lógica para obtener los pedidos de un usuario
+        // Trae los pedidos con sus productos asociados según el schema original
+        return prisma.pedido.findMany({
+            include: {
+                productos: true
+            }
+        });
     }
 
     async obtenerProductosDelPedido(idPedido: number) {
-        //TODO: Implementar la lógica para obtener los productos de un pedido
+        return prisma.pedido_productos.findMany({
+            where: { id_pedido: Number(idPedido) }
+        });
     }
 
     async crearPedido(data: CrearPedidoDTO) {
-        //TODO: Implementar la lógica para crear un nuevo pedido
+        return prisma.pedido.create({
+            data: {
+                estado: data.estado || 'carrito',
+                fecha: new Date()
+            }
+        });
     }
 
     async crearPedidoProducto(data: CrearPedidoProductoDTO) {
-        //TODO: Implementar la lógica para crear un nuevo producto en un pedido
+        return prisma.pedido_productos.create({
+            data: {
+                id_pedido: Number(data.id_pedido),
+                producto: data.producto,
+                categoria: data.categoria,
+                subcategoria: data.subcategoria,
+                precio: Number(data.precio)
+            }
+        });
     }
 }

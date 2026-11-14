@@ -8,6 +8,7 @@ const controller = new ProductoController();
 // Públicas (catálogo)
 router.get('/', controller.obtenerCatalogo);
 router.get('/destacados', controller.obtenerDestacados);
+router.get('/:id', controller.obtenerDetalle); // después de /destacados, para que no la tome como un id
 
 // Administración: requieren token de un usuario ADMIN
 router.get('/admin/listado', ...soloAdmin, controller.listarAdmin);

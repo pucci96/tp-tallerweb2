@@ -14,6 +14,11 @@ export class ProductoController {
     res.json(await this.productoService.obtenerCatalogo());
   };
 
+  obtenerDetalle = async (req: Request, res: Response) => {
+    const id = parseId(req.params['id'], 'id de producto');
+    res.json(await this.productoService.obtenerDetalle(id));
+  };
+
   listarAdmin = async (_req: Request, res: Response) => {
     res.json(await this.productoService.listarAdmin());
   };

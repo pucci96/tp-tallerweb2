@@ -26,6 +26,27 @@ export interface ProductoAdminDTO {
   descripcion: string;
 }
 
+/** Par nombre/descripción (especificaciones y estilos del producto). */
+export interface ProductoAtributoDTO {
+  nombre: string;
+  descripcion: string;
+}
+
+/** Producto completo para la página pública de detalle. */
+export interface ProductoDetalleDTO {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  stock: number;
+  imagen: string;
+  destacado: boolean;
+  categoria: { id: number; nombre: string };
+  subcategoria: { id: number; nombre: string };
+  especificaciones: ProductoAtributoDTO[];
+  estilos: ProductoAtributoDTO[];
+}
+
 /** Datos para crear o actualizar un producto (formulario de admin). */
 export interface GuardarProductoDTO {
   nombre: string;

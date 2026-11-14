@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService, UsuarioSesion } from '../services/auth.service';
@@ -16,6 +16,7 @@ import { AuthService, UsuarioSesion } from '../services/auth.service';
 export class PerfilComponent implements OnInit {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   mostrarAlertaExito: boolean = false;
   mostrarPassword: boolean = false;
@@ -48,6 +49,12 @@ export class PerfilComponent implements OnInit {
     this.usuario.apellido = datos.apellido;
     this.usuario.email = datos.email;
     this.usuario.direccion = datos.direccion;
+  }
+
+  /** Igual que el botón del header: borra la sesión y vuelve al inicio. */
+  cerrarSesion(): void {
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 
   cerrarAlerta(): void {

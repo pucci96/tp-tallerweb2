@@ -1,12 +1,10 @@
 <section class="banner-wrapper" (mouseenter)="stopAutoSlide()" (mouseleave)="startAutoSlide()">
   <div class="carousel-container">
-    @for (slide of slides; track slide.title; let i = $index) {
+    @for (slide of slides(); track slide.id; let i = $index) {
       <div class="carousel-slide" [class.active]="i === currentIndex()">
         <!-- Columna de texto -->
         <div class="slide-content">
-          <span class="badge" [ngClass]="slide.badgeType === 'success' ? 'badge-success' : 'badge-primary'">
-            {{ slide.badge }}
-          </span>
+          <span class="badge badge-primary">{{ slide.badge }}</span>
           <h2 class="slide-title">{{ slide.title }}</h2>
           <p class="slide-desc">{{ slide.description }}</p>
           <a [routerLink]="slide.link" class="btn-action">
@@ -14,14 +12,14 @@
               <circle cx="12" cy="12" r="10"></circle>
               <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon>
             </svg>
-            {{ slide.buttonText }}
+            Ver producto
           </a>
         </div>
 
-        <!-- Columna de imagen -->
-        <div class="slide-image-wrapper">
+        <!-- Columna de imagen: lleva al detalle del producto -->
+        <a class="slide-image-wrapper" [routerLink]="slide.link" [attr.aria-label]="'Ver ' + slide.title">
           <img [src]="slide.imageUrl" [alt]="slide.title" class="slide-image" />
-        </div>
+        </a>
       </div>
     }
 
@@ -39,7 +37,7 @@
 
     <!-- Indicadores inferiores -->
     <div class="dots-wrapper">
-      @for (slide of slides; track slide.title; let i = $index) {
+      @for (slide of slides(); track slide.id; let i = $index) {
         <button
           class="dot"
           [class.active]="i === currentIndex()"

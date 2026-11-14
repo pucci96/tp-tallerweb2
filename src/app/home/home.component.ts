@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { ProductCardComponent, Product } from '../productCard/productCard.component';
@@ -54,11 +54,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       imageUrl: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=900&q=80'
     }
   ];
-  currentIndex: number = 0;
-  private intervalId: any;
+  // Señales: en Angular 22 los componentes son OnPush por defecto, así que la vista
+  // solo se actualiza sola cuando cambia una señal (no una variable común).
+  readonly currentIndex = signal(0);
+  private intervalId: ReturnType<typeof setInterval> | undefined;
 
-  
-  productosDestacados: Product[] = [];
+  readonly productosDestacados = signal<Product[]>([]);
 
   ngOnInit(): void {
     this.startAutoSlide();
@@ -84,15 +85,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   nextSlide(): void {
-    this.currentIndex = (this.currentIndex + 1) % this.slides.length;
+    this.currentIndex.update((i) => (i + 1) % this.slides.length);
   }
 
   prevSlide(): void {
-    this.currentIndex = (this.currentIndex - 1 + this.slides.length) % this.slides.length;
+    this.currentIndex.update((i) => (i - 1 + this.slides.length) % this.slides.length);
   }
 
   goToSlide(index: number): void {
-    this.currentIndex = index;
+    this.currentIndex.set(index);
     this.startAutoSlide();
   }
 
@@ -101,12 +102,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.productService.getProductosDestacados().subscribe({
       next: (destacados) => {
         if (destacados.length > 0) {
-          this.productosDestacados = destacados;
+          this.productosDestacados.set(destacados);
           return;
         }
         // Si no hay ninguno marcado como destacado, se muestran los primeros 4 del catálogo
         this.productService.obtenerProductos().subscribe({
-          next: (todos) => (this.productosDestacados = todos.slice(0, 4)),
+          next: (todos) => this.productosDestacados.set(todos.slice(0, 4)),
           error: (err) => console.error('Error al cargar productos:', err),
         });
       },

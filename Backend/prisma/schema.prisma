@@ -25,6 +25,7 @@ model Usuario {
     direccion       String
     login           Login   @relation(fields: [email], references: [email])
     pedidos         Pedido[]
+    comentarios     Comentario[]
 }
 
 model Rol {
@@ -62,6 +63,23 @@ model Producto {
     detalle         Producto_detalles[]
     imagen           String?
     destacado     Boolean      @default(false)
+    comentarios     Comentario[]
+}
+
+// Comentario y calificación (1 a 5 estrellas) de un usuario sobre un producto.
+// Cada usuario puede comentar un mismo producto una sola vez.
+// Si se borra el producto o el usuario, se borran sus comentarios.
+model Comentario {
+    id              Int      @id @default(autoincrement())
+    id_producto     Int
+    id_usuario      Int
+    calificacion    Int
+    texto           String   @db.VarChar(500)
+    fecha           DateTime @default(now())
+    producto        Producto @relation(fields: [id_producto], references: [id], onDelete: Cascade)
+    usuario         Usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
+
+    @@unique([id_producto, id_usuario])
 }
 
 model Producto_estilo {

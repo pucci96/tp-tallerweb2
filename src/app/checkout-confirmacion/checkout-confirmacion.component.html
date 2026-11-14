@@ -36,7 +36,12 @@
                 >+</button>
               </div>
               <p class="cart-item-subtotal">$ {{ item.precio * item.cantidad | number: '1.0-0' }} ARS</p>
-              <button type="button" class="remove-btn" (click)="quitar(item.id)">Eliminar</button>
+              <button
+                type="button"
+                class="remove-btn"
+                (click)="quitar(item.id)"
+                [attr.aria-label]="'Eliminar ' + item.nombre + ' del carrito'"
+              >Eliminar</button>
             </li>
           }
         </ul>

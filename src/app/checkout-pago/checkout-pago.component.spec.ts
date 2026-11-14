@@ -53,6 +53,14 @@ describe('CheckoutPagoComponent', () => {
     expect(el.querySelector('.test-hint')?.textContent).toContain('0000');
   });
 
+  it('debería usar singular cuando hay un solo producto', async () => {
+    cart.cambiarCantidad(1, 1);
+    await fixture.whenStable();
+    const resumen = (fixture.nativeElement as HTMLElement).querySelector('.summary')?.textContent ?? '';
+    expect(resumen).toContain('1 producto');
+    expect(resumen).not.toContain('1 productos');
+  });
+
   it('debería deshabilitar el botón de pago con el formulario inválido', () => {
     const boton = (fixture.nativeElement as HTMLElement).querySelector(
       '[data-test="pagar"]',

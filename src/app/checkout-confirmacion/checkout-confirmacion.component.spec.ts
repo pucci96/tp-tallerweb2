@@ -67,6 +67,12 @@ describe('CheckoutConfirmacionComponent', () => {
     expect(el.textContent).toContain('Tu carrito está vacío');
   });
 
+  it('debería identificar el producto en la etiqueta accesible de "Eliminar"', async () => {
+    TestBed.inject(CartService).agregar({ id: 1, nombre: 'Teclado', precio: 1000, imagen: 't.png' });
+    const el = await crear();
+    expect(el.querySelector('.remove-btn')?.getAttribute('aria-label')).toBe('Eliminar Teclado del carrito');
+  });
+
   it('debería precargar el formulario con el usuario logueado', async () => {
     usuarioActual.set(usuario);
     await crear();

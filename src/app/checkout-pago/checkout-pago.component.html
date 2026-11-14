@@ -76,7 +76,7 @@
     <aside class="card summary">
       <h2 class="section-title">Tu pedido</h2>
       <div class="summary-row">
-        <span>{{ cantidadTotal() }} productos</span>
+        <span>{{ cantidadTotal() }} {{ cantidadTotal() === 1 ? 'producto' : 'productos' }}</span>
         <span>$ {{ total() | number: '1.0-0' }} ARS</span>
       </div>
       <div class="summary-row">

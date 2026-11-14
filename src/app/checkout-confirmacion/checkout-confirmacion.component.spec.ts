@@ -98,6 +98,15 @@ describe('CheckoutConfirmacionComponent', () => {
     expect(cp.valid).toBe(false);
   });
 
+  it('debería rechazar campos de texto compuestos solo por espacios', async () => {
+    await crear();
+    for (const campo of ['nombre', 'apellido', 'direccion', 'ciudad'] as const) {
+      const control = component.form.controls[campo];
+      control.setValue('   ');
+      expect(control.hasError('soloEspacios')).toBe(true);
+    }
+  });
+
   it('debería guardar los datos de envío y navegar al pago', async () => {
     TestBed.inject(CartService).agregar({ id: 1, nombre: 'Teclado', precio: 1000, imagen: 't.png' });
     await crear();

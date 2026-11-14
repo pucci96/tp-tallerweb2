@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { CartService } from '../services/cart.service';
 import { CheckoutService, DatosEnvio } from '../services/checkout.service';
+import { noSoloEspacios } from '../validators/no-solo-espacios.validator';
 
 @Component({
   selector: 'app-checkout-confirmacion',
@@ -24,11 +25,11 @@ export class CheckoutConfirmacionComponent {
   readonly cantidadTotal = this.cart.cantidadTotal;
 
   readonly form = inject(FormBuilder).nonNullable.group({
-    nombre: ['', Validators.required],
-    apellido: ['', Validators.required],
+    nombre: ['', [Validators.required, noSoloEspacios]],
+    apellido: ['', [Validators.required, noSoloEspacios]],
     email: ['', [Validators.required, Validators.email]],
-    direccion: ['', Validators.required],
-    ciudad: ['', Validators.required],
+    direccion: ['', [Validators.required, noSoloEspacios]],
+    ciudad: ['', [Validators.required, noSoloEspacios]],
     codigoPostal: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]{4,8}$/)]],
   });
 

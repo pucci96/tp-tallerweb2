@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../services/cart.service';
 import { CheckoutService, DatosEnvio } from '../services/checkout.service';
 import { PaymentSimulatorService, ResultadoPago } from '../services/payment-simulator.service';
+import { noSoloEspacios } from '../validators/no-solo-espacios.validator';
 import {
   limpiarNumeroTarjeta,
   numeroTarjetaValidator,
@@ -35,7 +36,7 @@ export class CheckoutPagoComponent implements OnInit {
 
   readonly form = inject(FormBuilder).nonNullable.group({
     numero: ['', [Validators.required, numeroTarjetaValidator]],
-    titular: ['', Validators.required],
+    titular: ['', [Validators.required, noSoloEspacios]],
     vencimiento: ['', [Validators.required, vencimientoValidator()]],
     cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]],
   });

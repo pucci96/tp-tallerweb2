@@ -60,6 +60,12 @@ describe('CheckoutPagoComponent', () => {
     expect(boton.disabled).toBe(true);
   });
 
+  it('debería rechazar un titular compuesto solo por espacios', () => {
+    const titular = component.form.controls.titular;
+    titular.setValue('   ');
+    expect(titular.hasError('soloEspacios')).toBe(true);
+  });
+
   it('debería redirigir a /checkout si no hay datos de envío', async () => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({

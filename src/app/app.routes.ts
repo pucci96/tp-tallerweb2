@@ -8,6 +8,7 @@ import { CatalogoProductoComponent } from './catalogo-producto/catalogo-producto
 import { AdminProductosListComponent } from './admin-productos-list/admin-productos-list.component';
 import { AdminProductoFormComponent } from './admin-productos-form/admin-productos-form.component';
 import { adminGuard } from './guards/admin-guard';
+import { CheckoutConfirmacionComponent } from './checkout-confirmacion/checkout-confirmacion.component';
 
 export const routes: Routes = [
 {
@@ -50,8 +51,12 @@ export const routes: Routes = [
   { 
     path: 'admin/productos/editar/:id', 
     component: AdminProductoFormComponent, 
-    canActivate: [adminGuard] 
+    canActivate: [adminGuard]
   },
+{
+    path: 'checkout',
+    component: CheckoutConfirmacionComponent
+},
 {
     path: '**',
     redirectTo:'home'

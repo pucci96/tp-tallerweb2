@@ -77,15 +77,16 @@
           </div>
           <input 
             type="range" 
-            min="50000" 
-            max="1500000" 
-            step="10000" 
-            [(ngModel)]="precioMax" 
+            min="0"
+            [max]="precioTope()"
+            [step]="PASO_PRECIO"
+            [(ngModel)]="precioMax"
             class="range-slider"
           />
+          <!-- El tope sale del producto más caro del catálogo -->
           <div class="range-limits">
-            <span>$50.000</span>
-            <span>$1.500.000</span>
+            <span>$0</span>
+            <span>${{ precioTope() | number:'1.0-0' }}</span>
           </div>
         </div>
 

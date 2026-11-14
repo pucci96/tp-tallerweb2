@@ -1,13 +1,15 @@
 <article class="card">
  
-  <div class="card-image-box">
+  <a class="card-image-box" [routerLink]="['/productos', product.id]" tabindex="-1">
     <span class="category-badge">{{ product.category }}</span>
     <img [src]="product.imageUrl" [alt]="product.title" class="product-img" />
-  </div>
+  </a>
 
-  
+
   <div class="card-content">
-    <h3 class="product-title" [title]="product.title">{{ product.title }}</h3>
+    <h3 class="product-title" [title]="product.title">
+      <a class="product-title-link" [routerLink]="['/productos', product.id]">{{ product.title }}</a>
+    </h3>
     <p class="product-description">{{ product.description }}</p>
 
    
@@ -17,12 +19,12 @@
         <strong class="price-value">$ {{ product.price | number:'1.0-0' }} ARS</strong>
       </div>
 
-      <button class="btn-detail" type="button" aria-label="Ver detalle del producto">
+      <a class="btn-detail" [routerLink]="['/productos', product.id]" aria-label="Ver detalle del producto">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
           <circle cx="12" cy="12" r="3"></circle>
         </svg>
-      </button>
+      </a>
     </div>
   </div>
 </article>

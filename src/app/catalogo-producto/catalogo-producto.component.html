@@ -52,15 +52,15 @@
             </svg>
             Categorías
           </h3>
-          <span class="meta-count">{{ categorias.length }} ramas</span>
+          <span class="meta-count">{{ categorias().length }} ramas</span>
         </div>
 
         <ul class="category-list">
           <li [class.active]="categoriaSeleccionadaId === null" (click)="seleccionarCategoria(null)">
             <span class="cat-label">Todas</span>
-            <span class="badge-pill">{{ productos.length }}</span>
+            <span class="badge-pill">{{ productos().length }}</span>
           </li>
-          @for (cat of categorias; track cat.id) {
+          @for (cat of categorias(); track cat.id) {
             <li [class.active]="categoriaSeleccionadaId === cat.id" (click)="seleccionarCategoria(cat.id)">
               <span class="cat-label">{{ cat.nombre }}</span>
             </li>

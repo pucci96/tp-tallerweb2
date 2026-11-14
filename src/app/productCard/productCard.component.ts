@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 /** Producto tal como lo devuelve el catálogo público (/api/productos). */
 export interface Product {
@@ -17,7 +18,7 @@ export interface Product {
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './productCard.component.html',
   styleUrls: ['./productCard.component.css']
 })

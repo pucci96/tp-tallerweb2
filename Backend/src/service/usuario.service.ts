@@ -2,7 +2,15 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 import { UsuarioRepository } from '../repository/usuario.repository';
-import { UsuarioDTO, LoginDTO, RolDTO, CrearUsuarioDTO, CrearLoginDTO, CrearRolDTO } from '../models/usuario.dto';
+import {
+  UsuarioDTO,
+  LoginDTO,
+  RolDTO,
+  CrearUsuarioDTO,
+  CrearLoginDTO,
+  CrearRolDTO,
+  ActualizarUsuarioDTO,
+} from '../models/usuario.dto';
 import { JWT_SECRET, JWT_EXPIRES_IN_SECONDS } from '../config/jwt';
 import { TokenPayload } from '../middleware/auth.middleware';
 import { HttpError } from '../utils/http-error';
@@ -119,6 +127,53 @@ export class UsuarioService {
       apellido: datos.apellido,
       direccion: datos.direccion,
       rol: datos.login.rol.nombre,
+    };
+  }
+
+  /**
+   * Actualiza los datos del usuario logueado (perfil).
+   * - El email no se puede modificar: si viene en el body se ignora.
+   * - Para cambiar la contraseña hay que mandar la actual y la nueva;
+   *   la actual se verifica contra la guardada antes de reemplazarla.
+   */
+  async actualizarMisDatos(id_usuario: number, data: Partial<ActualizarUsuarioDTO> | undefined): Promise<UsuarioDTO> {
+    const nombre = textoRequerido(data?.nombre, 'nombre');
+    const apellido = textoRequerido(data?.apellido, 'apellido');
+    const direccion = textoRequerido(data?.direccion, 'direccion');
+
+    const actual = await this.usuarioRepo.obtenerConLogin(id_usuario);
+    if (!actual) {
+      throw new HttpError(404, 'Usuario no encontrado');
+    }
+
+    const passwordActual = typeof data?.passwordActual === 'string' ? data.passwordActual : '';
+    const passwordNueva = typeof data?.passwordNueva === 'string' ? data.passwordNueva : '';
+    let passwordHash: string | undefined;
+
+    if (passwordActual || passwordNueva) {
+      if (!passwordActual || !passwordNueva) {
+        throw new HttpError(400, 'Para cambiar la contraseña ingresá la actual y la nueva');
+      }
+      // 400 y no 401: un 401 hace que el frontend cierre la sesión.
+      if (!(await bcrypt.compare(passwordActual, actual.login.password))) {
+        throw new HttpError(400, 'La contraseña actual es incorrecta');
+      }
+      validarPassword(passwordNueva);
+      if (passwordNueva === passwordActual) {
+        throw new HttpError(400, 'La contraseña nueva debe ser distinta de la actual');
+      }
+      passwordHash = await bcrypt.hash(passwordNueva, 10);
+    }
+
+    const usuario = await this.usuarioRepo.actualizarDatos(id_usuario, { nombre, apellido, direccion }, passwordHash);
+
+    return {
+      id: usuario.id,
+      email: usuario.email,
+      nombre: usuario.nombre,
+      apellido: usuario.apellido,
+      direccion: usuario.direccion,
+      rol: usuario.login.rol.nombre,
     };
   }
 

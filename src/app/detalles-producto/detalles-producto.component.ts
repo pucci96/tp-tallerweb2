@@ -4,6 +4,10 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProductService, ProductoDetalle } from '../services/product.service';
+import { Product } from '../productCard/productCard.component';
+
+/** Cantidad máxima de productos relacionados que se muestran. */
+const MAX_RELACIONADOS = 4;
 
 export interface ProductThumb {
   label: string;
@@ -15,14 +19,6 @@ export interface ProductFeature {
   icon: string;
   title: string;
   description: string;
-}
-
-export interface RelatedProduct {
-  label: string;
-  title: string;
-  price: number;
-  image: string;
-  badge?: string;
 }
 
 @Component({
@@ -41,6 +37,9 @@ export class DetallesProductoComponent {
   readonly cargando = signal(true);
   readonly mensajeError = signal('');
 
+  /** Otros productos de la misma categoría que el producto que se está viendo. */
+  readonly relacionados = signal<Product[]>([]);
+
   constructor() {
     // Se escucha paramMap (y no snapshot) para que, si se navega de un producto
     // a otro sin salir de la página, se vuelva a cargar con el id nuevo.
@@ -53,12 +52,14 @@ export class DetallesProductoComponent {
     this.cargando.set(true);
     this.mensajeError.set('');
     this.producto.set(null);
+    this.relacionados.set([]);
     this.quantity.set(1);
 
     this.productService.obtenerDetalle(id).subscribe({
       next: (producto) => {
         this.producto.set(producto);
         this.cargando.set(false);
+        this.cargarRelacionados(producto);
       },
       error: (err: HttpErrorResponse) => {
         this.mensajeError.set(
@@ -68,6 +69,22 @@ export class DetallesProductoComponent {
         );
         this.cargando.set(false);
       },
+    });
+  }
+
+  /** Busca en el catálogo otros productos de la misma categoría (sin incluir el actual). */
+  private cargarRelacionados(producto: ProductoDetalle): void {
+    this.productService.obtenerProductos().subscribe({
+      next: (todos) => {
+        // Si mientras tanto se navegó a otro producto, esta respuesta ya no sirve.
+        if (this.producto()?.id !== producto.id) return;
+        this.relacionados.set(
+          todos
+            .filter((p) => p.categoryId === producto.categoria.id && p.id !== producto.id)
+            .slice(0, MAX_RELACIONADOS)
+        );
+      },
+      error: (err) => console.error('Error al cargar productos relacionados:', err),
     });
   }
 
@@ -125,36 +142,6 @@ export class DetallesProductoComponent {
       icon: 'cable',
       title: 'Cable Type-C Desmontable',
       description: 'Mallado trenzado de 1.8 metros con conectores bañados en oro para máxima durabilidad y transporte seguro.'
-    }
-  ];
-
-  readonly related: RelatedProduct[] = [
-    {
-      label: 'Mouses',
-      title: 'Mouse Gamer Inalámbrico 26K DPI',
-      price: 48900,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBw9swQTsx0q4Yw4WnYRXT14-j3p4dG7Bdm61452pWbEe6gCteO7AZUeeaGSeX_ftcVLSau2x8lsm5B359_-xdcNu5uM6iQzkYgnEA-Wg08hH4R2kH-5GbpdraWgL3zteT90YPx6FzkAdcQxVLFAP1smJnPxYdIxbKTi5HqnhB4TuW_-1zbP2TCth0XiID2cnwEEa9sghUME_rgi6zACuz8NLU794OhhKNGTLD3YsM',
-      badge: '26.000 DPI'
-    },
-    {
-      label: 'Mousepads',
-      title: 'Mousepad XL Speed 900x400 Topo',
-      price: 21500,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCihOI7hDciVbBZ6uHtaySmFi6f37ngxmYkuOKUpdlo6X950ZYbBOBHTw50tOXf41558OA7EIFDBDTDvNzduyZVuEVTz6O00wc0shTapUgE8P5UGGCvxmP1sdKPFtQw_yFuPzp9p-HMvnWquauduPKLBG09bnH9mLEYMq8PGkvivfdXw-jAS8CigcIVTuUyNP4iANLTfs39FHjXYlcB2ZydGsR4HS3T4MxcyDoJgg8',
-      badge: 'Envío Gratis'
-    },
-    {
-      label: 'Accesorios',
-      title: 'Kit de Modding & Lubricación Switches',
-      price: 16200,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAXRws5qx6vc4oGwpEzEoIDn8BrEbObXn7HLct_Jd_hsZVp3Bum6zb-qHVI7B0Sh_ZS5qjkfqN0fs8AcFg6F9tcEYmKAmQSG_2MmF8sMu9evmPdCBpYbL2YwFhvOwyXFolryPlvGWcz_J1SmZvRZRq3TUq4hN53kJa2WB4wwf9IkL6zVjLJT9xTUfC-ZYE4QYwLTu4Czpue6YvmjeK_wVsjyj8fpl69fHdsMhD3NN4'
-    },
-    {
-      label: 'Audio',
-      title: 'Auriculares Pro 7.1 Espacial Wireless',
-      price: 119999,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCwfA84ZW77v0kLbaL8Gcu357ag-NHYQ1dX_dJVgM5d29VM_6aUHMIL32pjn1-9P_wzEJmWXZ0sTaPJ0uz4aG-kTO2YVCEkUZx5bUoMKhSPdqmjzUIhGjk6rJjwskCEDtdeJqAg9fv1Wr-YS0ejOTKLqx9PVbjVVk9LTjIzDGa5wjbglh7dxHFHUjJKBYfmmH2hX4Nzc1wvunw82c7slQCE6BxPmKw5l59rA-0ehrE',
-      badge: 'Últimas 2 un.'
     }
   ];
 

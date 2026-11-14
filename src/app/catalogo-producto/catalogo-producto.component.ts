@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -16,8 +16,10 @@ import { environment } from '../../environments/environment';
 export class CatalogoProductoComponent implements OnInit {
   private http = inject(HttpClient);
 
-  productos: any[] = [];
-  categorias: any[] = [];
+  // Señales: en Angular 22 los componentes son OnPush por defecto, así que la vista
+  // solo se actualiza sola al llegar la respuesta HTTP si el dato es una señal.
+  readonly productos = signal<any[]>([]);
+  readonly categorias = signal<any[]>([]);
 
   // Filtros reactivos
   searchQuery: string = '';
@@ -34,16 +36,12 @@ export class CatalogoProductoComponent implements OnInit {
 
 cargarDatos(): void {
   this.http.get<any[]>(`${environment.apiUrl}/productos`).subscribe({
-    next: (data) => {
-      this.productos = data;
-    },
+    next: (data) => this.productos.set(data),
     error: (err) => console.error('Error en productos:', err)
   });
 
   this.http.get<any[]>(`${environment.apiUrl}/categorias`).subscribe({
-    next: (data) => {
-      this.categorias = data;
-    },
+    next: (data) => this.categorias.set(data),
     error: (err) => console.error('Error en categorías:', err)
   });
 }
@@ -60,11 +58,12 @@ cargarDatos(): void {
   }
 
   get productosFiltrados(): any[] {
-  if (!this.productos || this.productos.length === 0) {
+  const productos = this.productos();
+  if (productos.length === 0) {
     return [];
   }
 
-  return this.productos
+  return productos
     .filter(p => {
       // 1. Filtro por nombre
       const titulo = (p.title || p.nombre || '').toLowerCase();

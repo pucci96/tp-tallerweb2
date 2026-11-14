@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -21,11 +21,22 @@ export class CatalogoProductoComponent implements OnInit {
   readonly productos = signal<any[]>([]);
   readonly categorias = signal<any[]>([]);
 
+  /**
+   * Tope del filtro de precio: el precio del producto más caro, redondeado hacia
+   * arriba al múltiplo de PASO_PRECIO. Así el rango siempre abarca todo el catálogo.
+   */
+  readonly PASO_PRECIO = 10000;
+  readonly precioTope = computed(() => {
+    const precios = this.productos().map((p) => Number(p.price ?? p.precio ?? 0));
+    const masCaro = Math.max(0, ...precios);
+    return Math.max(this.PASO_PRECIO, Math.ceil(masCaro / this.PASO_PRECIO) * this.PASO_PRECIO);
+  });
+
   // Filtros reactivos
   searchQuery: string = '';
   categoriaSeleccionadaId: number | null = null;
   ordenSeleccionado: string = 'asc';
-  precioMax: number = 1000000;
+  precioMax: number = 0; // se ajusta al tope cuando llegan los productos
   soloStock: boolean = true;
   envioGratis: boolean = false;
 
@@ -36,7 +47,10 @@ export class CatalogoProductoComponent implements OnInit {
 
 cargarDatos(): void {
   this.http.get<any[]>(`${environment.apiUrl}/productos`).subscribe({
-    next: (data) => this.productos.set(data),
+    next: (data) => {
+      this.productos.set(data);
+      this.precioMax = this.precioTope(); // al entrar no se oculta ningún producto por precio
+    },
     error: (err) => console.error('Error en productos:', err)
   });
 
@@ -54,7 +68,7 @@ cargarDatos(): void {
     this.searchQuery = '';
     this.categoriaSeleccionadaId = null;
     this.ordenSeleccionado = 'asc';
-    this.precioMax = 1000000;
+    this.precioMax = this.precioTope();
   }
 
   get productosFiltrados(): any[] {

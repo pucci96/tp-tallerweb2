@@ -1,6 +1,11 @@
 /**
  * Datos iniciales para desarrollo:  npm run db:seed
+ *
  * Es idempotente: se puede correr varias veces sin duplicar datos.
+ * Además ACTUALIZA lo que ya existe: si cambiás un precio, stock, descripción,
+ * comentario o dato de usuario acá y volvés a correr el seed, se actualiza en la base.
+ * (Los productos se identifican por nombre, los usuarios por email y los comentarios
+ * por producto + usuario.)
  */
 import bcrypt from 'bcryptjs';
 import { prisma } from '../src/config/prisma';
@@ -44,6 +49,10 @@ const PRODUCTOS = [
 const USUARIOS = [
   { email: 'admin@tecno.com', password: 'Admin1234', rol: 'ADMIN', nombre: 'Admin', apellido: 'TecnoCommerce', direccion: 'Av. Siempre Viva 742' },
   { email: 'cliente@tecno.com', password: 'Cliente1234', rol: 'CLIENTE', nombre: 'Juan', apellido: 'Pérez', direccion: 'Av. Corrientes 1234, CABA' },
+  // Clientes extra para tener más comentarios y promedios variados (misma contraseña: Cliente1234)
+  { email: 'maria@tecno.com', password: 'Cliente1234', rol: 'CLIENTE', nombre: 'María', apellido: 'González', direccion: 'Bv. San Juan 850, Córdoba' },
+  { email: 'lucas@tecno.com', password: 'Cliente1234', rol: 'CLIENTE', nombre: 'Lucas', apellido: 'Fernández', direccion: 'Calle 7 N° 1120, La Plata' },
+  { email: 'sofia@tecno.com', password: 'Cliente1234', rol: 'CLIENTE', nombre: 'Sofía', apellido: 'Martínez', direccion: 'Av. Pellegrini 1500, Rosario' },
 ];
 
 // Comentarios de ejemplo (un usuario comenta cada producto una sola vez)
@@ -70,19 +79,24 @@ async function main() {
     roles[nombre] = rol.id;
   }
 
-  // Usuarios (Login + Usuario)
+  // Usuarios (Login + Usuario). Si ya existen se actualizan sus datos, su rol y su
+  // contraseña, así las credenciales de prueba de este archivo siempre funcionan.
   for (const u of USUARIOS) {
-    const existe = await prisma.login.findUnique({ where: { email: u.email } });
-    if (!existe) {
-      await prisma.login.create({
-        data: {
-          email: u.email,
-          password: await bcrypt.hash(u.password, 10),
-          id_rol: roles[u.rol]!,
-          usuario: { create: { nombre: u.nombre, apellido: u.apellido, direccion: u.direccion } },
-        },
-      });
-    }
+    const datosPersonales = { nombre: u.nombre, apellido: u.apellido, direccion: u.direccion };
+    await prisma.login.upsert({
+      where: { email: u.email },
+      update: {
+        password: await bcrypt.hash(u.password, 10),
+        id_rol: roles[u.rol]!,
+        usuario: { upsert: { create: datosPersonales, update: datosPersonales } },
+      },
+      create: {
+        email: u.email,
+        password: await bcrypt.hash(u.password, 10),
+        id_rol: roles[u.rol]!,
+        usuario: { create: datosPersonales },
+      },
+    });
   }
 
   // Categorías y subcategorías
@@ -101,40 +115,66 @@ async function main() {
     }
   }
 
-  // Productos
+  // Productos: se crean o, si ya existen (por nombre), se actualizan
+  let productosCreados = 0;
+  let productosActualizados = 0;
   for (const p of PRODUCTOS) {
-    if (await prisma.producto.findFirst({ where: { nombre: p.nombre } })) continue;
-    const sub = subcategorias[p.sub]!;
-    await prisma.producto.create({
-      data: {
-        nombre: p.nombre,
-        precio: p.precio,
-        stock: p.stock,
-        imagen: p.imagen,
-        destacado: p.destacado,
-        id_categoria: sub.id_categoria,
-        id_subcategoria: sub.id,
-        detalle: { create: [{ nombre: 'Descripción', descripcion: p.descripcion }] },
-      },
+    const sub = subcategorias[p.sub];
+    if (!sub) throw new Error(`El producto "${p.nombre}" usa la subcategoría "${p.sub}", que no existe en CATEGORIAS`);
+
+    const datos = {
+      nombre: p.nombre,
+      precio: p.precio,
+      stock: p.stock,
+      imagen: p.imagen,
+      destacado: p.destacado,
+      id_categoria: sub.id_categoria,
+      id_subcategoria: sub.id,
+    };
+
+    const existente = await prisma.producto.findFirst({ where: { nombre: p.nombre } });
+    if (!existente) {
+      await prisma.producto.create({
+        data: { ...datos, detalle: { create: [{ nombre: 'Descripción', descripcion: p.descripcion }] } },
+      });
+      productosCreados++;
+      continue;
+    }
+
+    await prisma.producto.update({ where: { id: existente.id }, data: datos });
+    // La descripción es el primer registro de Producto_detalles (así lo usa el resto de la app)
+    const descripcion = await prisma.producto_detalles.findFirst({
+      where: { id_producto: existente.id },
+      orderBy: { id: 'asc' },
     });
+    if (descripcion) {
+      await prisma.producto_detalles.update({ where: { id: descripcion.id }, data: { descripcion: p.descripcion } });
+    } else {
+      await prisma.producto_detalles.create({
+        data: { id_producto: existente.id, nombre: 'Descripción', descripcion: p.descripcion },
+      });
+    }
+    productosActualizados++;
   }
 
-  // Comentarios (upsert por producto + usuario, así no se duplican)
+  // Comentarios (upsert por producto + usuario): se crean o se actualizan calificación y texto
   for (const c of COMENTARIOS) {
     const producto = await prisma.producto.findFirst({ where: { nombre: c.producto } });
     const usuario = await prisma.usuario.findUnique({ where: { email: c.email } });
-    if (!producto || !usuario) continue;
+    if (!producto) throw new Error(`Comentario sobre un producto que no está en PRODUCTOS: "${c.producto}"`);
+    if (!usuario) throw new Error(`Comentario de un usuario que no está en USUARIOS: "${c.email}"`);
     await prisma.comentario.upsert({
       where: { id_producto_id_usuario: { id_producto: producto.id, id_usuario: usuario.id } },
-      update: {},
+      update: { calificacion: c.calificacion, texto: c.texto },
       create: { id_producto: producto.id, id_usuario: usuario.id, calificacion: c.calificacion, texto: c.texto },
     });
   }
 
   console.log('Seed completado:');
-  console.log(`  ${Object.keys(roles).length} roles, ${USUARIOS.length} usuarios, ${Object.keys(subcategorias).length} subcategorías, ${PRODUCTOS.length} productos, ${COMENTARIOS.length} comentarios`);
-  console.log('  Admin:   admin@tecno.com   / Admin1234');
-  console.log('  Cliente: cliente@tecno.com / Cliente1234');
+  console.log(`  ${Object.keys(roles).length} roles, ${USUARIOS.length} usuarios, ${Object.keys(subcategorias).length} subcategorías`);
+  console.log(`  ${PRODUCTOS.length} productos (${productosCreados} nuevos, ${productosActualizados} actualizados), ${COMENTARIOS.length} comentarios`);
+  console.log('  Admin:    admin@tecno.com   / Admin1234');
+  console.log('  Clientes: cliente@tecno.com, maria@tecno.com, lucas@tecno.com, sofia@tecno.com / Cliente1234');
 }
 
 main()

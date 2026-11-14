@@ -8,6 +8,7 @@ import { CatalogoProductoComponent } from './catalogo-producto/catalogo-producto
 import { AdminProductosListComponent } from './admin-productos-list/admin-productos-list.component';
 import { AdminProductoFormComponent } from './admin-productos-form/admin-productos-form.component';
 import { adminGuard } from './guards/admin-guard';
+import { authGuard } from './guards/auth-guard';
 import { CheckoutConfirmacionComponent } from './checkout-confirmacion/checkout-confirmacion.component';
 import { CheckoutPagoComponent } from './checkout-pago/checkout-pago.component';
 import { CheckoutResultadoComponent } from './checkout-resultado/checkout-resultado.component';
@@ -27,7 +28,8 @@ export const routes: Routes = [
 },
 {
     path: 'perfil',
-    component: PerfilComponent
+    component: PerfilComponent,
+    canActivate: [authGuard]
 },
 {
     path: 'login',

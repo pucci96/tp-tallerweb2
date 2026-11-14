@@ -1,14 +1,18 @@
-import {inject} from '@angular/core'
-import { CanActivateFn, Router} from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService } from '../services/auth.service';
 
-export const adminGuard: CanActivateFn = (route, state) => {
+/**
+ * Protege las pantallas de administración en el frontend.
+ * Ojo: esto solo oculta la UI; la seguridad real está en el backend
+ * (las rutas /api/productos/admin exigen un token con rol ADMIN).
+ */
+export const adminGuard: CanActivateFn = () => {
+  const authService = inject(AuthService);
   const router = inject(Router);
 
-  const rol = localStorage.getItem('user_role');
-
-  if(rol === 'ADMIN'){
-    return true; 
+  if (authService.esAdmin()) {
+    return true;
   }
-  router.navigate(['/productos'])
-  return false;
+  return router.createUrlTree([authService.estaLogueado() ? '/productos' : '/login']);
 };

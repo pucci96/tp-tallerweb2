@@ -40,6 +40,29 @@ export interface ProductoDetalle {
   estilos: ProductoAtributo[];
 }
 
+/** Un comentario de un producto, como lo devuelve /productos/:id/comentarios */
+export interface Comentario {
+  id: number;
+  id_usuario: number;
+  autor: string;        // "Juan P."
+  calificacion: number; // 1 a 5
+  texto: string;
+  fecha: string;        // fecha ISO (JSON)
+}
+
+/** Comentarios de un producto con el resumen de su calificación. */
+export interface ComentariosProducto {
+  promedio: number; // 0 si no tiene comentarios
+  cantidad: number;
+  comentarios: Comentario[];
+}
+
+/** Lo que se manda para comentar. El autor lo toma el backend del token. */
+export interface NuevoComentario {
+  calificacion: number;
+  texto: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -60,6 +83,16 @@ export class ProductService {
   /** Detalle público de un producto (página /productos/:id). */
   obtenerDetalle(id: number): Observable<ProductoDetalle> {
     return this.http.get<ProductoDetalle>(`${this.apiUrl}/${id}`);
+  }
+
+  /** Comentarios del producto con el promedio y la cantidad (público). */
+  obtenerComentarios(idProducto: number): Observable<ComentariosProducto> {
+    return this.http.get<ComentariosProducto>(`${this.apiUrl}/${idProducto}/comentarios`);
+  }
+
+  /** Publica un comentario (requiere sesión: el interceptor agrega el token). */
+  comentar(idProducto: number, comentario: NuevoComentario): Observable<Comentario> {
+    return this.http.post<Comentario>(`${this.apiUrl}/${idProducto}/comentarios`, comentario);
   }
 
   /** Listado completo para el panel de admin (requiere rol ADMIN). */

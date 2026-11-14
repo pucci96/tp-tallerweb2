@@ -150,29 +150,118 @@
         </div>
       </div>
 
-      <!-- Descripción y características -->
+      <!-- Descripción y opiniones -->
       <div class="description-section">
         <div class="section-header">
           <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8,18h8V16H8v2Zm0-4h8V12H8v2ZM6,22q-0.82,0-1.41-0.59T4,20V4Q4,3.17 4.59,2.59T6,2h8l6,6V20q0,0.82-0.59,1.41T18,22H6ZM13,9V4H6V20H18V9H13ZM6,4V9V4V9V20V4Z"/>
           </svg>
-          <h2 class="section-title">Descripción y Características</h2>
+          <h2 class="section-title">Descripción</h2>
         </div>
         <p class="section-text">{{ p.descripcion }}</p>
 
-        <div class="features-grid">
-          @for (feature of features; track feature.title) {
-            <div class="feature-item">
-              <svg class="feature-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
-                <path [attr.d]="getIconPath(feature.icon)"></path>
-              </svg>
-              <div class="feature-body">
-                <h4 class="feature-title">{{ feature.title }}</h4>
-                <p class="feature-desc">{{ feature.description }}</p>
+        <!-- Opiniones: comentarios con calificación (definen las estrellas del encabezado) -->
+        <section class="opiniones" id="opiniones">
+          <div class="opiniones-header">
+            <h3 class="opiniones-title">Opiniones de clientes</h3>
+            @if (cantidadOpiniones() > 0) {
+              <div class="opiniones-resumen">
+                <span class="opiniones-promedio">{{ promedio() | number: '1.1-1' }}</span>
+                <span class="estrellas">
+                  @for (pct of estrellasPromedio(); track $index) {
+                    <span class="estrella">
+                      <svg class="estrella-base" viewBox="0 0 24 24"><path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/></svg>
+                      <span class="estrella-relleno" [style.width.%]="pct">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/></svg>
+                      </span>
+                    </span>
+                  }
+                </span>
+                <span class="opiniones-cantidad">({{ cantidadOpiniones() }})</span>
               </div>
-            </div>
+            }
+          </div>
+
+          <!-- Formulario para comentar -->
+          @if (!usuario()) {
+            <p class="opiniones-aviso">
+              <a routerLink="/login" class="opiniones-link">Iniciá sesión</a> para dejar tu opinión sobre este producto.
+            </p>
+          } @else if (yaComento()) {
+            <p class="opiniones-aviso">
+              {{ comentarioPublicado() ? '¡Gracias! Tu opinión fue publicada.' : 'Ya dejaste tu opinión sobre este producto.' }}
+            </p>
+          } @else {
+            <form class="opinion-form" (ngSubmit)="publicarComentario()">
+              <label class="opinion-label">Tu calificación</label>
+              <div class="selector-estrellas" (mouseleave)="calificacionHover.set(0)">
+                @for (n of [1, 2, 3, 4, 5]; track n) {
+                  <button
+                    type="button"
+                    class="selector-estrella"
+                    [class.activa]="n <= calificacionVisible()"
+                    (click)="elegirCalificacion(n)"
+                    (mouseenter)="calificacionHover.set(n)"
+                    [attr.aria-label]="n + (n === 1 ? ' estrella' : ' estrellas')"
+                    [attr.aria-pressed]="n === nuevaCalificacion()"
+                    [disabled]="enviandoComentario()"
+                  >
+                    <svg viewBox="0 0 24 24"><path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/></svg>
+                  </button>
+                }
+              </div>
+
+              <label class="opinion-label" for="opinion-texto">Tu comentario</label>
+              <textarea
+                id="opinion-texto"
+                name="texto"
+                class="opinion-textarea"
+                rows="3"
+                [maxlength]="maxLargoComentario"
+                placeholder="Contá qué te pareció el producto"
+                [ngModel]="nuevoTexto()"
+                (ngModelChange)="nuevoTexto.set($event); errorComentario.set('')"
+                [disabled]="enviandoComentario()"
+              ></textarea>
+              <span class="opinion-contador">{{ nuevoTexto().length }}/{{ maxLargoComentario }}</span>
+
+              @if (errorComentario()) {
+                <p class="opinion-error" role="alert">{{ errorComentario() }}</p>
+              }
+
+              <button type="submit" class="opinion-btn" [disabled]="enviandoComentario()">
+                {{ enviandoComentario() ? 'Publicando...' : 'Publicar opinión' }}
+              </button>
+            </form>
           }
-        </div>
+
+          <!-- Listado de comentarios -->
+          @if (comentarios().length === 0) {
+            <p class="opiniones-vacio">Todavía no hay opiniones. ¡Sé el primero en comentar!</p>
+          } @else {
+            <ul class="opiniones-lista">
+              @for (c of comentarios(); track c.id) {
+                <li class="opinion">
+                  <div class="opinion-cabecera">
+                    <span class="opinion-autor">{{ c.autor }}</span>
+                    <span class="estrellas estrellas-chicas" [attr.aria-label]="c.calificacion + ' de 5 estrellas'">
+                      @for (pct of porcentajesEstrellas(c.calificacion); track $index) {
+                        <span class="estrella">
+                          <svg class="estrella-base" viewBox="0 0 24 24"><path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/></svg>
+                          <span class="estrella-relleno" [style.width.%]="pct">
+                            <svg viewBox="0 0 24 24"><path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/></svg>
+                          </span>
+                        </span>
+                      }
+                    </span>
+                    <span class="opinion-fecha">{{ c.fecha | date: 'dd/MM/yyyy' }}</span>
+                  </div>
+                  <p class="opinion-texto">{{ c.texto }}</p>
+                </li>
+              }
+            </ul>
+          }
+        </section>
 
         <!-- Tabla de especificaciones técnicas (solo si el producto tiene) -->
         @if (p.especificaciones.length > 0) {
@@ -219,19 +308,27 @@
         <h1 class="product-title">{{ p.nombre }}</h1>
 
         <!-- Bloque de reseñas / puntuación -->
+        <!-- Promedio real de los comentarios (se actualiza al publicar uno) -->
         <div class="reviews-block">
-          <div class="stars">
-          @for (star of stars; track star) {
-            <svg class="star filled" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/>
-            </svg>
+          <span class="estrellas" [attr.aria-label]="cantidadOpiniones() > 0 ? (promedio() + ' de 5 estrellas') : 'Sin calificaciones'">
+            @for (pct of estrellasPromedio(); track $index) {
+              <span class="estrella">
+                <svg class="estrella-base" viewBox="0 0 24 24"><path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/></svg>
+                <span class="estrella-relleno" [style.width.%]="pct">
+                  <svg viewBox="0 0 24 24"><path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/></svg>
+                </span>
+              </span>
+            }
+          </span>
+          @if (cantidadOpiniones() > 0) {
+            <span class="rating-value">{{ promedio() | number: '1.1-1' }}</span>
+            <span class="reviews-divider">•</span>
+            <a class="reviews-link" href="#opiniones" (click)="irAOpiniones($event)">
+              {{ cantidadOpiniones() }} {{ cantidadOpiniones() === 1 ? 'opinión' : 'opiniones' }}
+            </a>
+          } @else {
+            <a class="reviews-link" href="#opiniones" (click)="irAOpiniones($event)">Sin opiniones todavía</a>
           }
-        </div>
-          <span class="rating-value">{{ rating }}</span>
-          <span class="reviews-divider">•</span>
-          <a class="reviews-link" routerLink="#opiniones">
-            {{ reviewsCount }} opiniones verificadas
-          </a>
         </div>
 
         <!-- Precio -->
@@ -397,31 +494,32 @@
     </div>
   </div>
 
-  <!-- Productos relacionados -->
+  <!-- Productos relacionados: otros de la misma categoría (se oculta si no hay) -->
+  @if (relacionados().length > 0) {
   <section class="related-products">
     <div class="related-header">
       <div>
-        <span class="related-tag">Catálogo TecnoCommerce</span>
-        <h3 class="related-title">Productos complementarios recomendados</h3>
+        <span class="related-tag">{{ p.categoria.nombre }}</span>
+        <h3 class="related-title">Más productos de esta categoría</h3>
       </div>
-      <a class="related-view-all" routerLink="/perifericos">
-        <span>Ver todos los periféricos</span>
+      <a class="related-view-all" routerLink="/productos">
+        <span>Ver todo el catálogo</span>
         <svg class="related-arrow" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M16.18,13H4V11H16.18l-5.6-5.6L12,4l8,8l-8,8l-1.42-1.4l5.6-5.6Z"/>
         </svg>
       </a>
     </div>
     <div class="related-grid">
-      @for (item of related; track item.title) {
-        <div class="related-card">
+      @for (item of relacionados(); track item.id) {
+        <a class="related-card" [routerLink]="['/productos', item.id]">
           <div class="related-img-wrap">
-            <img [src]="item.image" [alt]="item.title" class="related-image" />
-            @if (item.badge) {
-              <span class="related-badge">{{ item.badge }}</span>
+            <img [src]="item.imageUrl" [alt]="item.title" class="related-image" />
+            @if (item.stock <= 0) {
+              <span class="related-badge">Sin stock</span>
             }
           </div>
           <div class="related-body">
-            <span class="related-category">{{ item.label }}</span>
+            <span class="related-category">{{ item.category }}</span>
             <h4 class="related-name">{{ item.title }}</h4>
             <div class="related-price-row">
               <span class="related-price">$ </span>
@@ -429,15 +527,13 @@
               <span class="related-currency">{{ currency }}</span>
             </div>
           </div>
-          <button class="related-add" type="button">
-            <svg class="related-cart-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M11,9V6H8V4h3V1h2V4h3V6H13V9H11ZM5.59,21.41Q5,20.83 5,20t0.59-1.41T7,18q0.83,0 1.41,0.59Q9,19.18 9,20T8.41,21.41Q7.83,22 7,22T5.59,21.41Zm10,0Q15,20.83 15,20t0.59-1.41T17,18t1.41,0.59Q19,19.18 19,20t-0.59,1.41T17,22t-1.41-0.59ZM1,4V2H4.28l4.25,9h7l3.9-7H21.7l-4.4,7.95q-0.27,0.5-0.74,0.78T15.55,13H8.1L7,15H19v2H7q-1.13,0-1.71-0.98T5.25,14.05L6.6,11.6L3,4H1Z"/>
-            </svg>
-            <span class="related-cart-text">Agregar</span>
-          </button>
-        </div>
+          <span class="related-add">
+            <span class="related-cart-text">Ver producto</span>
+          </span>
+        </a>
       }
     </div>
   </section>
+  }
   }
 </div>

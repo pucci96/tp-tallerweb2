@@ -46,6 +46,22 @@ const USUARIOS = [
   { email: 'cliente@tecno.com', password: 'Cliente1234', rol: 'CLIENTE', nombre: 'Juan', apellido: 'Pérez', direccion: 'Av. Corrientes 1234, CABA' },
 ];
 
+// Comentarios de ejemplo (un usuario comenta cada producto una sola vez)
+const COMENTARIOS = [
+  { producto: 'Placa de Video RTX 4070 Super 12GB', email: 'cliente@tecno.com', calificacion: 5,
+    texto: 'Excelente placa, corre todo en 1440p sin problemas y no levanta mucha temperatura.' },
+  { producto: 'Placa de Video RTX 4070 Super 12GB', email: 'admin@tecno.com', calificacion: 4,
+    texto: 'Muy buen rendimiento. Le resto una estrella por el precio.' },
+  { producto: 'Procesador Ryzen 7 7800X3D', email: 'cliente@tecno.com', calificacion: 5,
+    texto: 'El mejor procesador para gaming que tuve. Llegó rápido y bien embalado.' },
+  { producto: 'Teclado Mecánico RGB Switch Red TKL', email: 'cliente@tecno.com', calificacion: 4,
+    texto: 'Los switches son suaves y silenciosos. El software de RGB podría ser mejor.' },
+  { producto: 'Teclado Mecánico RGB Switch Red TKL', email: 'admin@tecno.com', calificacion: 3,
+    texto: 'Cumple, pero el cable es un poco corto para mi escritorio.' },
+  { producto: 'Auriculares Pro 7.1 Wireless', email: 'cliente@tecno.com', calificacion: 5,
+    texto: 'Muy cómodos para usar muchas horas y el micrófono se escucha claro.' },
+];
+
 async function main() {
   // Roles
   const roles: Record<string, number> = {};
@@ -103,8 +119,20 @@ async function main() {
     });
   }
 
+  // Comentarios (upsert por producto + usuario, así no se duplican)
+  for (const c of COMENTARIOS) {
+    const producto = await prisma.producto.findFirst({ where: { nombre: c.producto } });
+    const usuario = await prisma.usuario.findUnique({ where: { email: c.email } });
+    if (!producto || !usuario) continue;
+    await prisma.comentario.upsert({
+      where: { id_producto_id_usuario: { id_producto: producto.id, id_usuario: usuario.id } },
+      update: {},
+      create: { id_producto: producto.id, id_usuario: usuario.id, calificacion: c.calificacion, texto: c.texto },
+    });
+  }
+
   console.log('Seed completado:');
-  console.log(`  ${Object.keys(roles).length} roles, ${USUARIOS.length} usuarios, ${Object.keys(subcategorias).length} subcategorías, ${PRODUCTOS.length} productos`);
+  console.log(`  ${Object.keys(roles).length} roles, ${USUARIOS.length} usuarios, ${Object.keys(subcategorias).length} subcategorías, ${PRODUCTOS.length} productos, ${COMENTARIOS.length} comentarios`);
   console.log('  Admin:   admin@tecno.com   / Admin1234');
   console.log('  Cliente: cliente@tecno.com / Cliente1234');
 }

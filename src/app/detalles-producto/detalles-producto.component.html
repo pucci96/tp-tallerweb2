@@ -16,12 +16,12 @@
             </button>
           </div>
           <p class="toast-message">
-            1x {{ title }} añadido con éxito
+            {{ cantidadAgregada() }}x {{ title }} añadido con éxito
           </p>
           <div class="toast-actions">
-            <a class="toast-link">Ver carrito (3)</a>
+            <a class="toast-link" routerLink="/checkout">Ver carrito ({{ cantidadEnCarrito() }})</a>
             <span class="toast-divider">•</span>
-            <a class="toast-link muted">Finalizar compra</a>
+            <a class="toast-link muted" routerLink="/checkout">Finalizar compra</a>
           </div>
         </div>
       </div>
@@ -309,7 +309,7 @@
             </svg>
             <span class="action-text">{{ isAddingToCart() ? 'Agregando...' : 'Agregar al carrito' }}</span>
           </button>
-          <button class="btn-buy" type="button">
+          <button class="btn-buy" type="button" (click)="comprarAhora()">
             <svg class="action-icon" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12,15.6L15.2,11H12.35l2-7H9v8h3v3.6ZM10,22V14H7V2H17L15,9h4L10,22Zm2-10H9h3Z"/>
             </svg>

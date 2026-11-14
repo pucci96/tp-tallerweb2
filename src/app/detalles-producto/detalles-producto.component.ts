@@ -1,6 +1,7 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { CartService } from '../services/cart.service';
 
 export interface ProductThumb {
   label: string;
@@ -35,6 +36,13 @@ export interface RelatedProduct {
   styleUrls: ['./detalles-producto.component.css']
 })
 export class DetallesProductoComponent {
+  private readonly cart = inject(CartService);
+  private readonly router = inject(Router);
+
+  // Hardcoded until the page loads a real product by :id (see spec follow-up).
+  readonly productId = 1;
+  readonly cantidadEnCarrito = this.cart.cantidadTotal;
+  readonly cantidadAgregada = signal(1);
 
 /* Datos del producto (mismo contenido del diseño original)         */
   readonly sku = 'TECNO-KB-94500';
@@ -186,7 +194,21 @@ export class DetallesProductoComponent {
     this.selectedThumbnail.set(index);
   }
 
+  private agregarProductoActual(): void {
+    this.cart.agregar(
+      { id: this.productId, nombre: this.title, precio: this.price, imagen: this.mainImageSrc },
+      this.quantity(),
+    );
+    this.cantidadAgregada.set(this.quantity());
+  }
+
+  comprarAhora(): void {
+    this.agregarProductoActual();
+    this.router.navigate(['/checkout']);
+  }
+
   triggerAddToCart(): void {
+    this.agregarProductoActual();
     this.isAddingToCart.set(true);
     this.showToast.set(true);
 

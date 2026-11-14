@@ -19,6 +19,27 @@ export interface ProductoAdmin {
   descripcion: string;
 }
 
+/** Par nombre/descripción (especificaciones y estilos del producto). */
+export interface ProductoAtributo {
+  nombre: string;
+  descripcion: string;
+}
+
+/** Producto completo para la página de detalle, como lo devuelve /productos/:id */
+export interface ProductoDetalle {
+  id: number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+  stock: number;
+  imagen: string;
+  destacado: boolean;
+  categoria: { id: number; nombre: string };
+  subcategoria: { id: number; nombre: string };
+  especificaciones: ProductoAtributo[];
+  estilos: ProductoAtributo[];
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -34,6 +55,11 @@ export class ProductService {
   /** Productos marcados como destacados (home). */
   getProductosDestacados(): Observable<Product[]> {
     return this.http.get<Product[]>(`${this.apiUrl}/destacados`);
+  }
+
+  /** Detalle público de un producto (página /productos/:id). */
+  obtenerDetalle(id: number): Observable<ProductoDetalle> {
+    return this.http.get<ProductoDetalle>(`${this.apiUrl}/${id}`);
   }
 
   /** Listado completo para el panel de admin (requiere rol ADMIN). */

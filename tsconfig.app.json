@@ -7,8 +7,13 @@
   },
   "include": [
     "src/**/*.ts"
-, "Backend/src/prisma.config.ts"  ],
+  ],
   "exclude": [
-    "src/**/*.spec.ts"
+    "src/**/*.spec.ts",
+    // Código de Node (backend viejo / generado) que no forma parte del frontend
+    "src/generated/**",
+    "src/index.ts",
+    "src/db.ts",
+    "src/config/**"
   ]
 }

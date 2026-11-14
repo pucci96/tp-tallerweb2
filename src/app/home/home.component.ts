@@ -1,7 +1,6 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { ProductCardComponent, Product } from '../productCard/productCard.component';
 import { ProductService } from '../services/product.service';
 
@@ -15,12 +14,6 @@ interface Slide {
   imageUrl: string;
 }
 
-export interface Categoria {
-  id: number;
-  nombre: string;
-  imagen: string;
-}
-
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -29,7 +22,6 @@ export interface Categoria {
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit, OnDestroy {
-  private http = inject(HttpClient);
   private productService = inject(ProductService);
 
   // Sliders
@@ -58,7 +50,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       title: 'Armá tu PC a Medida',
       description: 'Elegí tus componentes con compatibilidad garantizada y asesoramiento técnico directo.',
       buttonText: 'Comenzar Armado',
-      link: '/arma-tu-pc',
+      link: '/productos',
       imageUrl: 'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?auto=format&fit=crop&w=900&q=80'
     }
   ];
@@ -66,12 +58,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   private intervalId: any;
 
   
-  protected readonly categorias = signal<Categoria[]>([]);
   productosDestacados: Product[] = [];
 
   ngOnInit(): void {
     this.startAutoSlide();
-    this.obtenerCategorias();
     this.obtenerProductosDestacados();
   }
 
@@ -107,27 +97,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
  
-  obtenerCategorias(): void {
-    this.http.get<Categoria[]>('http://localhost:3000/api/categorias').subscribe({
-      next: (data) => this.categorias.set(data),
-      error: (err) => console.error('Error al obtener categorías:', err)
-    });
-  }
-
   obtenerProductosDestacados(): void {
-    
-    const stream$ = typeof this.productService.getProductosDestacados === 'function'
-      ? this.productService.getProductosDestacados()
-      : this.productService.obtenerProductos();
-
-    stream$.subscribe({
-      next: (data: Product[]) => {
-        const destacados = data.filter((p: any) => p.destacado);
-        this.productosDestacados = destacados.length > 0 ? destacados : data.slice(0, 4);
+    this.productService.getProductosDestacados().subscribe({
+      next: (destacados) => {
+        if (destacados.length > 0) {
+          this.productosDestacados = destacados;
+          return;
+        }
+        // Si no hay ninguno marcado como destacado, se muestran los primeros 4 del catálogo
+        this.productService.obtenerProductos().subscribe({
+          next: (todos) => (this.productosDestacados = todos.slice(0, 4)),
+          error: (err) => console.error('Error al cargar productos:', err),
+        });
       },
-      error: (err: any) => {
-        console.error('Error al cargar productos destacados:', err);
-      }
+      error: (err) => console.error('Error al cargar productos destacados:', err),
     });
   }
 }

@@ -1,16 +1,24 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
-  imports: [CommonModule, RouterModule, RouterLinkActive, RouterLink],
+  imports: [CommonModule, RouterLinkActive, RouterLink],
   selector: 'app-header',
   styleUrl: './header.component.css',
   templateUrl: './header.component.html',
   standalone: true,
 })
 export class HeaderComponent {
-  //Cambiar cuando tengamos BD
-  userName: string ='user';
-  cartCount: number = 2;
+  protected readonly auth = inject(AuthService);
+  private router = inject(Router);
+
+  // TODO: conectar con el carrito cuando exista (CarritoService)
+  cartCount = 0;
+
+  cerrarSesion(): void {
+    this.auth.logout();
+    this.router.navigate(['/']);
+  }
 }

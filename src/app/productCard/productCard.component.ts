@@ -1,13 +1,17 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+/** Producto tal como lo devuelve el catálogo público (/api/productos). */
 export interface Product {
   id: number;
+  categoryId: number;
   category: string;
   imageUrl: string;
   title: string;
   description: string;
   price: number;
+  stock: number;
+  destacado: boolean;
 }
 
 @Component({

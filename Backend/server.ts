@@ -1,41 +1,29 @@
+import { env } from './src/config/env'; // debe ser el primer import: carga el .env
 import express from 'express';
 import cors from 'cors';
-import { prisma } from './src/config/prisma';
 import productoRoutes from './src/routes/producto.routes';
 import usuarioRoutes from './src/routes/usuario.routes';
+import categoriaRoutes from './src/routes/categoria.routes';
+import pedidoRoutes from './src/routes/pedido.routes';
+import { manejarErrores, rutaNoEncontrada } from './src/middleware/error.middleware';
 
 const app = express();
-const PORT = 3000;
 
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok' });
+});
 
 app.use('/api/productos', productoRoutes);
 app.use('/api/usuarios', usuarioRoutes);
+app.use('/api/pedidos', pedidoRoutes);
+app.use('/api', categoriaRoutes); // /api/categorias y /api/subcategorias
 
-app.get('/api/categorias', async (_req, res) => {
-  try {
-    const categorias = await prisma.categoria.findMany({
-      orderBy: { id: 'asc' }
-    });
-    res.json(categorias);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener categorías' });
-  }
-});
+app.use('/api', rutaNoEncontrada);
+app.use(manejarErrores);
 
-
-app.get('/api/subcategorias', async (_req, res) => {
-  try {
-    const subcategorias = await prisma.subcategoria.findMany({
-      orderBy: { id: 'asc' }
-    });
-    res.json(subcategorias);
-  } catch (error) {
-    res.status(500).json({ error: 'Error al obtener subcategorías' });
-  }
-});
-app.listen(PORT, () => {
-  console.log(`Backend escuchando en http://localhost:${PORT}`);
+app.listen(env.port, () => {
+  console.log(`Backend escuchando en http://localhost:${env.port}`);
 });

@@ -8,6 +8,7 @@ import { CatalogoProductoComponent } from './catalogo-producto/catalogo-producto
 import { AdminProductosListComponent } from './admin-productos-list/admin-productos-list.component';
 import { AdminProductoFormComponent } from './admin-productos-form/admin-productos-form.component';
 import { adminGuard } from './guards/admin-guard';
+import { authGuard } from './guards/auth-guard';
 
 export const routes: Routes = [
 {
@@ -23,7 +24,8 @@ export const routes: Routes = [
 },
 {
     path: 'perfil',
-    component: PerfilComponent
+    component: PerfilComponent,
+    canActivate: [authGuard]
 },
 {
     path: 'login',

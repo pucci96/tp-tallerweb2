@@ -72,8 +72,21 @@ export class AuthService {
     return this.usuarioActual() !== null && localStorage.getItem('token') !== null;
   }
 
+  esAdmin(): boolean {
+    return this.estaLogueado() && this.usuarioActual()?.rol === 'ADMIN';
+  }
+
+  obtenerToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
   private leerSesion(): UsuarioSesion | null {
-    const guardado = localStorage.getItem('usuario');
-    return guardado ? JSON.parse(guardado) : null;
+    try {
+      const guardado = localStorage.getItem('usuario');
+      return guardado ? JSON.parse(guardado) : null;
+    } catch {
+      // Sesión corrupta en localStorage: se ignora en lugar de romper la app.
+      return null;
+    }
   }
 }

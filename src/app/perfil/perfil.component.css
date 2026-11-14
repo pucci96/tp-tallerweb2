@@ -549,3 +549,30 @@ input:checked + .slider:before {
     grid-template-columns: 1fr;
   }
 }
+/* Formulario en modo lectura (antes de "Modificar mis datos") y email no editable */
+.profile-form input:disabled {
+  background: #f1f5f9;
+  color: #475569;
+  cursor: not-allowed;
+}
+
+.password-help {
+  display: block;
+  margin-top: -0.5rem;
+}
+
+.form-error {
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  font-size: 0.88rem;
+}
+
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}

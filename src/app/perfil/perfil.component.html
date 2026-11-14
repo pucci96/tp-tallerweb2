@@ -25,7 +25,7 @@
   </header>
 
   <!-- Banner de alerta de éxito -->
-  <div class="alert-success" *ngIf="mostrarAlertaExito">
+  <div class="alert-success" *ngIf="mostrarAlertaExito()">
     <div class="alert-content">
       <div class="alert-icon">
         <svg viewBox="0 0 24 24" fill="currentColor">
@@ -56,8 +56,8 @@
           </button>
         </div>
 
-        <h2 class="user-card-name">{{ usuario.nombre }} {{ usuario.apellido }}</h2>
-        <span class="user-card-email">{{ usuario.email }}</span>
+        <h2 class="user-card-name">{{ datos()?.nombre }} {{ datos()?.apellido }}</h2>
+        <span class="user-card-email">{{ datos()?.email }}</span>
         
         <div class="client-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -144,14 +144,17 @@
         <h2 class="form-title">Mis datos personales</h2>
         <p class="form-subtitle">Actualizá tus datos para agilizar el proceso de compra, emisión de factura y seguimiento de envíos.</p>
 
-        <form (ngSubmit)="guardarCambios()" class="profile-form">
+        <!-- El formulario arranca inhabilitado; "Modificar mis datos" lo habilita -->
+        <form (ngSubmit)="guardarCambios()" class="profile-form" [class.form-bloqueado]="!modoEdicion()">
           <!-- Fila Nombre y Apellido -->
           <div class="form-row">
             <div class="form-group">
               <label>Nombre <span class="required">*</span></label>
               <div class="input-wrapper">
                 <span class="input-icon"></span>
-                <input type="text" [(ngModel)]="usuario.nombre" name="nombre" required />
+                <input type="text" name="nombre" required
+                  [ngModel]="nombre()" (ngModelChange)="nombre.set($event)"
+                  [disabled]="!modoEdicion()" />
               </div>
             </div>
 
@@ -159,19 +162,21 @@
               <label>Apellido <span class="required">*</span></label>
               <div class="input-wrapper">
                 <span class="input-icon"></span>
-                <input type="text" [(ngModel)]="usuario.apellido" name="apellido" required />
+                <input type="text" name="apellido" required
+                  [ngModel]="apellido()" (ngModelChange)="apellido.set($event)"
+                  [disabled]="!modoEdicion()" />
               </div>
             </div>
           </div>
 
-          <!-- Email -->
+          <!-- Email: se muestra pero nunca se puede editar -->
           <div class="form-group">
-            <label>Email / Correo electrónico <span class="required">*</span></label>
+            <label>Email / Correo electrónico</label>
             <div class="input-wrapper">
               <span class="input-icon"></span>
-              <input type="email" [(ngModel)]="usuario.email" name="email" required />
+              <input type="email" [value]="datos()?.email ?? ''" disabled />
             </div>
-            <span class="helper-text"> Utilizado para confirmaciones de compras y seguimiento de envíos.</span>
+            <span class="helper-text"> El email no se puede modificar.</span>
           </div>
 
           <!-- Dirección de entrega -->
@@ -179,35 +184,67 @@
             <label>Dirección de entrega <span class="required">*</span></label>
             <div class="input-wrapper">
               <span class="input-icon"></span>
-              <input type="text" [(ngModel)]="usuario.direccion" name="direccion" required />
+              <input type="text" name="direccion" required
+                [ngModel]="direccion()" (ngModelChange)="direccion.set($event)"
+                [disabled]="!modoEdicion()" />
             </div>
             <span class="helper-text"> Dirección principal predeterminada para el cálculo de flete vía Andreani / OCA.</span>
           </div>
 
-          <!-- Contraseña -->
-          <div class="form-group">
-            <label>Contraseña (o nueva contraseña)</label>
-            <div class="input-wrapper">
-              <span class="input-icon"></span>
-              <input [type]="mostrarPassword ? 'text' : 'password'" [(ngModel)]="usuario.password" name="password" />
-              <button type="button" class="btn-toggle-eye" (click)="toggleMostrarPassword()" aria-label="Ver contraseña">
-                👁
-              </button>
+          <!-- Cambio de contraseña: solo se pide en modo edición -->
+          @if (modoEdicion()) {
+            <div class="form-row">
+              <div class="form-group">
+                <label>Contraseña actual</label>
+                <div class="input-wrapper">
+                  <span class="input-icon"></span>
+                  <input name="passwordActual" autocomplete="current-password"
+                    [type]="mostrarPassword() ? 'text' : 'password'"
+                    [ngModel]="passwordActual()" (ngModelChange)="passwordActual.set($event)" />
+                  <button type="button" class="btn-toggle-eye" (click)="toggleMostrarPassword()" aria-label="Ver contraseñas">
+                    👁
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Contraseña nueva</label>
+                <div class="input-wrapper">
+                  <span class="input-icon"></span>
+                  <input name="passwordNueva" autocomplete="new-password"
+                    [type]="mostrarPassword() ? 'text' : 'password'"
+                    [ngModel]="passwordNueva()" (ngModelChange)="passwordNueva.set($event)" />
+                </div>
+              </div>
             </div>
-            <span class="helper-text">🛡 Dejá este campo en blanco si no deseás cambiar tu clave actual.</span>
-          </div>
+            <span class="helper-text password-help">🛡 Dejá ambos campos en blanco si no querés cambiar tu contraseña. La nueva debe tener al menos 8 caracteres, con letras y números.</span>
+          }
+
+          @if (mensajeError()) {
+            <p class="form-error" role="alert">{{ mensajeError() }}</p>
+          }
 
           <!-- Botones de Acción -->
           <div class="form-actions">
-            <button type="button" class="btn-secondary">Cancelar</button>
-            <button type="submit" class="btn-primary">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                <polyline points="7 3 7 8 15 8"></polyline>
-              </svg>
-              Guardar cambios
-            </button>
+            @if (modoEdicion()) {
+              <button type="button" class="btn-secondary" (click)="cancelarEdicion()" [disabled]="guardando()">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="guardando()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+              </button>
+            } @else {
+              <button type="button" class="btn-primary" (click)="habilitarEdicion()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+                </svg>
+                Modificar mis datos
+              </button>
+            }
           </div>
         </form>
       </div>

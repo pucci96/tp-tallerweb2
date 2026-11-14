@@ -16,7 +16,8 @@
     <nav class="nav-links">
       <a routerLink="/productos" routerLinkActive="active" class="nav-link">Productos</a>
       @if (auth.esAdmin()) {
-        <a routerLink="/admin/productos" routerLinkActive="active" class="nav-link">Administración</a>
+        <a routerLink="/admin/productos" routerLinkActive="active" class="nav-link">Inventario</a>
+        <a routerLink="/admin/productos/nuevo" routerLinkActive="active" class="nav-link">Nuevo Producto</a>
       }
     </nav>
   </div>

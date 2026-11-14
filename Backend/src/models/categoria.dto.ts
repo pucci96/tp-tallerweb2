@@ -1,19 +1,21 @@
 export interface CategoriaDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+  id: number;
+  nombre: string;
+  imagen: string;
 }
 
 export interface CrearCategoriaDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+  nombre: string;
+  imagen?: string;
 }
 
 export interface SubcategoriaDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+  id: number;
+  id_categoria: number;
+  nombre: string;
 }
 
 export interface CrearSubcategoriaDTO {
-    id: number;
-//TODO: Agregar campos necesarios
+  id_categoria: number;
+  nombre: string;
 }

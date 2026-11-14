@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
-import { ProductCardComponent } from '../productCard/productCard.component'; 
+import { ProductCardComponent } from '../productCard/productCard.component';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-catalogo-producto',
@@ -32,14 +33,14 @@ export class CatalogoProductoComponent implements OnInit {
 }
 
 cargarDatos(): void {
-  this.http.get<any[]>('http://localhost:3000/api/productos').subscribe({
+  this.http.get<any[]>(`${environment.apiUrl}/productos`).subscribe({
     next: (data) => {
       this.productos = data;
     },
     error: (err) => console.error('Error en productos:', err)
   });
 
-  this.http.get<any[]>('http://localhost:3000/api/categorias').subscribe({
+  this.http.get<any[]>(`${environment.apiUrl}/categorias`).subscribe({
     next: (data) => {
       this.categorias = data;
     },

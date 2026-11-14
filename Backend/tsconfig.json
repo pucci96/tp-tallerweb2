@@ -1,0 +1,20 @@
+{
+  // Configuración de TypeScript para el backend (Node + Express).
+  // El servidor se ejecuta con tsx; este archivo sirve para el chequeo de tipos
+  // (npm run typecheck:back) y para que VS Code marque los errores.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "commonjs",
+    "moduleResolution": "node10",
+    "ignoreDeprecations": "6.0",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["server.ts", "src/**/*.ts", "prisma/**/*.ts"],
+  "exclude": ["src/prisma.config.ts"]
+}

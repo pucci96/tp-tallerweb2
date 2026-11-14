@@ -7,20 +7,21 @@ export function limpiarNumeroTarjeta(valor: string): string {
 export const numeroTarjetaValidator: ValidatorFn = (
   control: AbstractControl,
 ): ValidationErrors | null => {
-  const valor = limpiarNumeroTarjeta(String(control.value ?? ''));
-  if (!valor) {
+  const crudo = String(control.value ?? '');
+  // Only a truly empty value is left to Validators.required; blanks must fail here.
+  if (crudo === '') {
     return null;
   }
-  return /^\d{16}$/.test(valor) ? null : { numeroTarjeta: true };
+  return /^\d{16}$/.test(limpiarNumeroTarjeta(crudo)) ? null : { numeroTarjeta: true };
 };
 
 export function vencimientoValidator(hoy: () => Date = () => new Date()): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
-    const valor = String(control.value ?? '').trim();
-    if (!valor) {
+    const crudo = String(control.value ?? '');
+    if (crudo === '') {
       return null;
     }
-    const coincidencia = /^(\d{2})\/(\d{2})$/.exec(valor);
+    const coincidencia = /^(\d{2})\/(\d{2})$/.exec(crudo.trim());
     if (!coincidencia) {
       return { vencimientoFormato: true };
     }

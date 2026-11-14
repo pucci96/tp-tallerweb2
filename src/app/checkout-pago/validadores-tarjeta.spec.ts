@@ -27,6 +27,14 @@ describe('validadores de tarjeta', () => {
     expect(vencimiento('')).toBeNull();
   });
 
+  it('debería rechazar un número compuesto solo por espacios', () => {
+    expect(numero('   ')).toEqual({ numeroTarjeta: true });
+  });
+
+  it('debería rechazar un vencimiento compuesto solo por espacios', () => {
+    expect(vencimiento('   ')).toEqual({ vencimientoFormato: true });
+  });
+
   it('debería exigir el formato MM/AA', () => {
     expect(vencimiento('3/27')).toEqual({ vencimientoFormato: true });
     expect(vencimiento('03-27')).toEqual({ vencimientoFormato: true });

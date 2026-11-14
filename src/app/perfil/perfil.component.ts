@@ -30,8 +30,6 @@ export class PerfilComponent implements OnInit {
     password: '',
     notificacionesWhatsapp: true,
     telefono: '+54 9 11 5824-9102',
-    puntosHardware: 2450,
-    nivelHardware: 2
   };
 
   ngOnInit(): void {

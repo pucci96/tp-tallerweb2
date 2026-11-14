@@ -1,0 +1,92 @@
+<section class="payment">
+  <a routerLink="/checkout" class="back-link">← Volver al pedido</a>
+  <h1 class="payment-title">Pago con tarjeta</h1>
+
+  <div class="payment-grid">
+    <form class="card card-form" [formGroup]="form" (ngSubmit)="pagar()" novalidate>
+      <label class="field">
+        <span>Número de tarjeta</span>
+        <input
+          type="text"
+          formControlName="numero"
+          inputmode="numeric"
+          autocomplete="cc-number"
+          placeholder="4111 1111 1111 1111"
+          maxlength="19"
+        />
+        @if (campoInvalido('numero')) {
+          <small class="field-error">Ingresá los 16 dígitos de la tarjeta.</small>
+        }
+      </label>
+
+      <label class="field">
+        <span>Titular</span>
+        <input type="text" formControlName="titular" autocomplete="cc-name" placeholder="Como figura en la tarjeta" />
+        @if (campoInvalido('titular')) {
+          <small class="field-error">Ingresá el nombre del titular.</small>
+        }
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Vencimiento</span>
+          <input type="text" formControlName="vencimiento" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5" />
+          @if (campoInvalido('vencimiento')) {
+            <small class="field-error">Usá MM/AA con una fecha vigente.</small>
+          }
+        </label>
+        <label class="field">
+          <span>CVV</span>
+          <input
+            type="password"
+            formControlName="cvv"
+            inputmode="numeric"
+            autocomplete="cc-csc"
+            placeholder="123"
+            maxlength="3"
+          />
+          @if (campoInvalido('cvv')) {
+            <small class="field-error">3 dígitos.</small>
+          }
+        </label>
+      </div>
+
+      <p class="test-hint">Modo de prueba: las tarjetas terminadas en <strong>0000</strong> son rechazadas.</p>
+
+      @if (error(); as motivo) {
+        <div class="payment-error" role="alert"><strong>Pago rechazado:</strong> {{ motivo }}</div>
+      }
+
+      <button
+        type="submit"
+        class="btn-primary btn-block"
+        data-test="pagar"
+        [disabled]="form.invalid || procesando()"
+      >
+        @if (procesando()) {
+          Procesando pago...
+        } @else if (error()) {
+          Reintentar
+        } @else {
+          Pagar $ {{ total() | number: '1.0-0' }} ARS
+        }
+      </button>
+    </form>
+
+    <aside class="card summary">
+      <h2 class="section-title">Tu pedido</h2>
+      <div class="summary-row">
+        <span>{{ cantidadTotal() }} productos</span>
+        <span>$ {{ total() | number: '1.0-0' }} ARS</span>
+      </div>
+      <div class="summary-row">
+        <span>Envío</span>
+        <span class="free">Gratis</span>
+      </div>
+      <div class="summary-row summary-total">
+        <span>Total</span>
+        <span>$ {{ total() | number: '1.0-0' }} ARS</span>
+      </div>
+    </aside>
+  </div>
+</section>

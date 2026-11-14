@@ -9,6 +9,8 @@ import { AdminProductosListComponent } from './admin-productos-list/admin-produc
 import { AdminProductoFormComponent } from './admin-productos-form/admin-productos-form.component';
 import { adminGuard } from './guards/admin-guard';
 import { CheckoutConfirmacionComponent } from './checkout-confirmacion/checkout-confirmacion.component';
+import { CheckoutPagoComponent } from './checkout-pago/checkout-pago.component';
+import { carritoNoVacioGuard } from './guards/carrito-no-vacio.guard';
 
 export const routes: Routes = [
 {
@@ -56,6 +58,11 @@ export const routes: Routes = [
 {
     path: 'checkout',
     component: CheckoutConfirmacionComponent
+},
+{
+    path: 'checkout/pago',
+    component: CheckoutPagoComponent,
+    canActivate: [carritoNoVacioGuard]
 },
 {
     path: '**',

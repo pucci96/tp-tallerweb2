@@ -1391,6 +1391,8 @@ export class CheckoutResultadoComponent implements OnInit {
 
 ## Task 7: Header and detail page wiring
 
+> **Update (header from upstream `main`, commit 69332b6):** the header was replaced by upstream's version (login/logout, admin link, `cartCount = 0` with a TODO, badge rendered only when `cartCount > 0`). The wiring was applied to that header instead of the snippets below: `cartCount` became `inject(CartService).cantidadTotal` (TODO removed), the template reads `cartCount()` and keeps the "hide when 0" badge, the cart `<button>` became `<a class="cart-btn" routerLink="/checkout">` (`text-decoration: none` added), and upstream's auth behavior and its spec cases were left untouched. The new spec cases assert no badge for an empty cart, the live count after `agregar`, and `href="/checkout"`. The detail page part was done separately (commit 0abee77).
+
 **Files:**
 - Modify: `src/app/layout/header/header.component.ts|html`, `header.component.spec.ts`
 - Modify: `src/app/detalles-producto/detalles-producto.component.ts|html`, `detalles-producto.component.spec.ts`

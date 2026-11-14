@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -21,6 +21,13 @@ export class PerfilComponent implements OnInit {
 
   /** Datos guardados del usuario (los que muestra la tarjeta de la izquierda). */
   readonly datos = signal<UsuarioSesion | null>(null);
+
+  /** Iniciales del avatar (nombre + apellido guardados), por ejemplo "Juan Pérez" → "JP". */
+  readonly iniciales = computed(() => {
+    const datos = this.datos();
+    const inicial = (texto?: string) => texto?.trim().charAt(0).toUpperCase() ?? '';
+    return inicial(datos?.nombre) + inicial(datos?.apellido);
+  });
 
   /** Campos del formulario. El email no es editable: se muestra desde `datos`. */
   readonly nombre = signal('');

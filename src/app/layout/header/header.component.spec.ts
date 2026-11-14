@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { HeaderComponent } from './header.component';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
@@ -55,5 +56,19 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
 
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('Administración');
+  });
+
+  it('debería ocultar el contador con el carrito vacío y mostrar la cantidad real', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.cart-badge')).toBeNull();
+
+    TestBed.inject(CartService).agregar({ id: 1, nombre: 'Teclado', precio: 1000, imagen: 't.png' }, 3);
+    fixture.detectChanges();
+    expect(compiled.querySelector('.cart-badge')?.textContent?.trim()).toBe('3');
+  });
+
+  it('debería enlazar el botón del carrito a /checkout', () => {
+    const boton = (fixture.nativeElement as HTMLElement).querySelector('.cart-btn');
+    expect(boton?.getAttribute('href')).toBe('/checkout');
   });
 });

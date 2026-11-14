@@ -9,6 +9,10 @@ import { AdminProductosListComponent } from './admin-productos-list/admin-produc
 import { AdminProductoFormComponent } from './admin-productos-form/admin-productos-form.component';
 import { adminGuard } from './guards/admin-guard';
 import { authGuard } from './guards/auth-guard';
+import { CheckoutConfirmacionComponent } from './checkout-confirmacion/checkout-confirmacion.component';
+import { CheckoutPagoComponent } from './checkout-pago/checkout-pago.component';
+import { CheckoutResultadoComponent } from './checkout-resultado/checkout-resultado.component';
+import { carritoNoVacioGuard } from './guards/carrito-no-vacio.guard';
 
 export const routes: Routes = [
 {
@@ -52,8 +56,21 @@ export const routes: Routes = [
   { 
     path: 'admin/productos/editar/:id', 
     component: AdminProductoFormComponent, 
-    canActivate: [adminGuard] 
+    canActivate: [adminGuard]
   },
+{
+    path: 'checkout',
+    component: CheckoutConfirmacionComponent
+},
+{
+    path: 'checkout/pago',
+    component: CheckoutPagoComponent,
+    canActivate: [carritoNoVacioGuard]
+},
+{
+    path: 'checkout/resultado',
+    component: CheckoutResultadoComponent
+},
 {
     path: '**',
     redirectTo:'home'

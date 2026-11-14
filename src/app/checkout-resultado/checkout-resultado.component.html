@@ -1,0 +1,26 @@
+@if (pedido(); as p) {
+  <section class="result">
+    <div class="result-card">
+      <div class="result-icon" aria-hidden="true">✓</div>
+      <h1 class="result-title">¡Pago aprobado!</h1>
+      <p class="result-text">
+        Gracias por tu compra, {{ p.envio.nombre }}. Te enviamos la confirmación a {{ p.envio.email }}.
+      </p>
+      <dl class="result-details">
+        <div>
+          <dt>Número de pedido</dt>
+          <dd class="order-number">{{ p.numeroPedido }}</dd>
+        </div>
+        <div>
+          <dt>Total pagado</dt>
+          <dd>$ {{ p.total | number: '1.0-0' }} ARS</dd>
+        </div>
+        <div>
+          <dt>Envío a</dt>
+          <dd>{{ p.envio.direccion }}, {{ p.envio.ciudad }} ({{ p.envio.codigoPostal }})</dd>
+        </div>
+      </dl>
+      <a routerLink="/home" class="btn-primary">Volver a la tienda</a>
+    </div>
+  </section>
+}

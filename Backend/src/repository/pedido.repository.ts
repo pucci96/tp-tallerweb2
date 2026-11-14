@@ -1,41 +1,45 @@
 import { prisma } from '../config/prisma';
-import { CrearPedidoDTO, CrearPedidoProductoDTO } from '../models/pedido.dto';
+
+const incluirProductos = { productos: { orderBy: { id: 'asc' as const } } };
 
 export class PedidoRepository {
+  async obtenerPedidosDelUsuario(idUsuario: number) {
+    return prisma.pedido.findMany({
+      where: { id_usuario: idUsuario },
+      include: incluirProductos,
+      orderBy: { fecha: 'desc' },
+    });
+  }
 
-    async obtenerPedidosDelUsuario(idUsuario: number) {
-        // Trae los pedidos con sus productos asociados según el schema original
-        return prisma.pedido.findMany({
-            include: {
-                productos: true
-            }
-        });
-    }
+  async obtenerPedido(idPedido: number) {
+    return prisma.pedido.findUnique({
+      where: { id: idPedido },
+      include: incluirProductos,
+    });
+  }
 
-    async obtenerProductosDelPedido(idPedido: number) {
-        return prisma.pedido_productos.findMany({
-            where: { id_pedido: Number(idPedido) }
-        });
-    }
+  async crearPedido(idUsuario: number, estado: string) {
+    return prisma.pedido.create({
+      data: { id_usuario: idUsuario, estado },
+      include: incluirProductos,
+    });
+  }
 
-    async crearPedido(data: CrearPedidoDTO) {
-        return prisma.pedido.create({
-            data: {
-                estado: data.estado || 'carrito',
-                fecha: new Date()
-            }
-        });
-    }
+  async obtenerProductoParaPedido(idProducto: number) {
+    return prisma.producto.findUnique({
+      where: { id: idProducto },
+      include: { categoria: true, subcategoria: true },
+    });
+  }
 
-    async crearPedidoProducto(data: CrearPedidoProductoDTO) {
-        return prisma.pedido_productos.create({
-            data: {
-                id_pedido: Number(data.id_pedido),
-                producto: data.producto,
-                categoria: data.categoria,
-                subcategoria: data.subcategoria,
-                precio: Number(data.precio)
-            }
-        });
-    }
+  async agregarProducto(data: {
+    id_pedido: number;
+    producto: string;
+    categoria: string;
+    subcategoria: string;
+    precio: number;
+    cantidad: number;
+  }) {
+    return prisma.pedido_productos.create({ data });
+  }
 }

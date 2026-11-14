@@ -14,13 +14,13 @@
     </a>
 
     <nav class="nav-links">
-      <a routerLink="/productos" routerLinkActive="active-link" class="nav-link active">Productos</a>
-      <a routerLink="/comparador" class="nav-link">Comparador</a>
-      <a routerLink="/arma-tu-pc" class="nav-link">Armá tu PC</a>
+      <a routerLink="/productos" routerLinkActive="active" class="nav-link">Productos</a>
+      @if (auth.esAdmin()) {
+        <a routerLink="/admin/productos" routerLinkActive="active" class="nav-link">Administración</a>
+      }
     </nav>
   </div>
 
- 
   <div class="nav-right">
     <!-- Carrito -->
     <button class="cart-btn" aria-label="Carrito de compras">
@@ -29,25 +29,29 @@
         <circle cx="19" cy="21" r="1" />
         <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
       </svg>
-      <span class="cart-badge">{{ cartCount }}</span>
+      @if (cartCount > 0) {
+        <span class="cart-badge">{{ cartCount }}</span>
+      }
     </button>
 
-    <!-- Perfil -->
-    <div class="user-profile" routerLink="/perfil">
-      <div class="user-avatar">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
+    @if (auth.usuarioActual(); as usuario) {
+      <!-- Perfil (usuario logueado) -->
+      <div class="user-profile" routerLink="/perfil">
+        <div class="user-avatar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
+        </div>
+        <div class="user-info">
+          <span class="user-name">{{ usuario.nombre }}</span>
+          <span class="user-sub">Mi Cuenta</span>
+        </div>
       </div>
-      <div class="user-info">
-        <span class="user-name">{{ userName }}</span>
-        <span class="user-sub">Mi Cuenta</span>
-      </div>
-      <!-- Flecha desplegable -->
-      <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M6 9l6 6 6-6" />
-      </svg>
-    </div>
+      <button type="button" class="nav-link btn-logout" (click)="cerrarSesion()">Cerrar sesión</button>
+    } @else {
+      <a routerLink="/login" class="nav-link">Iniciar sesión</a>
+      <a routerLink="/registro" class="btn-register">Registrarse</a>
+    }
   </div>
 </header>

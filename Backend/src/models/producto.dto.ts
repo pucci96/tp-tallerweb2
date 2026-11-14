@@ -1,3 +1,4 @@
+/** Producto como lo muestran el catálogo y las cards del frontend. */
 export interface ProductoCardDTO {
   id: number;
   categoryId: number;
@@ -6,19 +7,11 @@ export interface ProductoCardDTO {
   description: string;
   price: number;
   imageUrl: string;
-}
-
-export interface CrearProductoDTO {
-  nombre: string;
-  precio: number;
   stock: number;
-  id_categoria: number;
-  id_subcategoria?: number;
-  imagen?: string;
-  descripcion?: string;
-  destacado?: boolean;
+  destacado: boolean;
 }
 
+/** Producto con todos los campos, para el panel de administración. */
 export interface ProductoAdminDTO {
   id: number;
   nombre: string;
@@ -33,6 +26,7 @@ export interface ProductoAdminDTO {
   descripcion: string;
 }
 
+/** Datos para crear o actualizar un producto (formulario de admin). */
 export interface GuardarProductoDTO {
   nombre: string;
   precio: number;

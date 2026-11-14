@@ -9,6 +9,10 @@
     </a>
   </div>
 
+  @if (mensajeError) {
+    <div class="empty-cell">{{ mensajeError }}</div>
+  }
+
   <div class="table-container">
     @if (productos$ | async; as lista) {
       <table class="admin-table">
@@ -25,26 +29,28 @@
           @for (prod of lista; track prod.id) {
             <tr>
               <td class="cell-product">
-                <img [src]="prod.imageUrl || 'assets/placeholder.png'" alt="thumb" class="prod-thumb" />
+                @if (prod.imagen) {
+                  <img [src]="prod.imagen" [alt]="prod.nombre" class="prod-thumb" />
+                }
                 <div>
-                  <strong>{{ prod.title }}</strong>
+                  <strong>{{ prod.nombre }}</strong>
                   <span class="sub-text">ID: #{{ prod.id }}</span>
                 </div>
               </td>
               <td>
-                <span class="badge-cat">{{ prod.category }}</span>
+                <span class="badge-cat">{{ prod.categoriaNombre }} / {{ prod.subcategoriaNombre }}</span>
               </td>
-              <td>${{ prod.price | number:'1.0-0' }}</td>
+              <td>${{ prod.precio | number:'1.0-0' }}</td>
               <td>
                 <span class="badge-stock stock-ok">
-                  {{ prod.stock ?? 'Disponible' }}
+                  {{ prod.stock }}
                 </span>
               </td>
               <td class="cell-actions">
                 <a [routerLink]="['/admin/productos/editar', prod.id]" class="btn-action edit">
                   Editar
                 </a>
-                <button (click)="eliminarProducto(prod.id, prod.title)" class="btn-action delete">
+                <button (click)="eliminarProducto(prod.id, prod.nombre)" class="btn-action delete">
                   Eliminar
                 </button>
               </td>

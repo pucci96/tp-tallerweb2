@@ -24,6 +24,7 @@ model Usuario {
     apellido        String
     direccion       String
     login           Login   @relation(fields: [email], references: [email])
+    pedidos         Pedido[]
 }
 
 model Rol {
@@ -81,17 +82,22 @@ model Producto_detalles {
 
 model Pedido {
     id              Int     @id @default(autoincrement())
-    fecha           DateTime
-    estado          String
+    id_usuario      Int
+    fecha           DateTime @default(now())
+    estado          String   @default("carrito")
+    usuario         Usuario  @relation(fields: [id_usuario], references: [id])
     productos       Pedido_productos[]
 }
 
+// Guarda una COPIA de nombre/categoría/precio al momento de la compra,
+// así el pedido no cambia si después se edita o borra el producto.
 model Pedido_productos {
     id              Int     @id @default(autoincrement())
-    id_pedido       Int 
+    id_pedido       Int
     producto        String
     categoria       String
     subcategoria    String
     precio          Decimal
+    cantidad        Int     @default(1)
     pedido          Pedido @relation(fields: [id_pedido], references: [id])
 }

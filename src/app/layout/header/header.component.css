@@ -145,3 +145,26 @@
   stroke: #ffffff;
   margin-left: 0.25rem;
 }
+/* Sesión: botones de login / registro / logout */
+.btn-logout {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.btn-register {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease;
+}
+
+.btn-register:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}

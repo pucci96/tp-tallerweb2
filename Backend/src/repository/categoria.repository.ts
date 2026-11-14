@@ -1,19 +1,28 @@
 import { prisma } from '../config/prisma';
-import { CrearCategoriaDTO } from '../models/categoria.dto';
-import { CrearSubcategoriaDTO } from '../models/categoria.dto';
+import { CrearCategoriaDTO, CrearSubcategoriaDTO } from '../models/categoria.dto';
 
 export class CategoriaRepository {
-    async obtenerCategorias(){
-        //TODO: Implementar la lógica para obtener todas las categorías
-    }
-    async obtenerSubcategorias(){
-        //TODO: Implementar la lógica para obtener todas las categorías
-    }
+  async obtenerCategorias() {
+    return prisma.categoria.findMany({ orderBy: { id: 'asc' } });
+  }
 
-    async crearCategoria(data: CrearCategoriaDTO) {
-        //TODO: Implementar la lógica para crear una nueva categoría
-    }
-    async crearSubcategoria(data: CrearSubcategoriaDTO) {
-        //TODO: Implementar la lógica para crear una nueva subcategoría
-    }
+  async obtenerCategoriaPorId(id: number) {
+    return prisma.categoria.findUnique({ where: { id } });
+  }
+
+  async obtenerSubcategorias() {
+    return prisma.subcategoria.findMany({ orderBy: { id: 'asc' } });
+  }
+
+  async crearCategoria(data: CrearCategoriaDTO) {
+    return prisma.categoria.create({
+      data: { nombre: data.nombre, imagen: data.imagen ?? '' },
+    });
+  }
+
+  async crearSubcategoria(data: CrearSubcategoriaDTO) {
+    return prisma.subcategoria.create({
+      data: { nombre: data.nombre, id_categoria: data.id_categoria },
+    });
+  }
 }

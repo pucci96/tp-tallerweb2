@@ -1414,3 +1414,21 @@ margin-left: auto;
   height: 18px;
   display: inline-block;
 }
+
+/* Estados de carga / error de la página de detalle */
+.estado-carga {
+  min-height: 40vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.estado-link {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+}

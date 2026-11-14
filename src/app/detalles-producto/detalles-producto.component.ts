@@ -1,16 +1,14 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ProductService, ProductoDetalle } from '../services/product.service';
 
 export interface ProductThumb {
   label: string;
   src: string;
   alt: string;
-}
-
-export interface ProductSpec {
-  parameter: string;
-  detail: string;
 }
 
 export interface ProductFeature {
@@ -35,22 +33,49 @@ export interface RelatedProduct {
   styleUrls: ['./detalles-producto.component.css']
 })
 export class DetallesProductoComponent {
+  private route = inject(ActivatedRoute);
+  private productService = inject(ProductService);
 
-/* Datos del producto (mismo contenido del diseño original)         */
-  readonly sku = 'TECNO-KB-94500';
-  readonly category = 'Teclados Mecánicos';
-  readonly title = 'Teclado Mecánico RGB Switch Red TKL Custom';
+  /* Producto real, cargado desde el backend según el :id de la URL */
+  readonly producto = signal<ProductoDetalle | null>(null);
+  readonly cargando = signal(true);
+  readonly mensajeError = signal('');
+
+  constructor() {
+    // Se escucha paramMap (y no snapshot) para que, si se navega de un producto
+    // a otro sin salir de la página, se vuelva a cargar con el id nuevo.
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      this.cargarProducto(Number(params.get('id')));
+    });
+  }
+
+  private cargarProducto(id: number): void {
+    this.cargando.set(true);
+    this.mensajeError.set('');
+    this.producto.set(null);
+    this.quantity.set(1);
+
+    this.productService.obtenerDetalle(id).subscribe({
+      next: (producto) => {
+        this.producto.set(producto);
+        this.cargando.set(false);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.mensajeError.set(
+          err.status === 404 || err.status === 400
+            ? 'El producto que buscás no existe o fue eliminado.'
+            : 'No se pudo cargar el producto. Intentá de nuevo más tarde.'
+        );
+        this.cargando.set(false);
+      },
+    });
+  }
+
+  /* Datos de maqueta que todavía no existen en la base (se limpian en el paso 4b) */
   readonly rating = 4.8;
   readonly reviewsCount = 52;
-  readonly price = 94500;
   readonly originalPrice = 112000;
   readonly currency = 'ARS';
-  readonly stockText = 'Stock disponible';
-  readonly stockDetail = '(14 unidades para envío inmediato)';
-
-  readonly mainImageSrc =
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuDVRut7prLz_IW6bEmu-eA4j3AkmUQ_MNUiCFWcVGQ7XL3eaBkbQfgv3RoBCP7zY--vyPPT7Q-_K8sE-NoPOQHirrYPMp8Cu_MtOs5GLmdyZHFiBy9odEqSTVVHsABcfyS8wmpOOJaBSllWyblzgV4UADFRscIVPawfrPE_3uRYWailnhDN04AsFXx5pxRzqfpxd1NyvylhFBnbOih--d9614-W7k0UCicWvAyGcl0';
-  readonly mainImageAlt = 'Teclado Mecánico RGB Switch Red TKL Custom';
 
   readonly thumbnails: ProductThumb[] = [
     {
@@ -78,17 +103,6 @@ export class DetallesProductoComponent {
       src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjxVArcfYTPCgLBH_YFFMGpgMH7pjULlg1TgLnJMXWgvqrz7bGWOuz7SLvKr2Ddxk4PzT8sUGB9G1pfFCdPAkHW6CSZktAo0yoqAU1iTQpMfbp3auOt1seZIP3LAI4u6XrIDAoPbI2YvM5FZTpWsxn0RuFHrgdxb6XM2K88postikMRJH8BoI2xcUndq4VC7LGmfEBvtsEqkDQxLyk7xHISYIztSvYm4WPDK5LpZs',
       alt: 'Gaming battlestation environment at night with keyboard glowing with teal and magenta RGB'
     }
-  ];
-
-  readonly specs: ProductSpec[] = [
-    { parameter: 'Tipo de Interruptor (Switch)', detail: 'Mecánico Red Lineal (Hot-swappable 3/5 pines)' },
-    { parameter: 'Formato', detail: 'TKL 80% (87 Teclas con Layout ISO Español con letra Ñ)' },
-    { parameter: 'Conectividad', detail: 'Cable USB-C a USB-A desmontable mallado (1000Hz Polling Rate)' },
-    { parameter: 'Anti-Ghosting', detail: '100% N-Key Rollover (NKRO) simultáneo' },
-    { parameter: 'Estructura & Material', detail: 'Placa superior de Aluminio Anodizado + Keycaps PBT Doble Inyección' },
-    { parameter: 'Iluminación', detail: 'Chroma RGB 16.8M de colores con 18 modos preestablecidos' },
-    { parameter: 'Dimensiones & Peso', detail: '356 x 135 x 38 mm — 890 gramos (alta estabilidad antideslizante)' },
-    { parameter: 'Compatibilidad SO', detail: 'Windows 11 / 10 / 8, macOS Sonoma/Ventura, Linux Ubuntu & Steam Deck' }
   ];
 
   readonly features: ProductFeature[] = [
@@ -165,20 +179,14 @@ export class DetallesProductoComponent {
   readonly isAddingToCart = signal(false);
   readonly isFavorite = signal(false);
 
-  readonly transferPrice = computed(() => Math.round(this.price * 0.9));
-  readonly maxQuantity = 5;
-
-  readonly activeImage = computed(() => {
-    const thumb = this.thumbnails[this.selectedThumbnail()];
-    return {
-      src: thumb?.src ?? this.mainImageSrc,
-      alt: thumb?.alt ?? this.mainImageAlt,
-    };
-  });
+  readonly transferPrice = computed(() => Math.round((this.producto()?.precio ?? 0) * 0.9));
+  /** No se puede elegir más cantidad que el stock disponible. */
+  readonly maxQuantity = computed(() => Math.max(1, this.producto()?.stock ?? 1));
+  readonly sinStock = computed(() => (this.producto()?.stock ?? 0) <= 0);
 
   /*Acciones*/
   changeQuantity(delta: number): void {
-    const next = Math.max(1, Math.min(this.maxQuantity, this.quantity() + delta));
+    const next = Math.max(1, Math.min(this.maxQuantity(), this.quantity() + delta));
     this.quantity.set(next);
   }
 

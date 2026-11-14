@@ -29,10 +29,14 @@ export class PerfilComponent implements OnInit {
   readonly passwordActual = signal('');
   readonly passwordNueva = signal('');
 
-  /** El formulario arranca inhabilitado; se habilita con "Modificar mis datos". */
+  /** Sección visible del panel derecho, elegida desde el menú lateral. */
+  readonly seccion = signal<'datos' | 'seguridad'>('datos');
+
+  /** El formulario de datos arranca inhabilitado; se habilita con "Modificar mis datos". */
   readonly modoEdicion = signal(false);
   readonly guardando = signal(false);
-  readonly mostrarAlertaExito = signal(false);
+  /** Texto del cartel verde de éxito (vacío = no se muestra). */
+  readonly mensajeExito = signal('');
   readonly mensajeError = signal('');
   readonly mostrarPassword = signal(false);
 
@@ -64,9 +68,19 @@ export class PerfilComponent implements OnInit {
     this.mostrarPassword.set(false);
   }
 
+  /** Menú lateral: cambia de sección y descarta lo que no se haya guardado. */
+  mostrarSeccion(seccion: 'datos' | 'seguridad'): void {
+    if (this.guardando()) return;
+    this.restaurarFormulario();
+    this.modoEdicion.set(false);
+    this.mensajeError.set('');
+    this.mensajeExito.set('');
+    this.seccion.set(seccion);
+  }
+
   /** Botón "Modificar mis datos": habilita el formulario. */
   habilitarEdicion(): void {
-    this.mostrarAlertaExito.set(false);
+    this.mensajeExito.set('');
     this.mensajeError.set('');
     this.modoEdicion.set(true);
   }
@@ -78,39 +92,57 @@ export class PerfilComponent implements OnInit {
     this.modoEdicion.set(false);
   }
 
+  /** Sección "Mis datos": guarda nombre, apellido y dirección. */
   guardarCambios(): void {
     if (!this.modoEdicion() || this.guardando()) return;
 
     const nombre = this.nombre().trim();
     const apellido = this.apellido().trim();
     const direccion = this.direccion().trim();
-    const passwordActual = this.passwordActual();
-    const passwordNueva = this.passwordNueva();
 
     if (!nombre || !apellido || !direccion) {
       this.mensajeError.set('Nombre, apellido y dirección son obligatorios.');
       return;
     }
-    if ((passwordActual && !passwordNueva) || (!passwordActual && passwordNueva)) {
-      this.mensajeError.set('Para cambiar la contraseña completá la actual y la nueva.');
+
+    this.enviar({ nombre, apellido, direccion }, () => {
+      this.modoEdicion.set(false);
+      this.mensajeExito.set('Los cambios en tu información de cuenta y domicilio fueron guardados con éxito.');
+    });
+  }
+
+  /** Sección "Seguridad": cambia la contraseña verificando la actual. */
+  cambiarPassword(): void {
+    if (this.guardando()) return;
+
+    const passwordActual = this.passwordActual();
+    const passwordNueva = this.passwordNueva();
+    if (!passwordActual || !passwordNueva) {
+      this.mensajeError.set('Completá la contraseña actual y la nueva.');
       return;
     }
 
-    const cambios: ActualizarPerfilDatos = { nombre, apellido, direccion };
-    if (passwordActual && passwordNueva) {
-      cambios.passwordActual = passwordActual;
-      cambios.passwordNueva = passwordNueva;
-    }
+    // El endpoint también pide los datos personales: se mandan los ya guardados, sin cambios.
+    const datos = this.datos();
+    if (!datos) return;
 
+    this.enviar(
+      { nombre: datos.nombre, apellido: datos.apellido, direccion: datos.direccion, passwordActual, passwordNueva },
+      () => this.mensajeExito.set('Tu contraseña fue cambiada con éxito.')
+    );
+  }
+
+  /** Envía los cambios al backend; en caso de éxito recarga los datos y ejecuta `alTerminar`. */
+  private enviar(cambios: ActualizarPerfilDatos, alTerminar: () => void): void {
     this.guardando.set(true);
     this.mensajeError.set('');
+    this.mensajeExito.set('');
 
     this.authService.actualizarMisDatos(cambios).subscribe({
       next: (usuario) => {
         this.guardando.set(false);
-        this.cargarDatos(usuario);
-        this.modoEdicion.set(false);
-        this.mostrarAlertaExito.set(true);
+        this.cargarDatos(usuario); // también vacía las contraseñas
+        alTerminar();
       },
       error: (err: HttpErrorResponse) => {
         this.guardando.set(false);
@@ -126,7 +158,7 @@ export class PerfilComponent implements OnInit {
   }
 
   cerrarAlerta(): void {
-    this.mostrarAlertaExito.set(false);
+    this.mensajeExito.set('');
   }
 
   toggleMostrarPassword(): void {

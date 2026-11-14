@@ -227,6 +227,7 @@
   background: transparent;
   width: 100%;
   box-sizing: border-box;
+  font-family: inherit;
   transition: all 0.15s ease;
 }
 
@@ -554,11 +555,6 @@ input:checked + .slider:before {
   background: #f1f5f9;
   color: #475569;
   cursor: not-allowed;
-}
-
-.password-help {
-  display: block;
-  margin-top: -0.5rem;
 }
 
 .form-error {

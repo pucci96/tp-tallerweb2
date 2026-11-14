@@ -104,6 +104,50 @@ describe('CheckoutPagoComponent', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
+  it('debería pagar completando la tarjeta desde el DOM y haciendo clic en pagar', async () => {
+    const el = fixture.nativeElement as HTMLElement;
+    const boton = el.querySelector('[data-test="pagar"]') as HTMLButtonElement;
+    const valores: Record<string, string> = {
+      numero: '4111 1111 1111 1111',
+      titular: 'Ana García',
+      vencimiento: '12/99',
+      cvv: '123',
+    };
+    for (const [campo, valor] of Object.entries(valores)) {
+      const input = el.querySelector(`input[formControlName="${campo}"]`) as HTMLInputElement;
+      input.value = valor;
+      input.dispatchEvent(new Event('input'));
+    }
+    await fixture.whenStable();
+    expect(boton.disabled).toBe(false);
+
+    boton.click();
+    await fixture.whenStable();
+    expect(boton.textContent).toContain('Procesando pago...');
+    expect(boton.disabled).toBe(true);
+
+    await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith(['/checkout/resultado']));
+    expect(cart.items()).toEqual([]);
+    expect(TestBed.inject(CheckoutService).ultimoPedido()?.numeroPedido).toMatch(/^TC-\d{6}$/);
+  });
+
+  it('debería descartar el resultado si la vista se destruye antes de que llegue', () => {
+    const pendiente = new Subject<ResultadoPago>();
+    vi.spyOn(TestBed.inject(PaymentSimulatorService), 'procesarPago').mockReturnValue(pendiente);
+    const checkout = TestBed.inject(CheckoutService);
+    const registrar = vi.spyOn(checkout, 'registrarPedido');
+    completarTarjeta('4111 1111 1111 1111');
+
+    component.pagar();
+    fixture.destroy();
+    pendiente.next({ aprobado: true, numeroPedido: 'TC-123456' });
+
+    expect(navigate).not.toHaveBeenCalled();
+    expect(registrar).not.toHaveBeenCalled();
+    expect(checkout.ultimoPedido()).toBeNull();
+    expect(cart.cantidadTotal()).toBe(2);
+  });
+
   it('debería ignorar un segundo envío mientras procesa', () => {
     const pendiente = new Subject<ResultadoPago>();
     const procesar = vi

@@ -107,6 +107,33 @@ describe('CheckoutConfirmacionComponent', () => {
     }
   });
 
+  it('debería completar el formulario desde el DOM y navegar al pago al enviar', async () => {
+    TestBed.inject(CartService).agregar({ id: 1, nombre: 'Teclado', precio: 1000, imagen: 't.png' });
+    const el = await crear();
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+    const boton = el.querySelector('[data-test="continuar"]') as HTMLButtonElement;
+
+    const valores: Record<string, string> = {
+      nombre: 'Ana',
+      apellido: 'García',
+      email: 'ana@mail.com',
+      direccion: 'Calle 123',
+      ciudad: 'CABA',
+      codigoPostal: '1414',
+    };
+    for (const [campo, valor] of Object.entries(valores)) {
+      const input = el.querySelector(`input[formControlName="${campo}"]`) as HTMLInputElement;
+      input.value = valor;
+      input.dispatchEvent(new Event('input'));
+    }
+    await fixture.whenStable();
+    expect(boton.disabled).toBe(false);
+
+    boton.click();
+    expect(TestBed.inject(CheckoutService).datosEnvio()).toEqual(valores);
+    expect(navigate).toHaveBeenCalledWith(['/checkout/pago']);
+  });
+
   it('debería guardar los datos de envío y navegar al pago', async () => {
     TestBed.inject(CartService).agregar({ id: 1, nombre: 'Teclado', precio: 1000, imagen: 't.png' });
     await crear();

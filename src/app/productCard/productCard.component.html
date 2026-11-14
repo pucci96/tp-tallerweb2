@@ -1,28 +1,49 @@
-<article class="card">
- 
+<article class="card product-card-container">
+  
+  <!-- Notificación Toast Flotante estilo Mercado Libre -->
+  @if (mensajeAlerta) {
+    <div class="toast-notification" [class.toast-error]="tipoAlerta === 'danger'">
+      {{ mensajeAlerta }}
+    </div>
+  }
+
   <div class="card-image-box">
     <span class="category-badge">{{ product.category }}</span>
     <img [src]="product.imageUrl" [alt]="product.title" class="product-img" />
   </div>
 
-  
   <div class="card-content">
     <h3 class="product-title" [title]="product.title">{{ product.title }}</h3>
     <p class="product-description">{{ product.description }}</p>
 
-   
     <div class="card-footer">
       <div class="price-box">
         <span class="price-label">Precio contado</span>
         <strong class="price-value">$ {{ product.price | number:'1.0-0' }} ARS</strong>
       </div>
 
-      <button class="btn-detail" type="button" aria-label="Ver detalle del producto">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-          <circle cx="12" cy="12" r="3"></circle>
-        </svg>
-      </button>
+      <div class="actions-box" style="display: flex; gap: 8px; align-items: center;">
+        <!-- Botón Ver Detalle -->
+        <button class="btn-detail" type="button" aria-label="Ver detalle del producto" title="Ver detalle">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="eye-icon">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+
+        <!-- Botón Carrito condicional (Solo se muestra si hay stock gracias a las Signals) -->
+        @if (hayStock()) {
+          <button class="btn-detail btn-cart" type="button" (click)="agregarAlCarrito()" aria-label="Agregar al carrito" title="Agregar al carrito">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 20px; height: 20px;">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+          </button>
+        } @else {
+          <span class="badge-sin-stock">Sin stock</span>
+        }
+      </div>
     </div>
   </div>
 </article>

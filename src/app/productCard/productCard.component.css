@@ -128,3 +128,46 @@
   width: 20px;
   height: 20px;
 }
+
+.product-card-container {
+  position: relative; 
+  overflow: hidden;
+}
+
+
+.toast-notification {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #198754; 
+  color: white;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+  white-space: nowrap;
+  animation: fadeInOut 3s ease forwards;
+}
+
+.toast-error {
+  background-color: #dc3545; 
+}
+
+.badge-sin-stock {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #842029;
+  background-color: #f8d7da;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -10px); }
+  15% { opacity: 1; transform: translate(-50%, 0); }
+  85% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
+}

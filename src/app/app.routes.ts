@@ -7,6 +7,7 @@ import { DetallesProductoComponent } from './detalles-producto/detalles-producto
 import { CatalogoProductoComponent } from './catalogo-producto/catalogo-producto.component';
 import { AdminProductosListComponent } from './admin-productos-list/admin-productos-list.component';
 import { AdminProductoFormComponent } from './admin-productos-form/admin-productos-form.component';
+import { CarritoComponent } from './carrito/carrito.component';
 import { adminGuard } from './guards/admin-guard';
 import { authGuard } from './guards/auth-guard';
 
@@ -27,6 +28,11 @@ export const routes: Routes = [
     component: PerfilComponent,
     canActivate: [authGuard]
 },
+{
+    path: 'carrito', 
+    component: CarritoComponent,
+    canActivate: [authGuard]
+  },
 {
     path: 'login',
     component: LoginComponent

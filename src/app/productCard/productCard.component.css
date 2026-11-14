@@ -128,3 +128,12 @@
   width: 20px;
   height: 20px;
 }
+/* Enlaces al detalle del producto (/productos/:id) */
+.product-title-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-title-link:hover {
+  color: #0d6efd;
+}

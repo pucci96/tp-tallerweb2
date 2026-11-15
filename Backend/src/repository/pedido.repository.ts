@@ -48,6 +48,14 @@ export class PedidoRepository {
       where: { id: idItemPedido },
     });
   }
+
+  async actualizarEstadoPedido(idPedido: number, estado: string) {
+    return prisma.pedido.update({
+      where: { id: idPedido },
+      data: { estado },
+      include: incluirProductos, // Para que devuelva el pedido con sus productos mapeados correctamente
+    });
+  }
 }
 
 

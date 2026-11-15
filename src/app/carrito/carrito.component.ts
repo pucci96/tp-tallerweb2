@@ -20,7 +20,7 @@ export class CarritoComponent implements OnInit {
   carrito: PedidoDTO | null = null;
   cargando: boolean = true;
   
-  // Mensaje estilo Mercado Libre (Fondo oscuro)
+  
   mensajeAlerta: string | null = null;
 
   ngOnInit(): void {
@@ -121,18 +121,29 @@ export class CarritoComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
- eliminarProducto(idItemPedido: number): void {
-    if (!this.carrito) return;
+ eliminarProducto(idProductoOItem: number): void {
+    if (!this.carrito || !this.carrito.productos) return;
 
-    // Hacemos el DELETE real al backend
-    this.http.delete(`${environment.apiUrl}/pedidos/${this.carrito.id}/productos/${idItemPedido}`).subscribe({
-      next: (pedidoActualizado: any) => {
-        // Recargamos el carrito con la respuesta limpia que devuelve el backend
+    // Buscamos si hay varios ítems en el carrito que correspondan al mismo producto (por id_producto)
+    const itemEncontrado = this.carrito.productos.find(p => p.id === idProductoOItem || p.id_producto === idProductoOItem);
+    const idProductoReal = itemEncontrado ? (itemEncontrado.id_producto ?? itemEncontrado.id) : idProductoOItem;
+
+    // Hacemos una petición DELETE masiva o apuntamos al endpoint que limpia el producto entero del pedido
+    // Si tu backend soporta borrar por id_producto o si mandamos el id del ítem:
+    this.http.delete(`${environment.apiUrl}/pedidos/${this.carrito.id}/productos/producto/${idProductoReal}`).subscribe({
+      next: () => {
         this.cargarCarritoConImagenes();
-        this.mostrarToastML('¡Listo! Eliminaste el producto.');
+        this.mostrarToastML('¡Listo! Eliminaste el producto del carrito.');
       },
       error: (err) => {
         console.error('Error al eliminar el producto:', err);
+        // Fallback por si el backend usa el id directo del renglón
+        this.http.delete(`${environment.apiUrl}/pedidos/${this.carrito!.id}/productos/${idProductoOItem}`).subscribe({
+          next: () => {
+            this.cargarCarritoConImagenes();
+            this.mostrarToastML('¡Listo! Eliminaste el producto del carrito.');
+          }
+        });
       }
     });
   }
@@ -158,12 +169,21 @@ export class CarritoComponent implements OnInit {
   finalizarCompra(): void {
     if (!this.carrito) return;
 
-    this.mostrarToastML('¡Compra finalizada con éxito!');
-    setTimeout(() => {
-      this.carrito = null;
-      this.pedidoService.cantidadCarrito.set(0);
-      this.cdr.detectChanges();
-    }, 2000);
+    // Llamamos al servicio centralizado
+    this.pedidoService.finalizarPedido(this.carrito.id).subscribe({
+      next: () => {
+        this.mostrarToastML('¡Compra finalizada con éxito!');
+        
+        // Limpiamos la vista y ponemos el contador del header en 0
+        this.carrito = null;
+        this.pedidoService.cantidadCarrito.set(0);
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al finalizar la compra en el servidor:', err);
+        this.mostrarToastML('Hubo un error al procesar tu compra.');
+      }
+    });
   }
 
   private mostrarToastML(mensaje: string) {

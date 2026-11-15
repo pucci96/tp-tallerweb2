@@ -99,6 +99,10 @@ export class PedidoService {
     );
   }
 
+  finalizarPedido(idPedido: number) {
+    return this.http.put<PedidoDTO>(`${environment.apiUrl}/pedidos/${idPedido}`, { estado: 'completado' });
+  }
+
   /** Elimina un producto específico de un pedido (Petición DELETE al backend) */
   eliminarProductoDelPedido(idPedido: number, idItemPedido: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${idPedido}/productos/${idItemPedido}`);

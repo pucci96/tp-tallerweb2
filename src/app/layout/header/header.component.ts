@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core'; //  Importá OnInit
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -11,13 +11,20 @@ import { PedidoService } from '../../services/pedido.service';
   templateUrl: './header.component.html',
   standalone: true,
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit { // Agregá implements OnInit
   protected readonly auth = inject(AuthService);
   public readonly pedidoService = inject(PedidoService);
   private router = inject(Router);
 
   // Estado para el menú hamburguesa en mobile
   public menuAbierto = false;
+
+  ngOnInit(): void {
+    // 3. Apenas arranca o se recarga la página (F5), consultamos el carrito activo del usuario
+    if (this.auth.usuarioActual()) {
+      this.pedidoService.cargarContadorCarrito();
+    }
+  }
 
   toggleMenu(): void {
     this.menuAbierto = !this.menuAbierto;

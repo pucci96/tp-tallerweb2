@@ -73,7 +73,19 @@
           <span class="user-sub">Mi Cuenta</span>
         </div>
       </div>
-      <button type="button" class="nav-link btn-logout desktop-only" (click)="cerrarSesion()">Cerrar sesión</button>
+      <!-- Cerrar sesión: icono de apagado (power) -->
+      <button
+        type="button"
+        class="btn-logout"
+        (click)="cerrarSesion()"
+        aria-label="Cerrar sesión"
+        title="Cerrar sesión"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18.36 6.64a9 9 0 1 1-12.73 0" />
+          <line x1="12" y1="2" x2="12" y2="12" />
+        </svg>
+      </button>
     } @else {
       <div class="desktop-auth">
         <a routerLink="/login" class="nav-link">Iniciar sesión</a>

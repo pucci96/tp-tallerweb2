@@ -42,7 +42,7 @@ export const routes: Routes = [
     component: RegistroComponent
 },
 {
-    path: 'detalles',
+    path: 'productos/:id',
     component: DetallesProductoComponent
 },
 { 

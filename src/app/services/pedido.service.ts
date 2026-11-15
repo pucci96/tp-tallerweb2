@@ -1,11 +1,12 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface PedidoProductoDTO {
   id: number;
   id_pedido: number;
+  id_producto?: number;
   producto: string;
   categoria: string;
   subcategoria: string;
@@ -58,6 +59,22 @@ export class PedidoService {
     });
   }
 
+  /** Recalcula y actualiza la signal global consultando los pedidos activos del usuario de forma directa */
+  actualizarContadorGlobalDirecto() {
+    this.obtenerMisPedidos().subscribe({
+      next: (pedidos) => {
+        const carritoActivo = pedidos.find(p => p.estado === 'carrito');
+        if (carritoActivo && carritoActivo.productos) {
+          const totalUnidades = carritoActivo.productos.reduce((acc, prod) => acc + Number(prod.cantidad), 0);
+          this.cantidadCarrito.set(totalUnidades);
+        } else {
+          this.cantidadCarrito.set(0);
+        }
+      },
+      error: () => this.cantidadCarrito.set(0)
+    });
+  }
+
   /** Obtiene todos los pedidos realizados / carritos del usuario logueado. */
   obtenerMisPedidos(): Observable<PedidoDTO[]> {
     return this.http.get<PedidoDTO[]>(this.apiUrl);
@@ -74,11 +91,16 @@ export class PedidoService {
   }
 
   /** Agrega un producto a un pedido en estado carrito e incrementa la signal global de forma reactiva. */
-  agregarProducto(idPedido: number, data: AgregarProductoDTO): Observable<PedidoProductoDTO> {
+  agregarProducto(idPedido: number, data: AgregarProductoDTO): Observable<any> {
     return this.http.post<PedidoProductoDTO>(`${this.apiUrl}/${idPedido}/productos`, data).pipe(
       tap(() => {
         this.cantidadCarrito.update(count => count + (data.cantidad ?? 1));
       })
     );
+  }
+
+  /** Elimina un producto específico de un pedido (Petición DELETE al backend) */
+  eliminarProductoDelPedido(idPedido: number, idItemPedido: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${idPedido}/productos/${idItemPedido}`);
   }
 }

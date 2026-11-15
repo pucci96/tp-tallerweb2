@@ -42,4 +42,12 @@ export class PedidoRepository {
   }) {
     return prisma.pedido_productos.create({ data });
   }
+
+  async eliminarProductoDelPedido(idItemPedido: number) {
+    return prisma.pedido_productos.delete({
+      where: { id: idItemPedido },
+    });
+  }
 }
+
+

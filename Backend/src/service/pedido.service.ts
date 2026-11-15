@@ -58,6 +58,32 @@ export class PedidoService {
     return this.mapearPedido(await this.pedidoRepo.crearPedido(idUsuario, estado));
   }
 
+  async eliminarProductoDelPedido(
+    idPedido: number,
+    idItemPedido: number,
+    idUsuario: number,
+    esAdmin: boolean
+  ): Promise<PedidoDTO> {
+    // 1. Verificamos que el pedido sea del usuario y esté en estado carrito
+    const pedido = await this.pedidoPropio(idPedido, idUsuario, esAdmin);
+    if (pedido.estado !== 'carrito') {
+      throw new HttpError(400, 'Solo se pueden modificar pedidos en estado "carrito"');
+    }
+
+    // 2. Verificamos que el ítem pertenezca realmente a este pedido
+    const productoEnPedido = pedido.productos.find((p) => p.id === idItemPedido);
+    if (!productoEnPedido) {
+      throw new HttpError(404, 'El producto no se encuentra en este carrito');
+    }
+
+    // 3. Borramos el ítem en la base de datos usando el repositorio
+    await this.pedidoRepo.eliminarProductoDelPedido(idItemPedido);
+
+    // 4. Retornamos el pedido actualizado para que el frontend reciba los totales y la lista al día
+    const pedidoActualizado = await this.pedidoRepo.obtenerPedido(idPedido);
+    return this.mapearPedido(pedidoActualizado!);
+  }
+
   async agregarProducto(
     idPedido: number,
     idUsuario: number,

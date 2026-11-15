@@ -12,5 +12,5 @@ router.get('/', controller.obtenerMisPedidos);                        // pedidos
 router.post('/', controller.crearPedido);                             // crea un pedido (estado "carrito")
 router.get('/:id_pedido', controller.obtenerPedido);                  // detalle con productos y total
 router.post('/:id_pedido/productos', controller.agregarProducto);     // { id_producto, cantidad }
-
+router.delete('/:id_pedido/productos/:id_item', controller.eliminarProducto);
 export default router;

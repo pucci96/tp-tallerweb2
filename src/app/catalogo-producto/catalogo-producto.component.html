@@ -52,15 +52,15 @@
             </svg>
             Categorías
           </h3>
-          <span class="meta-count">{{ categorias.length }} ramas</span>
+          <span class="meta-count">{{ categorias().length }} ramas</span>
         </div>
 
         <ul class="category-list">
           <li [class.active]="categoriaSeleccionadaId === null" (click)="seleccionarCategoria(null)">
             <span class="cat-label">Todas</span>
-            <span class="badge-pill">{{ productos.length }}</span>
+            <span class="badge-pill">{{ productos().length }}</span>
           </li>
-          @for (cat of categorias; track cat.id) {
+          @for (cat of categorias(); track cat.id) {
             <li [class.active]="categoriaSeleccionadaId === cat.id" (click)="seleccionarCategoria(cat.id)">
               <span class="cat-label">{{ cat.nombre }}</span>
             </li>
@@ -77,15 +77,16 @@
           </div>
           <input 
             type="range" 
-            min="50000" 
-            max="1500000" 
-            step="10000" 
-            [(ngModel)]="precioMax" 
+            min="0"
+            [max]="precioTope()"
+            [step]="PASO_PRECIO"
+            [(ngModel)]="precioMax"
             class="range-slider"
           />
+          <!-- El tope sale del producto más caro del catálogo -->
           <div class="range-limits">
-            <span>$50.000</span>
-            <span>$1.500.000</span>
+            <span>$0</span>
+            <span>${{ precioTope() | number:'1.0-0' }}</span>
           </div>
         </div>
 

@@ -1,6 +1,7 @@
 import { Component, Input, signal, computed, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PedidoService } from '../services/pedido.service';
+import { RouterLink } from '@angular/router';
+import { PedidoService } from '../services/pedido.service'; //
 
 export interface Product {
   id: number;
@@ -17,7 +18,7 @@ export interface Product {
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './productCard.component.html',
   styleUrls: ['./productCard.component.css']
 })

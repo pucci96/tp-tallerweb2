@@ -36,11 +36,11 @@ export class CarritoComponent implements OnInit {
         // 2. Obtenemos los pedidos del usuario
         this.pedidoService.obtenerMisPedidos().subscribe({
           next: (pedidos) => {
-            this.carrito = pedidos.find(p => p.estado === 'carrito') || null;
+            const carritoCrudo = pedidos.find(p => p.estado === 'carrito') || null;
 
             // Cruzamos los ítems del carrito con el catálogo para inyectarles la 'imageUrl'
-            if (this.carrito && this.carrito.productos) {
-              this.carrito.productos = this.carrito.productos.map(itemPedido => {
+            if (carritoCrudo && carritoCrudo.productos) {
+              const productosMapeados = carritoCrudo.productos.map(itemPedido => {
                 const prodEnCatalogo = productosCatalogo.find(
                   p => p.title === itemPedido.producto || p.nombre === itemPedido.producto
                 );
@@ -49,6 +49,33 @@ export class CarritoComponent implements OnInit {
                   imageUrl: prodEnCatalogo ? (prodEnCatalogo.imageUrl || prodEnCatalogo.imagen) : 'assets/placeholder.png'
                 };
               });
+
+              // Agrupación precisa por ID o nombre único
+              const productosAgrupadosMap = new Map<number | string, any>();
+
+              for (const item of productosMapeados) {
+                const claveUnica = item.id_producto ?? item.producto; 
+
+                if (productosAgrupadosMap.has(claveUnica)) {
+                  const existente = productosAgrupadosMap.get(claveUnica);
+                  existente.cantidad += item.cantidad;
+                  existente.subtotal = existente.precio * existente.cantidad;
+                  // Mantenemos el ID de línea más alto para conservar el orden arriba
+                  if (item.id > existente.id) {
+                    existente.id = item.id;
+                  }
+                } else {
+                  productosAgrupadosMap.set(claveUnica, { ...item });
+                }
+              }
+
+              // Convertimos el Map de vuelta a array y ordenamos para que el último agregado quede arriba
+              this.carrito = {
+                ...carritoCrudo,
+                productos: Array.from(productosAgrupadosMap.values()).sort((a, b) => b.id - a.id)
+              };
+            } else {
+              this.carrito = null;
             }
 
             this.cargando = false;
@@ -94,18 +121,20 @@ export class CarritoComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  eliminarProducto(idItemPedido: number): void {
-    if (this.carrito && this.carrito.productos) {
-      this.carrito.productos = this.carrito.productos.filter(p => p.id !== idItemPedido);
-      this.recalcularTotal();
-      
-      // Actualizamos el contador del header para que baje de inmediato
-      this.actualizarContadorGlobal();
-      
-      // Lanzamos el popup estilo Mercado Libre
-      this.mostrarToastML('¡Listo! Eliminaste el producto.');
-      this.cdr.detectChanges();
-    }
+ eliminarProducto(idItemPedido: number): void {
+    if (!this.carrito) return;
+
+    // Hacemos el DELETE real al backend
+    this.http.delete(`${environment.apiUrl}/pedidos/${this.carrito.id}/productos/${idItemPedido}`).subscribe({
+      next: (pedidoActualizado: any) => {
+        // Recargamos el carrito con la respuesta limpia que devuelve el backend
+        this.cargarCarritoConImagenes();
+        this.mostrarToastML('¡Listo! Eliminaste el producto.');
+      },
+      error: (err) => {
+        console.error('Error al eliminar el producto:', err);
+      }
+    });
   }
 
   private actualizarContadorGlobal(): void {

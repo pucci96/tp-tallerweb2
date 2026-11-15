@@ -1,6 +1,20 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ProductService, ProductoDetalle, Comentario } from '../services/product.service';
+import { AuthService } from '../services/auth.service';
+import { Product } from '../productCard/productCard.component';
+import { PedidoService } from '../services/pedido.service';
+
+
+/** Cantidad máxima de productos relacionados que se muestran. */
+const MAX_RELACIONADOS = 4;
+
+/** Largo máximo de un comentario (igual que en el backend). */
+export const MAX_LARGO_COMENTARIO = 500;
 
 export interface ProductThumb {
   label: string;
@@ -8,49 +22,192 @@ export interface ProductThumb {
   alt: string;
 }
 
-export interface ProductSpec {
-  parameter: string;
-  detail: string;
-}
-
-export interface ProductFeature {
-  icon: string;
-  title: string;
-  description: string;
-}
-
-export interface RelatedProduct {
-  label: string;
-  title: string;
-  price: number;
-  image: string;
-  badge?: string;
-}
-
 @Component({
   selector: 'app-detalles-producto',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './detalles-producto.component.html',
   styleUrls: ['./detalles-producto.component.css']
 })
 export class DetallesProductoComponent {
+  private route = inject(ActivatedRoute);
+  private productService = inject(ProductService);
+  private authService = inject(AuthService);
+  private pedidoService = inject(PedidoService);
 
-/* Datos del producto (mismo contenido del diseño original)         */
-  readonly sku = 'TECNO-KB-94500';
-  readonly category = 'Teclados Mecánicos';
-  readonly title = 'Teclado Mecánico RGB Switch Red TKL Custom';
-  readonly rating = 4.8;
-  readonly reviewsCount = 52;
-  readonly price = 94500;
+  /* Producto real, cargado desde el backend según el :id de la URL */
+  readonly producto = signal<ProductoDetalle | null>(null);
+  readonly cargando = signal(true);
+  readonly mensajeError = signal('');
+
+  /** Otros productos de la misma categoría que el producto que se está viendo. */
+  readonly relacionados = signal<Product[]>([]);
+
+  /* ---------- Comentarios y calificación ---------- */
+  readonly comentarios = signal<Comentario[]>([]);
+  readonly promedio = signal(0);
+  readonly cantidadOpiniones = signal(0);
+  readonly maxLargoComentario = MAX_LARGO_COMENTARIO;
+
+  /** Las 5 estrellas del promedio: cuánto se pinta cada una (0, 50 o 100 %). */
+  readonly estrellasPromedio = computed(() => this.porcentajesEstrellas(this.promedio()));
+
+  /** Usuario logueado (null si no hay sesión): solo los logueados pueden comentar. */
+  readonly usuario = this.authService.usuarioActual;
+  /** Si el usuario logueado ya comentó este producto (solo se permite un comentario). */
+  readonly yaComento = computed(() => {
+    const usuario = this.usuario();
+    return !!usuario && this.comentarios().some((c) => c.id_usuario === usuario.id);
+  });
+
+  /** Formulario para comentar */
+  readonly nuevaCalificacion = signal(0);
+  readonly calificacionHover = signal(0);
+  readonly nuevoTexto = signal('');
+  readonly enviandoComentario = signal(false);
+  readonly errorComentario = signal('');
+  readonly comentarioPublicado = signal(false);
+
+  constructor() {
+    // Se escucha paramMap (y no snapshot) para que, si se navega de un producto
+    // a otro sin salir de la página, se vuelva a cargar con el id nuevo.
+    this.route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      this.cargarProducto(Number(params.get('id')));
+    });
+  }
+
+  private cargarProducto(id: number): void {
+    this.cargando.set(true);
+    this.mensajeError.set('');
+    this.producto.set(null);
+    this.relacionados.set([]);
+    this.quantity.set(1);
+    this.limpiarComentarios();
+
+    this.productService.obtenerDetalle(id).subscribe({
+      next: (producto) => {
+        this.producto.set(producto);
+        this.cargando.set(false);
+        this.cargarRelacionados(producto);
+        this.cargarComentarios(producto.id);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.mensajeError.set(
+          err.status === 404 || err.status === 400
+            ? 'El producto que buscás no existe o fue eliminado.'
+            : 'No se pudo cargar el producto. Intentá de nuevo más tarde.'
+        );
+        this.cargando.set(false);
+      },
+    });
+  }
+
+  /** Busca en el catálogo otros productos de la misma categoría (sin incluir el actual). */
+  private cargarRelacionados(producto: ProductoDetalle): void {
+    this.productService.obtenerProductos().subscribe({
+      next: (todos) => {
+        // Si mientras tanto se navegó a otro producto, esta respuesta ya no sirve.
+        if (this.producto()?.id !== producto.id) return;
+        this.relacionados.set(
+          todos
+            .filter((p) => p.categoryId === producto.categoria.id && p.id !== producto.id)
+            .slice(0, MAX_RELACIONADOS)
+        );
+      },
+      error: (err) => console.error('Error al cargar productos relacionados:', err),
+    });
+  }
+
+  /** Vacía los comentarios y el formulario (al cambiar de producto). */
+  private limpiarComentarios(): void {
+    this.comentarios.set([]);
+    this.promedio.set(0);
+    this.cantidadOpiniones.set(0);
+    this.nuevaCalificacion.set(0);
+    this.calificacionHover.set(0);
+    this.nuevoTexto.set('');
+    this.errorComentario.set('');
+    this.comentarioPublicado.set(false);
+  }
+
+  /** Trae los comentarios y el promedio del producto. */
+  private cargarComentarios(idProducto: number): void {
+    this.productService.obtenerComentarios(idProducto).subscribe({
+      next: (resultado) => {
+        if (this.producto()?.id !== idProducto) return; // se navegó a otro producto
+        this.comentarios.set(resultado.comentarios);
+        this.promedio.set(resultado.promedio);
+        this.cantidadOpiniones.set(resultado.cantidad);
+      },
+      error: (err) => console.error('Error al cargar comentarios:', err),
+    });
+  }
+
+  /**
+   * Cuánto se pinta cada una de las 5 estrellas para una calificación.
+   * Ej: 3.5 → [100, 100, 100, 50, 0]. Se redondea a la media estrella más cercana.
+   */
+  porcentajesEstrellas(valor: number): number[] {
+    const redondeado = Math.round(valor * 2) / 2;
+    return [1, 2, 3, 4, 5].map((n) => (redondeado >= n ? 100 : redondeado >= n - 0.5 ? 50 : 0));
+  }
+
+  /** Selector de estrellas del formulario: elegir y "previsualizar" con el mouse. */
+  elegirCalificacion(valor: number): void {
+    this.nuevaCalificacion.set(valor);
+    this.errorComentario.set('');
+  }
+
+  /** Estrellas que se ven llenas en el selector (la del hover tiene prioridad). */
+  readonly calificacionVisible = computed(() => this.calificacionHover() || this.nuevaCalificacion());
+
+  publicarComentario(): void {
+    const producto = this.producto();
+    if (!producto || this.enviandoComentario()) return;
+
+    const calificacion = this.nuevaCalificacion();
+    const texto = this.nuevoTexto().trim();
+    if (calificacion < 1 || calificacion > 5) {
+      this.errorComentario.set('Elegí una calificación de 1 a 5 estrellas.');
+      return;
+    }
+    if (!texto) {
+      this.errorComentario.set('Escribí tu comentario.');
+      return;
+    }
+    if (texto.length > MAX_LARGO_COMENTARIO) {
+      this.errorComentario.set(`El comentario puede tener hasta ${MAX_LARGO_COMENTARIO} caracteres.`);
+      return;
+    }
+
+    this.enviandoComentario.set(true);
+    this.errorComentario.set('');
+
+    this.productService.comentar(producto.id, { calificacion, texto }).subscribe({
+      next: () => {
+        this.enviandoComentario.set(false);
+        this.nuevaCalificacion.set(0);
+        this.nuevoTexto.set('');
+        this.comentarioPublicado.set(true);
+        // Se recargan para tener el promedio actualizado (lo calcula el backend).
+        this.cargarComentarios(producto.id);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.enviandoComentario.set(false);
+        this.errorComentario.set(err.error?.error || 'No se pudo publicar el comentario. Intentá de nuevo.');
+      },
+    });
+  }
+
+  /** Link "N opiniones" del encabezado: baja hasta la sección de comentarios. */
+  irAOpiniones(event: Event): void {
+    event.preventDefault();
+    document.getElementById('opiniones')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  /* Datos de maqueta que todavía no existen en la base */
   readonly originalPrice = 112000;
   readonly currency = 'ARS';
-  readonly stockText = 'Stock disponible';
-  readonly stockDetail = '(14 unidades para envío inmediato)';
-
-  readonly mainImageSrc =
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuDVRut7prLz_IW6bEmu-eA4j3AkmUQ_MNUiCFWcVGQ7XL3eaBkbQfgv3RoBCP7zY--vyPPT7Q-_K8sE-NoPOQHirrYPMp8Cu_MtOs5GLmdyZHFiBy9odEqSTVVHsABcfyS8wmpOOJaBSllWyblzgV4UADFRscIVPawfrPE_3uRYWailnhDN04AsFXx5pxRzqfpxd1NyvylhFBnbOih--d9614-W7k0UCicWvAyGcl0';
-  readonly mainImageAlt = 'Teclado Mecánico RGB Switch Red TKL Custom';
 
   readonly thumbnails: ProductThumb[] = [
     {
@@ -80,105 +237,22 @@ export class DetallesProductoComponent {
     }
   ];
 
-  readonly specs: ProductSpec[] = [
-    { parameter: 'Tipo de Interruptor (Switch)', detail: 'Mecánico Red Lineal (Hot-swappable 3/5 pines)' },
-    { parameter: 'Formato', detail: 'TKL 80% (87 Teclas con Layout ISO Español con letra Ñ)' },
-    { parameter: 'Conectividad', detail: 'Cable USB-C a USB-A desmontable mallado (1000Hz Polling Rate)' },
-    { parameter: 'Anti-Ghosting', detail: '100% N-Key Rollover (NKRO) simultáneo' },
-    { parameter: 'Estructura & Material', detail: 'Placa superior de Aluminio Anodizado + Keycaps PBT Doble Inyección' },
-    { parameter: 'Iluminación', detail: 'Chroma RGB 16.8M de colores con 18 modos preestablecidos' },
-    { parameter: 'Dimensiones & Peso', detail: '356 x 135 x 38 mm — 890 gramos (alta estabilidad antideslizante)' },
-    { parameter: 'Compatibilidad SO', detail: 'Windows 11 / 10 / 8, macOS Sonoma/Ventura, Linux Ubuntu & Steam Deck' }
-  ];
-
-  readonly features: ProductFeature[] = [
-    {
-      icon: 'tune',
-      title: 'Switches Lineales Red (50M)',
-      description: 'Recorrido suave y silencioso de 2.0mm con fuerza de actuación ligera de 45g, ideal para tiempos de respuesta récord.'
-    },
-    {
-      icon: 'palette',
-      title: 'Iluminación RGB 16.8M',
-      description: 'Efectos dinámicos configurables por tecla con perfiles integrados en memoria onboard sin software forzoso.'
-    },
-    {
-      icon: 'keyboard',
-      title: 'Keycaps PBT Double-Shot',
-      description: 'Inmunes al desgaste y brillo por uso continuado con leyenda translúcida nítida en español latinoamericano.'
-    },
-    {
-      icon: 'cable',
-      title: 'Cable Type-C Desmontable',
-      description: 'Mallado trenzado de 1.8 metros con conectores bañados en oro para máxima durabilidad y transporte seguro.'
-    }
-  ];
-
-  readonly related: RelatedProduct[] = [
-    {
-      label: 'Mouses',
-      title: 'Mouse Gamer Inalámbrico 26K DPI',
-      price: 48900,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBw9swQTsx0q4Yw4WnYRXT14-j3p4dG7Bdm61452pWbEe6gCteO7AZUeeaGSeX_ftcVLSau2x8lsm5B359_-xdcNu5uM6iQzkYgnEA-Wg08hH4R2kH-5GbpdraWgL3zteT90YPx6FzkAdcQxVLFAP1smJnPxYdIxbKTi5HqnhB4TuW_-1zbP2TCth0XiID2cnwEEa9sghUME_rgi6zACuz8NLU794OhhKNGTLD3YsM',
-      badge: '26.000 DPI'
-    },
-    {
-      label: 'Mousepads',
-      title: 'Mousepad XL Speed 900x400 Topo',
-      price: 21500,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCihOI7hDciVbBZ6uHtaySmFi6f37ngxmYkuOKUpdlo6X950ZYbBOBHTw50tOXf41558OA7EIFDBDTDvNzduyZVuEVTz6O00wc0shTapUgE8P5UGGCvxmP1sdKPFtQw_yFuPzp9p-HMvnWquauduPKLBG09bnH9mLEYMq8PGkvivfdXw-jAS8CigcIVTuUyNP4iANLTfs39FHjXYlcB2ZydGsR4HS3T4MxcyDoJgg8',
-      badge: 'Envío Gratis'
-    },
-    {
-      label: 'Accesorios',
-      title: 'Kit de Modding & Lubricación Switches',
-      price: 16200,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAXRws5qx6vc4oGwpEzEoIDn8BrEbObXn7HLct_Jd_hsZVp3Bum6zb-qHVI7B0Sh_ZS5qjkfqN0fs8AcFg6F9tcEYmKAmQSG_2MmF8sMu9evmPdCBpYbL2YwFhvOwyXFolryPlvGWcz_J1SmZvRZRq3TUq4hN53kJa2WB4wwf9IkL6zVjLJT9xTUfC-ZYE4QYwLTu4Czpue6YvmjeK_wVsjyj8fpl69fHdsMhD3NN4'
-    },
-    {
-      label: 'Audio',
-      title: 'Auriculares Pro 7.1 Espacial Wireless',
-      price: 119999,
-      image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCwfA84ZW77v0kLbaL8Gcu357ag-NHYQ1dX_dJVgM5d29VM_6aUHMIL32pjn1-9P_wzEJmWXZ0sTaPJ0uz4aG-kTO2YVCEkUZx5bUoMKhSPdqmjzUIhGjk6rJjwskCEDtdeJqAg9fv1Wr-YS0ejOTKLqx9PVbjVVk9LTjIzDGa5wjbglh7dxHFHUjJKBYfmmH2hX4Nzc1wvunw82c7slQCE6BxPmKw5l59rA-0ehrE',
-      badge: 'Últimas 2 un.'
-    }
-  ];
-
-  /*Paths de iconos SVG (Material Symbols Outlined)*/
-  readonly iconPaths: Record<string, string> = {
-    tune: 'M11,21V15h2v2h8v2H13v2H11ZM3,19V17H9v2H3Zm4-4V13H3V11H7V9H9v6H7Zm4-2V11H21v2H11Zm4-4V3h2V5h4V7H17V9H15ZM3,7V5H13V7H3Z',
-    palette: 'M12,22q-2.05,0-3.88-0.79Q6.3,20.43 4.94,19.06Q3.58,17.7 2.79,15.88T2,12Q2,9.92 2.81,8.1q0.81-1.83 2.2-3.17Q6.4,3.57 8.25,2.79T12.2,2q2,0 3.78,0.69t3.11,1.9t2.13,2.88Q22,9.13 22,11.05q0,2.88-1.75,4.41T16,17H14.15q-0.22,0-0.31,0.13T13.75,17.4q0,0.3 0.38,0.86t0.38,1.29q0,1.25-0.69,1.85T12,22Zm0-10ZM7.58,12.58Q8,12.15 8,11.5T7.58,10.43T6.5,10T5.43,10.43T5,11.5t0.43,1.07T6.5,13t1.08-0.43Zm3-4Q11,8.15 11,7.5T10.58,6.43T9.5,6T8.43,6.43T8,7.5T8.43,8.57T9.5,9t1.08-0.43Zm5,0Q16,8.15 16,7.5T15.58,6.43T14.5,6T13.43,6.43T13,7.5t0.43,1.07T14.5,9t1.08-0.43Zm3,4Q19,12.15 19,11.5t-0.43-1.08T17.5,10t-1.07,0.42T16,11.5t0.43,1.07T17.5,13t1.07-0.43ZM12,20q0.23,0 0.36-0.13t0.14-0.32q0-0.35-0.38-0.82T11.75,17.3q0-1.05 0.73-1.68T14.25,15H16q1.65,0 2.82-0.96T20,11.05q0-3.03-2.31-5.04T12.2,4Q8.8,4 6.4,6.32T4,12q0,3.32 2.34,5.66T12,20Z',
-    keyboard: 'M4,19q-0.82,0-1.41-0.59T2,17V7Q2,6.18 2.59,5.59T4,5H20q0.83,0 1.41,0.59Q22,6.18 22,7V17q0,0.82-0.59,1.41T20,19H4Zm0-2H20V7H4V17Zm4-1h8V14H8v2ZM5,13H7V11H5v2Zm3,0h2V11H8v2Zm3,0h2V11H11v2Zm3,0h2V11H14v2Zm3,0h2V11H17v2ZM5,10H7V8H5v2Zm3,0h2V8H8v2Zm3,0h2V8H11v2Zm3,0h2V8H14v2Zm3,0h2V8H17v2ZM4,17V7V17Z',
-    cable: 'M5,21q-0.42,0-0.71-0.29Q4,20.43 4,20V19H3V15q0-0.43 0.29-0.71T4,14H5V7Q5,5.35 6.18,4.17T9,3t2.83,1.17T13,7V17q0,0.82 0.59,1.41T15,19t1.41-0.59T17,17V10H16q-0.42,0-0.71-0.29T15,9V5h1V4q0-0.43 0.29-0.71T17,3h2q0.43,0 0.71,0.29T20,4V5h1V9q0,0.42-0.29,0.71T20,10H19v7q0,1.65-1.18,2.82T15,21t-2.82-1.18T11,17V7q0-0.82-0.59-1.41T9,5Q8.18,5 7.59,5.59Q7,6.18 7,7v7H8q0.43,0 0.71,0.29T9,15v4H8v1q0,0.43-0.29,0.71T7,21H5Z',
-  };
-
-  getIconPath(iconName: string): string {
-    return this.iconPaths[iconName] || '';
-  }
-
   /*Estado de la interfaz (señales, igual que LoginComponent)*/
   readonly quantity = signal(1);
-  readonly stars = [1, 2, 3, 4, 5];
   readonly selectedThumbnail = signal(0);
   readonly showToast = signal(false);
   readonly showShippingFeedback = signal(false);
   readonly isAddingToCart = signal(false);
   readonly isFavorite = signal(false);
 
-  readonly transferPrice = computed(() => Math.round(this.price * 0.9));
-  readonly maxQuantity = 5;
-
-  readonly activeImage = computed(() => {
-    const thumb = this.thumbnails[this.selectedThumbnail()];
-    return {
-      src: thumb?.src ?? this.mainImageSrc,
-      alt: thumb?.alt ?? this.mainImageAlt,
-    };
-  });
+  readonly transferPrice = computed(() => Math.round((this.producto()?.precio ?? 0) * 0.9));
+  /** No se puede elegir más cantidad que el stock disponible. */
+  readonly maxQuantity = computed(() => Math.max(1, this.producto()?.stock ?? 1));
+  readonly sinStock = computed(() => (this.producto()?.stock ?? 0) <= 0);
 
   /*Acciones*/
   changeQuantity(delta: number): void {
-    const next = Math.max(1, Math.min(this.maxQuantity, this.quantity() + delta));
+    const next = Math.max(1, Math.min(this.maxQuantity(), this.quantity() + delta));
     this.quantity.set(next);
   }
 
@@ -187,13 +261,58 @@ export class DetallesProductoComponent {
   }
 
   triggerAddToCart(): void {
-    this.isAddingToCart.set(true);
-    this.showToast.set(true);
+    const productoActual = this.producto();
+    if (!productoActual || this.isAddingToCart() || this.sinStock()) return;
 
-    setTimeout(() => {
-      this.isAddingToCart.set(false);
-      this.showToast.set(false);
-    }, 5500);
+    this.isAddingToCart.set(true);
+    const cantidadSeleccionada = this.quantity();
+
+    // 1. Buscamos si el usuario ya tiene un pedido en estado 'carrito'
+    this.pedidoService.obtenerMisPedidos().subscribe({
+      next: (pedidos) => {
+        let carritoActivo = pedidos.find(p => p.estado === 'carrito');
+
+        const ejecutarAgregar = (idPedido: number) => {
+          this.pedidoService.agregarProducto(idPedido, {
+            id_producto: productoActual.id,
+            cantidad: cantidadSeleccionada
+          }).subscribe({
+            next: () => {
+              this.isAddingToCart.set(false);
+              this.showToast.set(true);
+              
+              // Ocultar toast automáticamente a los 4 segundos
+              setTimeout(() => {
+                this.showToast.set(false);
+              }, 4000);
+            },
+            error: (err) => {
+              console.error('Error al agregar el producto al carrito:', err);
+              this.isAddingToCart.set(false);
+            }
+          });
+        };
+
+        if (carritoActivo) {
+          ejecutarAgregar(carritoActivo.id);
+        } else {
+          // Si no tiene carrito activo, lo creamos primero y luego agregamos el producto
+          this.pedidoService.crearPedido().subscribe({
+            next: (nuevoCarrito) => {
+              ejecutarAgregar(nuevoCarrito.id);
+            },
+            error: (err) => {
+              console.error('Error al crear el carrito:', err);
+              this.isAddingToCart.set(false);
+            }
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error al obtener los pedidos:', err);
+        this.isAddingToCart.set(false);
+      }
+    });
   }
 
   simulateShipping(): void {

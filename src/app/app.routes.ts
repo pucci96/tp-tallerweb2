@@ -8,6 +8,7 @@ import { CatalogoProductoComponent } from './catalogo-producto/catalogo-producto
 import { AdminProductosListComponent } from './admin-productos-list/admin-productos-list.component';
 import { AdminProductoFormComponent } from './admin-productos-form/admin-productos-form.component';
 import { CarritoComponent } from './carrito/carrito.component';
+import { MisPedidos } from './components/mis-pedidos/mis-pedidos'; // Ajustá la ruta según la carpeta donde lo hayas guardado
 import { adminGuard } from './guards/admin-guard';
 import { authGuard } from './guards/auth-guard';
 
@@ -33,6 +34,13 @@ export const routes: Routes = [
     component: CarritoComponent,
     canActivate: [authGuard]
   },
+
+  {
+    path: 'mis-pedidos', 
+    component: MisPedidos,
+    canActivate: [authGuard]
+},
+
 {
     path: 'login',
     component: LoginComponent

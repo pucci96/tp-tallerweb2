@@ -1,0 +1,64 @@
+<div class="compras-wrapper">
+  <h2 class="compras-titulo">Mis compras</h2>
+
+  @if (cargando) {
+    <div class="estado-vacio">
+      <div class="spinner"></div>
+      <p>Cargando tus compras...</p>
+    </div>
+  }
+
+  @if (!cargando && pedidos.length === 0) {
+    <div class="estado-vacio">
+      <h3>Todavía no tenés compras realizadas</h3>
+      <p>Cuando realices una compra, la verás reflejada aquí.</p>
+      <a routerLink="/productos" class="btn-primario">Ver productos</a>
+    </div>
+  }
+
+  @if (!cargando && pedidos.length > 0) {
+    <div class="compras-lista">
+      @for (pedido of pedidos; track pedido.id) {
+        <div class="pedido-card">
+          
+          <!-- Cabecera de la compra -->
+          <div class="pedido-header">
+            <div class="pedido-meta">
+              <span>Comprado el {{ pedido.fecha | date:'d \'de\' MMMM \'de\' yyyy' }}</span>
+              <span class="separador">•</span>
+              <span>Pedido #{{ pedido.id }}</span>
+            </div>
+            <span class="badge-estado">{{ pedido.estado }}</span>
+          </div>
+
+          <!-- Lista de productos -->
+          <div class="pedido-productos">
+            @for (item of pedido.productos; track item.id) {
+              <div class="producto-fila">
+                <div class="producto-info">
+                  <h4 class="producto-nombre">{{ item.producto }}</h4>
+                  <p class="producto-categoria">{{ item.categoria }} > {{ item.subcategoria }}</p>
+                  <p class="producto-detalle">
+                    Cantidad: {{ item.cantidad }} <span class="separador">|</span> 
+                    <strong>$ {{ item.subtotal | number:'1.2-2' }} ARS</strong>
+                  </p>
+                </div>
+
+                <div class="producto-acciones">
+                  <a routerLink="/productos" class="btn-secundario">Volver a comprar</a>
+                </div>
+              </div>
+            }
+          </div>
+
+          <!-- Pie con el total -->
+          <div class="pedido-footer">
+            <span class="total-label">Total pagado</span>
+            <span class="total-monto">$ {{ pedido.total | number:'1.2-2' }} <small>ARS</small></span>
+          </div>
+
+        </div>
+      }
+    </div>
+  }
+</div>

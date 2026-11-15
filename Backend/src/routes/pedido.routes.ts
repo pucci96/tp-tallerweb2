@@ -13,4 +13,5 @@ router.post('/', controller.crearPedido);                             // crea un
 router.get('/:id_pedido', controller.obtenerPedido);                  // detalle con productos y total
 router.post('/:id_pedido/productos', controller.agregarProducto);     // { id_producto, cantidad }
 router.delete('/:id_pedido/productos/:id_item', controller.eliminarProducto);
+router.put('/:id_pedido', controller.actualizarEstado);
 export default router;

@@ -1,7 +1,7 @@
 import { Component, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProductService, ProductoDetalle, Comentario } from '../services/product.service';
@@ -31,6 +31,7 @@ export interface ProductThumb {
 })
 export class DetallesProductoComponent {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private productService = inject(ProductService);
   private authService = inject(AuthService);
   private pedidoService = inject(PedidoService);
@@ -322,4 +323,10 @@ export class DetallesProductoComponent {
   closeToast(): void {
     this.showToast.set(false);
   }
+
+  /** Redirige al usuario hacia la vista del carrito de compras */
+irAlCarrito(): void {
+  this.showToast.set(false); // Cierra el toast opcionalmente al hacer click
+  this.router.navigate(['/carrito']);
+}
 }

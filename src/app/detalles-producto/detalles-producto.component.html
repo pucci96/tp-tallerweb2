@@ -19,9 +19,9 @@
             {{ quantity() }}x {{ producto()?.nombre }} añadido con éxito
           </p>
           <div class="toast-actions">
-            <a class="toast-link">Ver carrito (3)</a>
+            <a class="toast-link" (click)="irAlCarrito()" style="cursor: pointer;">Ver carrito ({{ pedidoService.cantidadCarrito() }})</a>
             <span class="toast-divider">•</span>
-            <a class="toast-link muted">Finalizar compra</a>
+            <a class="toast-link muted" (click)="irAlCarrito()" style="cursor: pointer;">Finalizar compra</a>
           </div>
         </div>
       </div>

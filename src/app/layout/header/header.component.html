@@ -31,6 +31,9 @@
     <!-- Enlaces de navegación (Desktop y desplegable Mobile) -->
     <nav class="nav-links" [class.show]="menuAbierto">
       <a routerLink="/productos" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">Productos</a>
+      @if (auth.usuarioActual()) {
+      <a routerLink="/mis-pedidos" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">Mis Pedidos</a>
+      }
       @if (auth.esAdmin()) {
         <a routerLink="/admin/productos" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">Inventario</a>
         <a routerLink="/admin/productos/nuevo" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">Nuevo Producto</a>

@@ -32,7 +32,7 @@
     <nav class="nav-links" [class.show]="menuAbierto">
       <a routerLink="/productos" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">Productos</a>
       @if (auth.usuarioActual()) {
-      <a routerLink="/mis-pedidos" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">Mis Pedidos</a>
+      <a routerLink="/mis-pedidos" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">Mis Compras</a>
       }
       @if (auth.esAdmin()) {
         <a routerLink="/admin/productos" routerLinkActive="active" class="nav-link" (click)="cerrarMenu()">Inventario</a>

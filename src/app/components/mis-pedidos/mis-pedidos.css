@@ -245,4 +245,88 @@
     text-align: center;
     box-sizing: border-box;
   }
+
+  /* Contenedor de la miniatura de la imagen */
+.producto-imagen-container {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border: 1px solid #eeeeee;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.producto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Mantiene la proporción de la foto del producto sin deformarla */
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+
+.producto-info {
+  flex: 1;
+}
+
+
+
+/* Contenedor estricto para la miniatura */
+.producto-imagen-container {
+  width: 60px !important;
+  height: 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+/* Tamaño fijo y prolijo para la imagen */
+.producto-img {
+  width: 60px !important;
+  height: 60px !important;
+  object-fit: contain !important;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+/* Asegurar que la fila del producto ordene bien los elementos en línea */
+.producto-fila {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+ .producto-imagen-container {
+  width: 60px !important;
+  height: 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.producto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
 }

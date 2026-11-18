@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Observable ,BehaviorSubject, combineLatest, map} from 'rxjs';
@@ -133,13 +133,36 @@ aplicarFiltros(): void {
     this.productos$ = this.productoService.listarAdmin();
     this.vm$ = this.crearStreamPaginado(); // Re-vincula el paginado con la lista nueva
   }
-  eliminarProducto(id: number, nombre: string): void {
-    if (!confirm(`¿Eliminar "${nombre}"?`)) return;
 
+ productoAEliminar = signal<{ id: number; nombre: string } | null>(null);
+  eliminando = signal<boolean>(false);
+
+  abrirModalEliminar(id: number, nombre: string): void {
     this.mensajeError = '';
-    this.productoService.eliminar(id).subscribe({
-      next: () => this.cargarProductos(),
+    this.productoAEliminar.set({ id, nombre });
+  }
+
+  cerrarModalEliminar(): void {
+    if (!this.eliminando()) {
+      this.productoAEliminar.set(null);
+    }
+  }
+
+  confirmarEliminacion(): void {
+    const prod = this.productoAEliminar();
+    if (!prod) return;
+
+    this.eliminando.set(true);
+
+    this.productoService.eliminar(prod.id).subscribe({
+      next: () => {
+        this.eliminando.set(false);
+        this.productoAEliminar.set(null);
+        this.cargarProductos();
+      },
       error: (err) => {
+        this.eliminando.set(false);
+        this.productoAEliminar.set(null);
         this.mensajeError = err.error?.error || 'No se pudo eliminar el producto.';
         console.error('Error al eliminar:', err);
       },

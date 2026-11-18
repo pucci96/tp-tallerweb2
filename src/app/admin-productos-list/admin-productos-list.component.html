@@ -15,6 +15,96 @@
 
   <div class="table-container">
     @if (vm$ | async; as vm) {
+    <!-- BARRA DE FILTROS -->
+    <div class="filters-bar">
+      <!-- Búsqueda por palabra clave -->
+      <div class="filter-group filter-search">
+        <label>Buscar producto</label>
+        <input
+          type="text"
+          [(ngModel)]="filtros.busqueda"
+          (ngModelChange)="aplicarFiltros()"
+          placeholder="Nombre, subcategoría o ID..."
+        />
+      </div>
+
+      <!-- Categoría desplegable -->
+      <div class="filter-group">
+        <label>Categoría</label>
+        <select [(ngModel)]="filtros.categoria" (ngModelChange)="aplicarFiltros()">
+          <option value="">Todas las categorías</option>
+          @for (cat of vm.categoriasDisponibles; track cat) {
+            <option [value]="cat">{{ cat }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Rango de Precio -->
+      <div class="filter-group filter-range">
+        <label>Precio ($ ARS)</label>
+        <div class="range-inputs">
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="filtros.precioMin"
+            (ngModelChange)="aplicarFiltros()"
+            placeholder="Mín"
+          />
+          <span>-</span>
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="filtros.precioMax"
+            (ngModelChange)="aplicarFiltros()"
+            placeholder="Máx"
+          />
+        </div>
+      </div>
+
+      <!-- Rango de Stock -->
+      <div class="filter-group filter-range">
+        <label>Stock (unid.)</label>
+        <div class="range-inputs">
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="filtros.stockMin"
+            (ngModelChange)="aplicarFiltros()"
+            placeholder="Desde"
+          />
+          <span>-</span>
+          <input
+            type="number"
+            min="0"
+            [(ngModel)]="filtros.stockMax"
+            (ngModelChange)="aplicarFiltros()"
+            placeholder="Hasta"
+          />
+        </div>
+      </div>
+
+      <!-- Ordenamiento por Precio o Stock -->
+      <div class="filter-group">
+        <label>Ordenar por</label>
+        <select [(ngModel)]="filtros.orden" (ngModelChange)="aplicarFiltros()">
+          <option value="ninguno">Por defecto</option>
+          <option value="precio-desc">Precio: Mayor a menor</option>
+          <option value="precio-asc">Precio: Menor a mayor</option>
+          <option value="stock-desc">Stock: Mayor a menor</option>
+          <option value="stock-asc">Stock: Menor a mayor</option>
+        </select>
+      </div>
+
+      <!-- Botón Limpiar -->
+      <div class="filter-actions">
+        <button type="button" class="btn-clear" (click)="limpiarFiltros()">
+          Limpiar
+        </button>
+      </div>
+    </div>
+
+    <!-- TABLA Y PAGINACIÓN -->
+    <div class="table-container">
       <table class="admin-table">
         <thead>
           <tr>
@@ -58,7 +148,7 @@
           } @empty {
             <tr>
               <td colspan="5" class="empty-cell">
-                No hay productos cargados en la base de datos.
+                No se encontraron productos con los filtros aplicados.
               </td>
             </tr>
           }
@@ -100,10 +190,13 @@
           </div>
         </div>
       }
-    } @else {
+    </div>
+  } @else {
+    <div class="table-container">
       <div class="empty-cell">
         Cargando inventario desde el servidor...
       </div>
-    }
-  </div>
+    </div>
+  }
+</div>
 </div>

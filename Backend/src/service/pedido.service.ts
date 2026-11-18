@@ -58,6 +58,40 @@ export class PedidoService {
     return this.mapearPedido(await this.pedidoRepo.crearPedido(idUsuario, estado));
   }
 
+ async eliminarProductoDelPedido(
+    idPedido: number,
+    idItemPedido: number,
+    idUsuario: number,
+    esAdmin: boolean
+  ): Promise<PedidoDTO> {
+    // 1. Verificamos que el pedido sea del usuario y esté en estado carrito
+    const pedido = await this.pedidoPropio(idPedido, idUsuario, esAdmin);
+    if (pedido.estado !== 'carrito') {
+      throw new HttpError(400, 'Solo se pueden modificar pedidos en estado "carrito"');
+    }
+
+    // 2. Buscamos el ítem seleccionado para saber qué producto es
+    const productoEnPedido = pedido.productos.find((p) => p.id === idItemPedido);
+    if (!productoEnPedido) {
+      throw new HttpError(404, 'El producto no se encuentra en este carrito');
+    }
+
+    // 3. Borramos TODOS los registros de este mismo producto en el pedido de forma masiva
+    // (Asegurate de que tu repositorio tenga un método o hacelo directo con prisma si tenés acceso, 
+    // o recorremos los IDs asegurando el funcionamiento asíncrono con Promise.all)
+    const idsAEliminar = pedido.productos
+      .filter((p) => p.producto === productoEnPedido.producto)
+      .map((p) => p.id);
+
+    await Promise.all(
+      idsAEliminar.map((id) => this.pedidoRepo.eliminarProductoDelPedido(id))
+    );
+
+    // 4. Retornamos el pedido actualizado
+    const pedidoActualizado = await this.pedidoRepo.obtenerPedido(idPedido);
+    return this.mapearPedido(pedidoActualizado!);
+  }
+
   async agregarProducto(
     idPedido: number,
     idUsuario: number,
@@ -93,5 +127,25 @@ export class PedidoService {
       cantidad,
     });
     return this.mapearProducto(fila);
+  }
+
+  async actualizarEstadoPedido(
+    idPedido: number,
+    idUsuario: number,
+    esAdmin: boolean,
+    nuevoEstado: string
+  ): Promise<PedidoDTO> {
+    await this.pedidoPropio(idPedido, idUsuario, esAdmin);
+    const estadoLimpio = typeof nuevoEstado === 'string' && nuevoEstado.trim() ? nuevoEstado.trim() : 'completado';
+
+    // 1. Actualizamos el pedido actual a 'completado'
+    const pedidoActualizado = await this.pedidoRepo.actualizarEstadoPedido(idPedido, estadoLimpio);
+
+    // 2. Creamos un nuevo pedido en blanco con estado 'carrito' para la siguiente compra
+    if (estadoLimpio === 'completado') {
+      await this.pedidoRepo.crearPedido(idUsuario, 'carrito');
+    }
+
+    return this.mapearPedido(pedidoActualizado);
   }
 }

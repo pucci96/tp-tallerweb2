@@ -1,5 +1,5 @@
 import { ProductoRepository, ProductoConRelaciones } from '../repository/producto.repository';
-import { ProductoCardDTO, GuardarProductoDTO, ProductoAdminDTO } from '../models/producto.dto';
+import { ProductoCardDTO, GuardarProductoDTO, ProductoAdminDTO, ProductoDetalleDTO } from '../models/producto.dto';
 import { HttpError } from '../utils/http-error';
 
 export const IMAGEN_POR_DEFECTO =
@@ -90,6 +90,31 @@ export class ProductoService {
   async obtenerCatalogo(): Promise<ProductoCardDTO[]> {
     const productos = await this.productoRepo.obtenerTodos();
     return productos.map((p) => this.mapearACardDTO(p));
+  }
+
+  /**
+   * Detalle público de un producto.
+   * El primer registro de Producto_detalles es la descripción (así lo guarda crear());
+   * el resto se muestran como especificaciones.
+   */
+  async obtenerDetalle(id: number): Promise<ProductoDetalleDTO> {
+    const p = await this.productoRepo.obtenerDetalle(id);
+    if (!p) throw new HttpError(404, 'Producto no encontrado');
+
+    const [primero, ...resto] = p.detalle;
+    return {
+      id: p.id,
+      nombre: p.nombre,
+      descripcion: primero?.descripcion || 'Sin descripción',
+      precio: Number(p.precio),
+      stock: p.stock,
+      imagen: p.imagen || IMAGEN_POR_DEFECTO,
+      destacado: p.destacado,
+      categoria: { id: p.categoria.id, nombre: p.categoria.nombre },
+      subcategoria: { id: p.subcategoria.id, nombre: p.subcategoria.nombre },
+      especificaciones: resto.map((d) => ({ nombre: d.nombre, descripcion: d.descripcion })),
+      estilos: p.estilo.map((e) => ({ nombre: e.nombre, descripcion: e.descripcion })),
+    };
   }
 
   async listarAdmin(): Promise<ProductoAdminDTO[]> {

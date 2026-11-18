@@ -37,6 +37,12 @@ export class UsuarioController {
     res.json(await this.usuarioService.obtenerDatosUsuario(id_usuario));
   };
 
+  /** Actualiza los datos del usuario logueado (el id sale del token, nunca de la URL). */
+  actualizarMisDatos = async (req: Request, res: Response) => {
+    const { id_usuario } = usuarioDelToken(req);
+    res.json(await this.usuarioService.actualizarMisDatos(id_usuario, req.body));
+  };
+
   obtenerDatosUsuario = async (req: Request, res: Response) => {
     const id_usuario = parseId(req.params['id_usuario'], 'id de usuario');
     this.verificarAcceso(req, id_usuario);

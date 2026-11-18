@@ -1,0 +1,115 @@
+<div class="carrito-container">
+  <!-- (Oscuro) -->
+  @if (mensajeAlerta) {
+    <div class="toast-ml">
+      {{ mensajeAlerta }}
+    </div>
+  }
+
+  <div class="carrito-header">
+    <h1>Carrito de Compras</h1>
+    <a routerLink="/productos" class="btn-volver">← Seguir comprando</a>
+  </div>
+
+  @if (cargando) {
+    <div class="loading-state">Cargando tu carrito...</div>
+  } @else if (!carrito || !carrito.productos || carrito.productos.length === 0) {
+    <!-- Estado Vacío -->
+    <div class="empty-cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+      <h2>Tu carrito está vacío</h2>
+      <p>¿No sabés qué comprar? ¡Explorá nuestro catálogo con stock en tiempo real!</p>
+      <a routerLink="/productos" class="btn-primary-custom">Ver productos</a>
+    </div>
+  } @else {
+    <!-- Contenedor general del carrito -->
+    <div class="carrito-content-wrapper">
+      
+      <!-- 1. Listado de Productos (Arriba en mobile, Izquierda en PC) -->
+      <div class="productos-list">
+        <div class="list-card">
+          <h3 class="section-title">Productos en tu carrito ({{ carrito.productos.length }})</h3>
+          
+          @for (item of carrito.productos; track item.id) {
+            <div class="cart-item">
+              
+              <!-- Imagen del producto -->
+              <div class="item-image-box">
+                <img [src]="$any(item).imageUrl || 'assets/placeholder.png'" [alt]="item.producto" class="item-img" />
+              </div>
+
+              <!-- Información del producto -->
+              <div class="item-info">
+                <span class="item-category">{{ item.categoria }}</span>
+                <h4 class="item-title">{{ item.producto }}</h4>
+                <span class="item-unit-price">$ {{ item.precio | number:'1.0-0' }} ARS c/u</span>
+              </div>
+
+              <!-- Controles de Cantidad -->
+              <div class="item-quantity-controls">
+                <button 
+                  class="qty-btn" 
+                  [disabled]="item.cantidad <= 1"
+                  [class.disabled]="item.cantidad <= 1"
+                  (click)="cambiarCantidad(item, -1)">-</button>
+                <span class="qty-value">{{ item.cantidad }}</span>
+                <button class="qty-btn" (click)="cambiarCantidad(item, 1)">+</button>
+              </div>
+
+              <!-- Subtotal y Botón Eliminar -->
+              <div class="item-subtotal-box">
+                <span class="subtotal-value">$ {{ (item.subtotal || (item.precio * item.cantidad)) | number:'1.0-0' }} ARS</span>
+                <button class="btn-delete" (click)="eliminarProducto(item.id)" title="Eliminar producto" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 18px; height: 18px;">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </button>
+              </div>
+
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- 2. Resumen de Compra (Abajo en mobile, Derecha en PC) -->
+      <div class="carrito-resumen">
+        <div class="resumen-card">
+          <div class="resumen-header-desktop">
+            <h3>Resumen de compra</h3>
+            <div class="resumen-row">
+              <span>Productos ({{ carrito.productos.length }})</span>
+              <span>$ {{ carrito.total | number:'1.0-0' }} ARS</span>
+            </div>
+            <div class="resumen-row">
+              <span>Envío</span>
+              <span class="free-shipping">Gratis</span>
+            </div>
+            <hr class="divider" />
+          </div>
+
+          <div class="resumen-total">
+            <span>Total a pagar</span>
+            <strong>$ {{ carrito.total | number:'1.0-0' }} ARS</strong>
+          </div>
+
+          <button class="btn-checkout" (click)="finalizarCompra()">
+            Continuar con la compra ({{ carrito.productos.length }})
+          </button>
+          
+          <div class="security-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: #198754;">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>Compra 100% protegida y segura</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+</div>

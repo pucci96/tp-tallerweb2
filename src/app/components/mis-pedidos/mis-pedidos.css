@@ -1,0 +1,332 @@
+/* Esto destraba el ancho dentro del <main> flex de tu app */
+:host {
+  display: block;
+  width: 100%;
+}
+
+.compras-wrapper {
+  max-width: 960px;
+  width: 100%;
+  margin: 36px auto 60px auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.compras-titulo {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0 0 24px 0;
+}
+
+.compras-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Tarjeta principal estilo Mercado Libre */
+.pedido-card {
+  background-color: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.pedido-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Cabecera */
+.pedido-header {
+  background-color: #fafafa;
+  padding: 14px 24px;
+  border-bottom: 1px solid #eeeeee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pedido-meta {
+  font-size: 13px;
+  color: #666666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.separador {
+  color: #cccccc;
+}
+
+.badge-estado {
+  background-color: #e6f7ed;
+  color: #00a650;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 12px;
+  letter-spacing: 0.4px;
+}
+
+/* Filas de productos */
+.pedido-productos {
+  padding: 0 24px;
+}
+
+.producto-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 16px;
+}
+
+.producto-fila:last-child {
+  border-bottom: none;
+}
+
+.producto-info {
+  flex: 1;
+}
+
+.producto-nombre {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 6px 0;
+}
+
+.producto-categoria {
+  font-size: 13px;
+  color: #888888;
+  margin: 0 0 6px 0;
+}
+
+.producto-detalle {
+  font-size: 14px;
+  color: #555555;
+  margin: 0;
+}
+
+.producto-detalle strong {
+  color: #222222;
+}
+
+/* Botones estilo Mercado Libre */
+.btn-secundario {
+  display: inline-block;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #3483fa;
+  background-color: rgba(65, 137, 230, 0.12);
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-secundario:hover {
+  background-color: rgba(65, 137, 230, 0.22);
+}
+
+.btn-primario {
+  display: inline-block;
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #3483fa;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-primario:hover {
+  background-color: #2968c8;
+}
+
+/* Footer con el total */
+.pedido-footer {
+  background-color: #fafafa;
+  padding: 16px 24px;
+  border-top: 1px solid #eeeeee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555555;
+}
+
+.total-monto {
+  font-size: 19px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.total-monto small {
+  font-size: 13px;
+  font-weight: 400;
+  color: #666666;
+}
+
+/* Estado vacío o cargando */
+.estado-vacio {
+  background-color: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 48px 24px;
+  text-align: center;
+  color: #666666;
+}
+
+.estado-vacio h3 {
+  color: #222222;
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.estado-vacio p {
+  margin: 0 0 20px 0;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e6e6e6;
+  border-top-color: #3483fa;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 14px auto;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive para celulares */
+@media (max-width: 600px) {
+  .compras-wrapper {
+    margin: 20px auto 40px auto;
+    padding: 0 12px;
+  }
+
+  .pedido-header,
+  .pedido-footer {
+    padding: 12px 16px;
+  }
+
+  .pedido-productos {
+    padding: 0 16px;
+  }
+
+  .producto-fila {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .producto-acciones,
+  .btn-secundario {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  /* Contenedor de la miniatura de la imagen */
+.producto-imagen-container {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border: 1px solid #eeeeee;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.producto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* Mantiene la proporción de la foto del producto sin deformarla */
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+
+.producto-info {
+  flex: 1;
+}
+
+
+
+/* Contenedor estricto para la miniatura */
+.producto-imagen-container {
+  width: 60px !important;
+  height: 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+/* Tamaño fijo y prolijo para la imagen */
+.producto-img {
+  width: 60px !important;
+  height: 60px !important;
+  object-fit: contain !important;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+/* Asegurar que la fila del producto ordene bien los elementos en línea */
+.producto-fila {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+ .producto-imagen-container {
+  width: 60px !important;
+  height: 60px !important;
+  min-width: 60px !important;
+  min-height: 60px !important;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.producto-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+}

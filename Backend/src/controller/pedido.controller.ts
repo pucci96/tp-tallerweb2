@@ -29,4 +29,20 @@ export class PedidoController {
     const idPedido = parseId(req.params['id_pedido'], 'id de pedido');
     res.status(201).json(await this.pedidoService.agregarProducto(idPedido, id_usuario, req.body));
   };
+
+  actualizarEstado = async (req: Request, res: Response) => {
+    const { id_usuario, rol } = usuarioDelToken(req);
+    const idPedido = parseId(req.params['id_pedido'], 'id de pedido');
+    const { estado } = req.body;
+
+    res.json(await this.pedidoService.actualizarEstadoPedido(idPedido, id_usuario, rol === 'ADMIN', estado));
+  };
+
+  eliminarProducto = async (req: Request, res: Response) => {
+    const { id_usuario, rol } = usuarioDelToken(req);
+    const idPedido = parseId(req.params['id_pedido'], 'id de pedido');
+    const idItemPedido = parseId(req.params['id_item'], 'id de item');
+    
+    res.json(await this.pedidoService.eliminarProductoDelPedido(idPedido, idItemPedido, id_usuario, rol === 'ADMIN'));
+  };
 }

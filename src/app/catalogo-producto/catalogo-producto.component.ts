@@ -1,10 +1,11 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { ProductCardComponent } from '../productCard/productCard.component';
 import { environment } from '../../environments/environment';
+import { PedidoService } from '../services/pedido.service'; 
 
 @Component({
   selector: 'app-catalogo-producto',
@@ -15,35 +16,51 @@ import { environment } from '../../environments/environment';
 })
 export class CatalogoProductoComponent implements OnInit {
   private http = inject(HttpClient);
+  private pedidoService = inject(PedidoService); 
 
-  productos: any[] = [];
-  categorias: any[] = [];
+  // Señales: en Angular 22 los componentes son OnPush por defecto, así que la vista
+  // solo se actualiza sola al llegar la respuesta HTTP si el dato es una señal.
+  readonly productos = signal<any[]>([]);
+  readonly categorias = signal<any[]>([]);
+
+  /**
+   * Tope del filtro de precio: el precio del producto más caro, redondeado hacia
+   * arriba al múltiplo de PASO_PRECIO. Así el rango siempre abarca todo el catálogo.
+   */
+  readonly PASO_PRECIO = 10000;
+  readonly precioTope = computed(() => {
+    const precios = this.productos().map((p) => Number(p.price ?? p.precio ?? 0));
+    const masCaro = Math.max(0, ...precios);
+    return Math.max(this.PASO_PRECIO, Math.ceil(masCaro / this.PASO_PRECIO) * this.PASO_PRECIO);
+  });
 
   // Filtros reactivos
   searchQuery: string = '';
   categoriaSeleccionadaId: number | null = null;
   ordenSeleccionado: string = 'asc';
-  precioMax: number = 1000000;
+  precioMax: number = 0; // se ajusta al tope cuando llegan los productos
   soloStock: boolean = true;
   envioGratis: boolean = false;
 
   ngOnInit(): void {
-
-  this.cargarDatos();
-}
+    console.log('--- CatalogoComponent inicializado ---');
+    this.cargarDatos();
+    
+    // contador del carrito apenas entra al catálogo
+    this.pedidoService.cargarContadorCarrito();
+  }
 
 cargarDatos(): void {
   this.http.get<any[]>(`${environment.apiUrl}/productos`).subscribe({
     next: (data) => {
-      this.productos = data;
+      this.productos.set(data);
+      this.precioMax = this.precioTope(); // al entrar no se oculta ningún producto por precio
     },
     error: (err) => console.error('Error en productos:', err)
   });
 
   this.http.get<any[]>(`${environment.apiUrl}/categorias`).subscribe({
-    next: (data) => {
-      this.categorias = data;
-    },
+    next: (data) => this.categorias.set(data),
     error: (err) => console.error('Error en categorías:', err)
   });
 }
@@ -56,15 +73,16 @@ cargarDatos(): void {
     this.searchQuery = '';
     this.categoriaSeleccionadaId = null;
     this.ordenSeleccionado = 'asc';
-    this.precioMax = 1000000;
+    this.precioMax = this.precioTope();
   }
 
   get productosFiltrados(): any[] {
-  if (!this.productos || this.productos.length === 0) {
+  const productos = this.productos();
+  if (productos.length === 0) {
     return [];
   }
 
-  return this.productos
+  return productos
     .filter(p => {
      
       const titulo = (p.title || p.nombre || '').toLowerCase();

@@ -33,6 +33,17 @@ export class ProductoRepository {
     });
   }
 
+  /** Producto con todo lo necesario para la página pública de detalle. */
+  async obtenerDetalle(id: number) {
+    return prisma.producto.findUnique({
+      where: { id },
+      include: {
+        ...incluirRelaciones,
+        estilo: { orderBy: { id: 'asc' } },
+      },
+    });
+  }
+
   async obtenerSubcategoria(id: number) {
     return prisma.subcategoria.findUnique({ where: { id } });
   }

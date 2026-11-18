@@ -65,6 +65,41 @@ export class UsuarioRepository {
     });
   }
 
+  /** Usuario con su login (incluye el hash de la contraseña, para verificarla). */
+  async obtenerConLogin(id_usuario: number) {
+    return prisma.usuario.findUnique({
+      where: { id: id_usuario },
+      include: { login: { include: { rol: true } } },
+    });
+  }
+
+  /**
+   * Actualiza los datos personales y, si viene, la contraseña (ya hasheada).
+   * Usuario y Login se actualizan juntos: si falla uno, no se guarda ninguno.
+   */
+  async actualizarDatos(
+    id_usuario: number,
+    datos: { nombre: string; apellido: string; direccion: string },
+    passwordHash?: string
+  ) {
+    return prisma.$transaction(async (tx) => {
+      const usuario = await tx.usuario.update({
+        where: { id: id_usuario },
+        data: datos,
+        include: { login: { include: { rol: true } } },
+      });
+
+      if (passwordHash) {
+        await tx.login.update({
+          where: { email: usuario.email },
+          data: { password: passwordHash },
+        });
+      }
+
+      return usuario;
+    });
+  }
+
   async obtenerRol(id_usuario: number) {
     const usuario = await prisma.usuario.findUnique({
       where: { id: id_usuario },

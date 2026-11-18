@@ -11,6 +11,7 @@ router.post('/registrar', controller.crearUsuario);
 
 // Usuario logueado
 router.get('/me', verificarToken, controller.obtenerMisDatos);
+router.put('/me', verificarToken, controller.actualizarMisDatos);
 router.get('/datos/:id_usuario', verificarToken, controller.obtenerDatosUsuario);
 router.get('/rol/:id_usuario', verificarToken, controller.obtenerRol);
 

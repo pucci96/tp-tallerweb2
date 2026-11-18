@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface UsuarioSesion {
@@ -15,6 +15,18 @@ export interface UsuarioSesion {
 interface LoginResponse {
   token: string;
   usuario: UsuarioSesion;
+}
+
+/**
+ * Datos editables desde el perfil. El email no se puede cambiar.
+ * La contraseña solo cambia si se mandan la actual y la nueva.
+ */
+export interface ActualizarPerfilDatos {
+  nombre: string;
+  apellido: string;
+  direccion: string;
+  passwordActual?: string;
+  passwordNueva?: string;
 }
 
 interface RegistroDatos {
@@ -52,6 +64,28 @@ export class AuthService {
       },
     };
     return this.http.post<UsuarioSesion>(`${this.apiUrl}/registrar`, body);
+  }
+
+  /** Datos del usuario logueado, actualizados desde el backend. */
+  obtenerMisDatos(): Observable<UsuarioSesion> {
+    return this.http.get<UsuarioSesion>(`${this.apiUrl}/me`);
+  }
+
+  /**
+   * Guarda los cambios del perfil y actualiza la sesión con la respuesta,
+   * así el header (y cualquier vista que use usuarioActual) muestra los datos nuevos.
+   */
+  actualizarMisDatos(datos: ActualizarPerfilDatos): Observable<UsuarioSesion> {
+    return this.http
+      .put<UsuarioSesion>(`${this.apiUrl}/me`, datos)
+      .pipe(tap((usuario) => this.actualizarUsuarioSesion(usuario)));
+  }
+
+  /** Reemplaza los datos del usuario en la sesión, sin tocar el token. */
+  private actualizarUsuarioSesion(usuario: UsuarioSesion): void {
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+    localStorage.setItem('user_role', usuario.rol);
+    this.usuarioActual.set(usuario);
   }
 
   guardarSesion(respuesta: LoginResponse): void {

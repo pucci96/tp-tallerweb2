@@ -14,7 +14,7 @@
   }
 
   <div class="table-container">
-    @if (productos$ | async; as lista) {
+    @if (vm$ | async; as vm) {
       <table class="admin-table">
         <thead>
           <tr>
@@ -26,7 +26,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (prod of lista; track prod.id) {
+          @for (prod of vm.items; track prod.id) {
             <tr>
               <td class="cell-product">
                 @if (prod.imagen) {
@@ -64,8 +64,43 @@
           }
         </tbody>
       </table>
+
+      @if (vm.totalItems > 0) {
+        <div class="pagination-bar">
+          <span class="pagination-info">
+            Mostrando <strong>{{ vm.desde }}</strong> a <strong>{{ vm.hasta }}</strong> de <strong>{{ vm.totalItems }}</strong> productos
+          </span>
+
+          <div class="pagination-controls">
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="vm.paginaActual === 1"
+              (click)="cambiarPagina(vm.paginaActual - 1, vm.totalPaginas)">
+              &lt; Anterior
+            </button>
+
+            @for (num of vm.paginas; track num) {
+              <button
+                type="button"
+                class="page-btn"
+                [class.active]="num === vm.paginaActual"
+                (click)="cambiarPagina(num, vm.totalPaginas)">
+                {{ num }}
+              </button>
+            }
+
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="vm.paginaActual === vm.totalPaginas"
+              (click)="cambiarPagina(vm.paginaActual + 1, vm.totalPaginas)">
+              Siguiente &gt;
+            </button>
+          </div>
+        </div>
+      }
     } @else {
-     
       <div class="empty-cell">
         Cargando inventario desde el servidor...
       </div>

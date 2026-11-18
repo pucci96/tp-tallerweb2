@@ -28,7 +28,7 @@ export class CatalogoProductoComponent implements OnInit {
   envioGratis: boolean = false;
 
   ngOnInit(): void {
-  console.log('--- CatalogoComponent inicializado ---');
+
   this.cargarDatos();
 }
 
@@ -66,19 +66,19 @@ cargarDatos(): void {
 
   return this.productos
     .filter(p => {
-      // 1. Filtro por nombre
+     
       const titulo = (p.title || p.nombre || '').toLowerCase();
       const coincideBusqueda = this.searchQuery 
         ? titulo.includes(this.searchQuery.toLowerCase()) 
         : true;
 
-      // 2. Filtro por categoría (solo filtra si hay una seleccionada)
+      
       const catId = p.categoryId ?? p.categoriaId;
       const coincideCategoria = this.categoriaSeleccionadaId !== null 
         ? catId === this.categoriaSeleccionadaId 
         : true;
 
-      // 3. Filtro por precio (tolerante si no viene definido)
+     
       const precio = Number(p.price ?? p.precio ?? 0);
       const coincidePrecio = precio <= this.precioMax;
 

@@ -45,18 +45,18 @@ export class AdminProductoFormComponent implements OnInit {
   }
 
   cargarDatosIniciales(): void {
-    // 1. Cargar Categorías
+    
     this.http.get<any[]>(`${this.apiUrl}/categorias`).subscribe({
       next: (data) => this.categorias = data,
       error: (err) => console.error('Error cargando categorías:', err)
     });
 
-    // 2. Cargar Subcategorías
+    
     this.http.get<any[]>(`${this.apiUrl}/subcategorias`).subscribe({
       next: (data) => {
         this.todasLasSubcategorias = data;
         
-        // Si viene en modo edición, cargamos el producto una vez tengamos las subcategorías
+       
         const idParam = this.route.snapshot.paramMap.get('id');
         if (idParam) {
           this.productoId = Number(idParam);
@@ -79,7 +79,7 @@ export class AdminProductoFormComponent implements OnInit {
         return;
       }
 
-      // Filtramos subcategorías pertenecientes a la categoría seleccionada
+      
       this.subcategoriasFiltradas = this.todasLasSubcategorias.filter(
         sub => Number(sub.id_categoria) === categoriaId
       );
@@ -87,7 +87,7 @@ export class AdminProductoFormComponent implements OnInit {
       const subcatControl = this.productoForm.get('id_subcategoria');
       subcatControl?.enable();
 
-      // Si la subcategoría actualmente seleccionada no pertenece a la nueva lista, la reseteamos
+      
       const subActual = Number(subcatControl?.value);
       const existeEnFiltro = this.subcategoriasFiltradas.some(s => s.id === subActual);
       if (!existeEnFiltro) {

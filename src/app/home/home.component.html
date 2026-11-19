@@ -2,7 +2,7 @@
   <div class="carousel-container">
     @for (slide of slides(); track slide.id; let i = $index) {
       <div class="carousel-slide" [class.active]="i === currentIndex()">
-        <!-- Columna de texto -->
+       
         <div class="slide-content">
           <span class="badge badge-primary">{{ slide.badge }}</span>
           <h2 class="slide-title">{{ slide.title }}</h2>
@@ -16,14 +16,14 @@
           </a>
         </div>
 
-        <!-- Columna de imagen: lleva al detalle del producto -->
+       
         <a class="slide-image-wrapper" [routerLink]="slide.link" [attr.aria-label]="'Ver ' + slide.title">
           <img [src]="slide.imageUrl" [alt]="slide.title" class="slide-image" />
         </a>
       </div>
     }
 
-    <!-- Flechas de navegación manual -->
+   
     <button class="nav-arrow prev" (click)="prevSlide()" aria-label="Anterior">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <polyline points="15 18 9 12 15 6"></polyline>
@@ -52,11 +52,23 @@
 <section class="products-section">
   <div class="section-header">
     <h2 class="section-title">Productos Destacados</h2>
-    <a routerLink="/productos" class="see-more-link">Ver todo el catálogo →</a>
+
+    <div class="destacados-controls">
+      @if (totalPaginasDestacados() > 1) {
+        <button type="button" class="carousel-btn" (click)="anteriorDestacados()" aria-label="Anteriores">
+          &lt;
+        </button>
+        <span class="carousel-page">{{ paginaDestacados() + 1 }} / {{ totalPaginasDestacados() }}</span>
+        <button type="button" class="carousel-btn" (click)="siguienteDestacados()" aria-label="Siguientes">
+          &gt;
+        </button>
+      }
+      <a routerLink="/productos" class="see-more-link">Ver todo el catálogo →</a>
+    </div>
   </div>
 
   <div class="products-grid">
-    @for (prod of productosDestacados(); track prod.id) {
+    @for (prod of destacadosVisibles(); track prod.id) {
       <app-product-card [product]="prod"></app-product-card>
     }
   </div>

@@ -43,8 +43,8 @@ describe('HeaderComponent', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.user-name')?.textContent).toContain('Ana');
-    expect(compiled.textContent).toContain('Cerrar sesión');
-    expect(compiled.textContent).not.toContain('Administración');
+    expect(compiled.querySelector('.btn-logout')?.getAttribute('aria-label')).toBe('Cerrar sesión');
+    expect(compiled.textContent).not.toContain('Inventario');
   });
 
   it('muestra el link de administración solo a usuarios ADMIN', () => {
@@ -54,6 +54,6 @@ describe('HeaderComponent', () => {
     });
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Administración');
+    expect((fixture.nativeElement as HTMLElement).textContent).toContain('Inventario');
   });
 });

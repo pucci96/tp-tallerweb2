@@ -3,11 +3,7 @@
   <header class="page-header">
     <div class="header-left">
       <nav class="breadcrumb">
-        <a routerLink="/"><i class="icon-home">⌂</i> Inicio</a>
-        <span>›</span>
-        <span>Mi cuenta</span>
-        <span>›</span>
-        <span class="active">Mi perfil</span>
+        <a routerLink="/">Inicio</a>/<span>Mi Perfil</span>
       </nav>
       <h1 class="page-title">Mi Perfil</h1>
       <p class="page-subtitle">Gestioná tu información personal, dirección de entrega y seguridad.</p>
@@ -48,17 +44,11 @@
       <div class="user-card">
         <div class="user-avatar-wrapper">
           <div class="avatar-box">{{ iniciales() }}</div>
-          <button class="avatar-edit-btn" aria-label="Cambiar foto">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-              <circle cx="12" cy="13" r="4"></circle>
-            </svg>
-          </button>
         </div>
 
         <h2 class="user-card-name">{{ datos()?.nombre }} {{ datos()?.apellido }}</h2>
         <span class="user-card-email">{{ datos()?.email }}</span>
-        
+
         <div class="client-badge">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
@@ -282,7 +272,7 @@
         </div>
       </div>
 
-    
+
     </main>
   </div>
 </div>

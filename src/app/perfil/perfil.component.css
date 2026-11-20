@@ -27,6 +27,7 @@
   align-items: center;
   font-size: 0.85rem;
   color: #64748b;
+  color: #2563eb;
   margin-bottom: 0.4rem;
 }
 
@@ -146,27 +147,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.avatar-edit-btn {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  width: 28px;
-  height: 28px;
-  background: #0d6efd;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.avatar-edit-btn svg {
-  width: 14px;
-  height: 14px;
 }
 
 .user-card-name {

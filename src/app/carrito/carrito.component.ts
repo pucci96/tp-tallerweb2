@@ -166,26 +166,6 @@ export class CarritoComponent implements OnInit {
     }
   }
 
-  finalizarCompra(): void {
-    if (!this.carrito) return;
-
-    // Llamamos al servicio centralizado
-    this.pedidoService.finalizarPedido(this.carrito.id).subscribe({
-      next: () => {
-        this.mostrarToastML('¡Compra finalizada con éxito!');
-        
-        // Limpiamos la vista y ponemos el contador del header en 0
-        this.carrito = null;
-        this.pedidoService.cantidadCarrito.set(0);
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error al finalizar la compra en el servidor:', err);
-        this.mostrarToastML('Hubo un error al procesar tu compra.');
-      }
-    });
-  }
-
   private mostrarToastML(mensaje: string) {
     this.mensajeAlerta = mensaje;
     this.cdr.detectChanges();

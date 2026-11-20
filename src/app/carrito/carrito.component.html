@@ -97,9 +97,9 @@
             <strong>$ {{ carrito.total | number:'1.0-0' }} ARS</strong>
           </div>
 
-          <button class="btn-checkout" (click)="finalizarCompra()">
+          <a class="btn-checkout" routerLink="/checkout">
             Continuar con la compra ({{ carrito.productos.length }})
-          </button>
+          </a>
           
           <div class="security-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: #198754;">

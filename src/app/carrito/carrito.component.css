@@ -245,6 +245,10 @@
 }
 
 .btn-checkout {
+  display: block;
+  box-sizing: border-box;
+  text-align: center;
+  text-decoration: none;
   width: 100%;
   background-color: #0d6efd;
   color: white;

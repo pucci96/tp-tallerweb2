@@ -11,6 +11,9 @@ import { CarritoComponent } from './carrito/carrito.component';
 import { MisPedidos } from './components/mis-pedidos/mis-pedidos'; // Ajustá la ruta según la carpeta donde lo hayas guardado
 import { adminGuard } from './guards/admin-guard';
 import { authGuard } from './guards/auth-guard';
+import { CheckoutConfirmacionComponent } from './checkout-confirmacion/checkout-confirmacion.component';
+import { CheckoutPagoComponent } from './checkout-pago/checkout-pago.component';
+import { CheckoutResultadoComponent } from './checkout-resultado/checkout-resultado.component';
 
 export const routes: Routes = [
 {
@@ -68,6 +71,21 @@ export const routes: Routes = [
     component: AdminProductoFormComponent, 
     canActivate: [adminGuard] 
   },
+{
+    path: 'checkout',
+    component: CheckoutConfirmacionComponent,
+    canActivate: [authGuard]
+},
+{
+    path: 'checkout/pago',
+    component: CheckoutPagoComponent,
+    canActivate: [authGuard]
+},
+{
+    path: 'checkout/resultado',
+    component: CheckoutResultadoComponent,
+    canActivate: [authGuard]
+},
 {
     path: '**',
     redirectTo:'home'

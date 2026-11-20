@@ -9,7 +9,9 @@ import { manejarErrores, rutaNoEncontrada } from './src/middleware/error.middlew
 
 const app = express();
 
-app.use(cors());
+// CORS con lista blanca: el navegador solo deja usar la API a los frontends
+// configurados en CORS_ORIGINS (por defecto, Angular en http://localhost:4200).
+app.use(cors({ origin: env.corsOrigins }));
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => {

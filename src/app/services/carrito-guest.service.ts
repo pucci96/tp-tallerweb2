@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 
 export interface ItemGuest {
   id_producto: number;
@@ -34,7 +34,6 @@ export class CarritoGuestService {
     } else {
       this.items.set([...actual, item]);
     }
-    this.persistir();
   }
 
   cambiarCantidad(id_producto: number, delta: number): void {
@@ -45,23 +44,19 @@ export class CarritoGuestService {
           : i)
         .filter(i => i.cantidad > 0)
     );
-    this.persistir();
   }
 
   quitar(id_producto: number): void {
     this.items.set(this.items().filter(i => i.id_producto !== id_producto));
-    this.persistir();
   }
 
   /*Borrar cosas q ya estan en back */
   quitarRango(ids: number[]): void {
     this.items.set(this.items().filter(i => !ids.includes(i.id_producto)));
-    this.persistir();
   }
 
   vaciar(): void {
     this.items.set([]);
-    this.persistir();
   }
 
   private leer(): ItemGuest[] {
@@ -73,7 +68,19 @@ export class CarritoGuestService {
     }
   }
 
-  private persistir(): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.items()));
-  }
+  /**
+   * Guarda el carrito en localStorage cada vez que cambia la señal items.
+   * Con effect() no hace falta acordarse de llamar a "guardar" en cada método
+   * (agregar, cambiarCantidad, quitar, vaciar...): Angular lo ejecuta solo
+   * cuando items() cambia. Como el service es singleton (providedIn: 'root'),
+   * el effect vive mientras la app esté abierta y no hace falta destruirlo.
+   */
+  private readonly guardarEnStorage = effect(() => {
+    const items = this.items();
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // Sin acceso a localStorage (modo privado, cuota llena): el carrito sigue en memoria.
+    }
+  });
 }

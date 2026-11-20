@@ -1,6 +1,7 @@
 import { PedidoRepository } from '../repository/pedido.repository';
 import { PedidoDTO, PedidoProductoDTO, CrearPedidoDTO, AgregarProductoDTO } from '../models/pedido.dto';
 import { HttpError } from '../utils/http-error';
+import { esDuenioOAdmin } from '../utils/autorizacion';
 
 type PedidoConProductos = NonNullable<Awaited<ReturnType<PedidoRepository['obtenerPedido']>>>;
 type FilaProducto = PedidoConProductos['productos'][number];
@@ -38,7 +39,7 @@ export class PedidoService {
   private async pedidoPropio(idPedido: number, idUsuario: number, esAdmin: boolean) {
     const pedido = await this.pedidoRepo.obtenerPedido(idPedido);
     if (!pedido) throw new HttpError(404, 'Pedido no encontrado');
-    if (pedido.id_usuario !== idUsuario && !esAdmin) {
+    if (!esDuenioOAdmin(pedido.id_usuario, idUsuario, esAdmin)) {
       throw new HttpError(403, 'No tenés permisos sobre este pedido');
     }
     return pedido;

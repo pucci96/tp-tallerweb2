@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../config/jwt';
+import { ROL_ADMIN } from '../utils/autorizacion';
 
 export interface TokenPayload {
   sub: number;        // id de Login
@@ -49,7 +50,7 @@ export const requireRole = (rolRequerido: string) => {
 };
 
 /** Atajo para rutas de administración: token válido + rol ADMIN. */
-export const soloAdmin = [verificarToken, requireRole('ADMIN')];
+export const soloAdmin = [verificarToken, requireRole(ROL_ADMIN)];
 
 /** Devuelve el usuario del token. Usar solo en rutas protegidas con verificarToken. */
 export function usuarioDelToken(req: Request): TokenPayload {

@@ -8,6 +8,7 @@ import { ProductService, ProductoDetalle, Comentario } from '../services/product
 import { AuthService } from '../services/auth.service';
 import { Product } from '../productCard/productCard.component';
 import { PedidoService } from '../services/pedido.service';
+import { SelectorEstrellasComponent } from '../selector-estrellas/selector-estrellas.component';
 
 
 /** Cantidad máxima de productos relacionados que se muestran. */
@@ -19,7 +20,7 @@ export const MAX_LARGO_COMENTARIO = 500;
 @Component({
   selector: 'app-detalles-producto',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, SelectorEstrellasComponent],
   templateUrl: './detalles-producto.component.html',
   styleUrls: ['./detalles-producto.component.css']
 })
@@ -57,7 +58,6 @@ export class DetallesProductoComponent {
 
   /** Formulario para comentar */
   readonly nuevaCalificacion = signal(0);
-  readonly calificacionHover = signal(0);
   readonly nuevoTexto = signal('');
   readonly enviandoComentario = signal(false);
   readonly errorComentario = signal('');
@@ -119,7 +119,6 @@ export class DetallesProductoComponent {
     this.promedio.set(0);
     this.cantidadOpiniones.set(0);
     this.nuevaCalificacion.set(0);
-    this.calificacionHover.set(0);
     this.nuevoTexto.set('');
     this.errorComentario.set('');
     this.comentarioPublicado.set(false);
@@ -147,14 +146,11 @@ export class DetallesProductoComponent {
     return [1, 2, 3, 4, 5].map((n) => (redondeado >= n ? 100 : redondeado >= n - 0.5 ? 50 : 0));
   }
 
-  /** Selector de estrellas del formulario: elegir y "previsualizar" con el mouse. */
+  /** Recibe la estrella elegida que emite <app-selector-estrellas> (output calificacionCambiada). */
   elegirCalificacion(valor: number): void {
     this.nuevaCalificacion.set(valor);
     this.errorComentario.set('');
   }
-
-  /** Estrellas que se ven llenas en el selector (la del hover tiene prioridad). */
-  readonly calificacionVisible = computed(() => this.calificacionHover() || this.nuevaCalificacion());
 
   publicarComentario(): void {
     const producto = this.producto();

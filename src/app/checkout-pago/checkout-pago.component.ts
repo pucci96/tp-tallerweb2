@@ -1,11 +1,14 @@
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { CarritoCheckout, CheckoutService, DatosEnvio } from '../services/checkout.service';
+import { Router } from '@angular/router';
+import { CheckoutCabeceraComponent } from '../checkout-shared/checkout-cabecera.component';
+import { CheckoutResumenComponent } from '../checkout-shared/checkout-resumen.component';
+import { CarritoCheckout, CheckoutService, DatosEnvio, MedioPago } from '../services/checkout.service';
 import { PaymentSimulatorService, ResultadoPago } from '../services/payment-simulator.service';
 import { noSoloEspacios } from '../validators/no-solo-espacios.validator';
+import { marcaTarjeta } from './marca-tarjeta';
 import {
   limpiarNumeroTarjeta,
   numeroTarjetaValidator,
@@ -17,9 +20,9 @@ type CampoTarjeta = 'numero' | 'titular' | 'vencimiento' | 'cvv';
 @Component({
   selector: 'app-checkout-pago',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, CheckoutCabeceraComponent, CheckoutResumenComponent],
   templateUrl: './checkout-pago.component.html',
-  styleUrls: ['./checkout-pago.component.css'],
+  styleUrls: ['../checkout-shared/checkout-shared.css', './checkout-pago.component.css'],
 })
 export class CheckoutPagoComponent implements OnInit {
   private readonly checkout = inject(CheckoutService);
@@ -27,6 +30,7 @@ export class CheckoutPagoComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
+  readonly envio = this.checkout.datosEnvio;
   readonly carrito = signal<CarritoCheckout | null>(null);
   readonly procesando = signal(false);
   readonly error = signal<string | null>(null);
@@ -37,6 +41,16 @@ export class CheckoutPagoComponent implements OnInit {
     vencimiento: ['', [Validators.required, vencimientoValidator()]],
     cvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]],
   });
+
+  // Vista previa de la tarjeta: se actualiza a medida que se escribe.
+  private readonly valores = toSignal(this.form.valueChanges, { initialValue: this.form.getRawValue() });
+  readonly marca = computed(() => marcaTarjeta(this.valores().numero ?? ''));
+  readonly numeroVisual = computed(() => {
+    const digitos = limpiarNumeroTarjeta(this.valores().numero ?? '').padEnd(16, '•');
+    return (digitos.match(/.{1,4}/g) ?? []).join(' ');
+  });
+  readonly titularVisual = computed(() => (this.valores().titular ?? '').trim().toUpperCase() || 'NOMBRE APELLIDO');
+  readonly vencimientoVisual = computed(() => this.valores().vencimiento || 'MM/AA');
 
   ngOnInit(): void {
     // Los datos de envío viven solo en memoria; tras recargar hay que completarlos de nuevo.
@@ -80,25 +94,28 @@ export class CheckoutPagoComponent implements OnInit {
     }
 
     const { numero, titular, vencimiento, cvv } = this.form.getRawValue();
+    const numeroLimpio = limpiarNumeroTarjeta(numero);
+    // Del medio de pago solo se conservan la marca y los últimos 4 dígitos para el comprobante.
+    const pago: MedioPago = { marca: marcaTarjeta(numeroLimpio), ultimos4: numeroLimpio.slice(-4) };
     this.procesando.set(true);
     this.error.set(null);
     this.form.disable();
 
     this.pagos
-      .procesarPago({
-        numero: limpiarNumeroTarjeta(numero),
-        titular: titular.trim(),
-        vencimiento,
-        cvv,
-      })
+      .procesarPago({ numero: numeroLimpio, titular: titular.trim(), vencimiento, cvv })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (resultado) => this.manejarResultado(resultado, carrito, envio),
+        next: (resultado) => this.manejarResultado(resultado, carrito, envio, pago),
         error: () => this.mostrarRechazo('No pudimos procesar el pago. Intentá nuevamente.'),
       });
   }
 
-  private manejarResultado(resultado: ResultadoPago, carrito: CarritoCheckout, envio: DatosEnvio): void {
+  private manejarResultado(
+    resultado: ResultadoPago,
+    carrito: CarritoCheckout,
+    envio: DatosEnvio,
+    pago: MedioPago,
+  ): void {
     if (!resultado.aprobado) {
       this.mostrarRechazo(resultado.motivo ?? 'El pago fue rechazado.');
       return;
@@ -111,8 +128,12 @@ export class CheckoutPagoComponent implements OnInit {
         next: () => {
           this.checkout.registrarPedido({
             numeroPedido: this.checkout.numeroPedido(carrito.idPedido),
+            lineas: carrito.lineas,
+            cantidadTotal: carrito.cantidadTotal,
             total: carrito.total,
             envio,
+            fecha: new Date(),
+            pago,
           });
           this.checkout.vaciarContadorCarrito();
           this.router.navigate(['/checkout/resultado']);

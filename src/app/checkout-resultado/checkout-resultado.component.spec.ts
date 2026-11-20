@@ -20,7 +20,11 @@ describe('CheckoutResultadoComponent', () => {
   it('debería mostrar el número de pedido y la dirección de envío', async () => {
     TestBed.inject(CheckoutService).registrarPedido({
       numeroPedido: 'TC-123456',
+      lineas: [{ nombre: 'Teclado', precio: 1000, cantidad: 2, subtotal: 2000, imagen: '' }],
+      cantidadTotal: 2,
       total: 2000,
+      fecha: new Date(2026, 10, 19, 16, 42),
+      pago: { marca: 'VISA', ultimos4: '1111' },
       envio: {
         nombre: 'Ana',
         apellido: 'García',
@@ -33,10 +37,14 @@ describe('CheckoutResultadoComponent', () => {
     fixture = TestBed.createComponent(CheckoutResultadoComponent);
     await fixture.whenStable();
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('¡Pago aprobado!');
+    expect(el.textContent).toContain('¡Pedido realizado con éxito!');
     expect(el.textContent).toContain('TC-123456');
+    expect(el.textContent).toContain('VISA •••• 1111');
+    expect(el.textContent).toContain('19/11/2026 16:42');
     expect(el.textContent).toContain('Calle 123');
-    expect(el.querySelector('a[href="/home"]')?.textContent).toContain('Volver a la tienda');
+    expect(el.textContent).toContain('Teclado');
+    expect(el.querySelector('a[href="/mis-pedidos"]')?.textContent).toContain('Ver mis pedidos');
+    expect(el.querySelector('a[href="/productos"]')?.textContent).toContain('Seguir comprando');
     expect(navigate).not.toHaveBeenCalled();
   });
 

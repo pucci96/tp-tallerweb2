@@ -1,94 +1,114 @@
-<section class="payment">
-  <a routerLink="/checkout" class="back-link">← Volver al pedido</a>
-  <h1 class="payment-title">Pago con tarjeta</h1>
+<section class="checkout-page">
+  <app-checkout-cabecera
+    [paso]="2"
+    icono="pago"
+    titulo="Simulación de pago"
+    subtitulo="Verificá los datos y confirmá la transacción."
+    etiquetaPaso="Pago seguro simulado"
+  />
 
-  <div class="payment-grid">
-    <form class="card card-form" [formGroup]="form" (ngSubmit)="pagar()" novalidate>
-      <label class="field">
-        <span>Número de tarjeta</span>
-        <input
-          type="text"
-          formControlName="numero"
-          inputmode="numeric"
-          autocomplete="cc-number"
-          placeholder="4111 1111 1111 1111"
-          maxlength="19"
-        />
-        @if (campoInvalido('numero')) {
-          <small class="field-error">Ingresá los 16 dígitos de la tarjeta.</small>
-        }
-      </label>
+  <div class="aviso" role="note">
+    <p>
+      <strong>Esto es una simulación. No se procesa ningún pago real.</strong>
+      <span class="test-hint">
+        Las tarjetas terminadas en <strong>0000</strong> son rechazadas; con cualquier otra el pago se aprueba.
+      </span>
+    </p>
+    <span class="aviso-tag">Modo sandbox</span>
+  </div>
 
-      <label class="field">
-        <span>Titular</span>
-        <input type="text" formControlName="titular" autocomplete="cc-name" placeholder="Como figura en la tarjeta" />
-        @if (campoInvalido('titular')) {
-          <small class="field-error">Ingresá el nombre del titular.</small>
-        }
-      </label>
+  <div class="checkout-grid">
+    <form class="panel" [formGroup]="form" (ngSubmit)="pagar()" novalidate>
+      <div class="panel-head"><h2>Tarjeta de crédito / débito</h2></div>
+      <div class="panel-body">
+        <div class="tarjeta" aria-hidden="true">
+          <div class="tarjeta-top">
+            <span>Banco simulado</span>
+            <span class="marca">{{ marca() }}</span>
+          </div>
+          <div class="chip"></div>
+          <div class="tarjeta-numero">{{ numeroVisual() }}</div>
+          <div class="tarjeta-pie">
+            <div><small>Titular</small><span>{{ titularVisual() }}</span></div>
+            <div><small>Vence</small><span>{{ vencimientoVisual() }}</span></div>
+          </div>
+        </div>
 
-      <div class="field-row">
         <label class="field">
-          <span>Vencimiento</span>
-          <input type="text" formControlName="vencimiento" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5" />
-          @if (campoInvalido('vencimiento')) {
-            <small class="field-error">Usá MM/AA con una fecha vigente.</small>
-          }
-        </label>
-        <label class="field">
-          <span>CVV</span>
+          <span>Número de tarjeta</span>
           <input
-            type="password"
-            formControlName="cvv"
+            type="text"
+            formControlName="numero"
             inputmode="numeric"
-            autocomplete="cc-csc"
-            placeholder="123"
-            maxlength="3"
+            autocomplete="cc-number"
+            placeholder="4111 1111 1111 1111"
+            maxlength="19"
           />
-          @if (campoInvalido('cvv')) {
-            <small class="field-error">3 dígitos.</small>
+          @if (campoInvalido('numero')) {
+            <small class="field-error">Ingresá los 16 dígitos de la tarjeta.</small>
           }
         </label>
-      </div>
 
-      <p class="test-hint">Modo de prueba: las tarjetas terminadas en <strong>0000</strong> son rechazadas.</p>
+        <label class="field">
+          <span>Titular</span>
+          <input type="text" formControlName="titular" autocomplete="cc-name" placeholder="Como figura en la tarjeta" />
+          @if (campoInvalido('titular')) {
+            <small class="field-error">Ingresá el nombre del titular.</small>
+          }
+        </label>
 
-      @if (error(); as motivo) {
-        <div class="payment-error" role="alert"><strong>Pago rechazado:</strong> {{ motivo }}</div>
-      }
+        <div class="field-row">
+          <label class="field">
+            <span>Vencimiento</span>
+            <input type="text" formControlName="vencimiento" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5" />
+            @if (campoInvalido('vencimiento')) {
+              <small class="field-error">Usá MM/AA con una fecha vigente.</small>
+            }
+          </label>
+          <label class="field">
+            <span>Código de seguridad (CVV)</span>
+            <input
+              type="password"
+              formControlName="cvv"
+              inputmode="numeric"
+              autocomplete="cc-csc"
+              placeholder="123"
+              maxlength="3"
+            />
+            @if (campoInvalido('cvv')) {
+              <small class="field-error">3 dígitos.</small>
+            }
+          </label>
+        </div>
 
-      <button
-        type="submit"
-        class="btn-primary btn-block"
-        data-test="pagar"
-        [disabled]="form.invalid || procesando() || !carrito()"
-      >
-        @if (procesando()) {
-          Procesando pago...
-        } @else if (error()) {
-          Reintentar
-        } @else {
-          Pagar $ {{ carrito()?.total ?? 0 | number: '1.0-0' }} ARS
+        @if (error(); as motivo) {
+          <div class="payment-error" role="alert"><strong>Pago rechazado:</strong> {{ motivo }}</div>
         }
-      </button>
+
+        <button
+          type="submit"
+          class="btn-primary btn-block"
+          data-test="pagar"
+          [disabled]="form.invalid || procesando() || !carrito()"
+        >
+          @if (procesando()) {
+            Procesando pago...
+          } @else if (error()) {
+            Reintentar
+          } @else {
+            Confirmar pago ($ {{ carrito()?.total ?? 0 | number: '1.0-0' }} ARS)
+          }
+        </button>
+      </div>
     </form>
 
     @if (carrito(); as c) {
-      <aside class="card summary">
-        <h2 class="section-title">Tu pedido</h2>
-        <div class="summary-row">
-          <span>{{ c.cantidadTotal }} {{ c.cantidadTotal === 1 ? 'producto' : 'productos' }}</span>
-          <span>$ {{ c.total | number: '1.0-0' }} ARS</span>
-        </div>
-        <div class="summary-row">
-          <span>Envío</span>
-          <span class="free">Gratis</span>
-        </div>
-        <div class="summary-row summary-total">
-          <span>Total</span>
-          <span>$ {{ c.total | number: '1.0-0' }} ARS</span>
-        </div>
-      </aside>
+      <app-checkout-resumen
+        [resumen]="c"
+        [envio]="envio()"
+        modificarRuta="/checkout"
+        modificarTexto="Modificar datos de envío"
+      />
     }
   </div>
 </section>

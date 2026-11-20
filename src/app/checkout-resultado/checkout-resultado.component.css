@@ -1,76 +1,105 @@
-.result {
+.resultado {
   display: flex;
-  justify-content: center;
-  padding: 3rem 1rem;
-  color: var(--neutral-dark);
-  font-family: var(--font-main);
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.result-card {
-  width: 100%;
-  max-width: 520px;
-  padding: 2rem;
-  background: #fff;
-  border: 1px solid #e3e6ea;
-  border-radius: 12px;
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2.5rem 1.5rem;
   text-align: center;
 }
 
-.result-icon {
+.hero h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--secondary-color);
+}
+
+.hero-nota {
+  font-size: 0.85rem;
+}
+
+.hero-icon {
+  display: grid;
+  place-items: center;
   width: 64px;
   height: 64px;
-  margin: 0 auto 1rem;
-  border-radius: 50%;
-  background: var(--tertiary-color);
-  color: #fff;
+  border-radius: 16px;
+  background: #d1e7dd;
+  color: var(--tertiary-color);
   font-size: 2rem;
-  line-height: 64px;
+  font-weight: 700;
 }
 
-.result-title {
-  margin: 0 0 0.5rem;
-  font-size: 1.75rem;
+.hero-tag,
+.estado {
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background: #d1e7dd;
+  color: #0f5132;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.result-text {
-  margin: 0 0 1.5rem;
-  color: var(--secondary-color);
+.estado {
+  text-transform: none;
+  font-size: 0.8rem;
 }
 
-.result-details {
-  margin: 0 0 1.5rem;
-  text-align: left;
-}
-
-.result-details div {
-  display: flex;
-  justify-content: space-between;
+.datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
-  padding: 0.6rem 0;
-  border-top: 1px solid #e3e6ea;
+  margin: 0;
+  padding: 1.25rem;
 }
 
-.result-details dt {
+.datos dt {
+  margin-bottom: 0.25rem;
   color: var(--secondary-color);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.result-details dd {
+.datos dd {
   margin: 0;
   font-weight: 600;
-  text-align: right;
 }
 
 .order-number {
-  color: var(--primary-color);
-  letter-spacing: 0.05em;
+  font-size: 1.25rem;
 }
 
-.btn-primary {
-  display: inline-block;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  background: var(--primary-color);
-  color: #fff;
+.domicilio {
+  gap: 0.25rem;
+  font-style: normal;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.btn-secundario {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  border-radius: 10px;
+  background: #e9ecef;
+  color: var(--neutral-dark);
   font-weight: 600;
   text-decoration: none;
 }

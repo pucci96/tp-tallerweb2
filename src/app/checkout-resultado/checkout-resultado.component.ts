@@ -1,14 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { CheckoutResumenComponent } from '../checkout-shared/checkout-resumen.component';
 import { CheckoutService } from '../services/checkout.service';
 
 @Component({
   selector: 'app-checkout-resultado',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, CheckoutResumenComponent],
   templateUrl: './checkout-resultado.component.html',
-  styleUrls: ['./checkout-resultado.component.css'],
+  styleUrls: ['../checkout-shared/checkout-shared.css', './checkout-resultado.component.css'],
 })
 export class CheckoutResultadoComponent implements OnInit {
   private readonly router = inject(Router);

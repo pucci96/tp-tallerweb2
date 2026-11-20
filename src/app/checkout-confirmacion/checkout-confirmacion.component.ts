@@ -2,6 +2,8 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { CheckoutCabeceraComponent } from '../checkout-shared/checkout-cabecera.component';
+import { CheckoutResumenComponent } from '../checkout-shared/checkout-resumen.component';
 import { AuthService } from '../services/auth.service';
 import { CarritoCheckout, CheckoutService, DatosEnvio } from '../services/checkout.service';
 import { noSoloEspacios } from '../validators/no-solo-espacios.validator';
@@ -9,9 +11,15 @@ import { noSoloEspacios } from '../validators/no-solo-espacios.validator';
 @Component({
   selector: 'app-checkout-confirmacion',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    CheckoutCabeceraComponent,
+    CheckoutResumenComponent,
+  ],
   templateUrl: './checkout-confirmacion.component.html',
-  styleUrls: ['./checkout-confirmacion.component.css'],
+  styleUrls: ['../checkout-shared/checkout-shared.css', './checkout-confirmacion.component.css'],
 })
 export class CheckoutConfirmacionComponent implements OnInit {
   private readonly checkout = inject(CheckoutService);

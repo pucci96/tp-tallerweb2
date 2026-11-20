@@ -18,8 +18,8 @@ const usuario: UsuarioSesion = {
 const carrito: CarritoCheckout = {
   idPedido: 5,
   lineas: [
-    { nombre: 'Teclado', precio: 1000, cantidad: 2, subtotal: 2000 },
-    { nombre: 'Mouse', precio: 500, cantidad: 1, subtotal: 500 },
+    { nombre: 'Teclado', precio: 1000, cantidad: 2, subtotal: 2000, imagen: 't.png' },
+    { nombre: 'Mouse', precio: 500, cantidad: 1, subtotal: 500, imagen: '' },
   ],
   cantidadTotal: 3,
   total: 2500,
@@ -89,7 +89,7 @@ describe('CheckoutConfirmacionComponent', () => {
     const el = await crear();
     expect(el.querySelectorAll('.cart-item').length).toBe(2);
     expect(el.textContent).toContain('Teclado');
-    expect(el.textContent).toContain('x2');
+    expect(el.textContent).toContain('Cantidad: 2');
     expect(el.querySelector('.summary-total')?.textContent).toContain('2,500');
     expect(el.querySelector('a[href="/carrito"]')).not.toBeNull();
   });

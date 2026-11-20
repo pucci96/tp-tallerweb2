@@ -21,7 +21,7 @@ const envio: DatosEnvio = {
 
 const carrito: CarritoCheckout = {
   idPedido: 42,
-  lineas: [{ nombre: 'Teclado', precio: 1000, cantidad: 2, subtotal: 2000 }],
+  lineas: [{ nombre: 'Teclado', precio: 1000, cantidad: 2, subtotal: 2000, imagen: 't.png' }],
   cantidadTotal: 2,
   total: 2000,
 };
@@ -79,9 +79,22 @@ describe('CheckoutPagoComponent', () => {
   it('debería usar singular cuando hay un solo producto', async () => {
     checkout.cargarCarrito.mockReturnValue(of({ ...carrito, cantidadTotal: 1 }));
     await crear();
-    const resumen = (fixture.nativeElement as HTMLElement).querySelector('.summary')?.textContent ?? '';
+    const resumen = (fixture.nativeElement as HTMLElement).querySelector('app-checkout-resumen')?.textContent ?? '';
     expect(resumen).toContain('1 producto');
     expect(resumen).not.toContain('1 productos');
+  });
+
+  it('debería mostrar el domicilio de entrega y actualizar la vista previa de la tarjeta', async () => {
+    await crear();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.textContent).toContain('Calle 123, CABA (1414)');
+    completarTarjeta('4111 1111 1111 1111');
+    fixture.detectChanges();
+    const tarjeta = el.querySelector('.tarjeta')?.textContent ?? '';
+    expect(tarjeta).toContain('VISA');
+    expect(tarjeta).toContain('4111 1111 1111 1111');
+    expect(tarjeta).toContain('ANA GARCÍA');
+    expect(tarjeta).toContain('12/99');
   });
 
   it('debería deshabilitar el botón de pago con el formulario inválido', async () => {
@@ -113,8 +126,12 @@ describe('CheckoutPagoComponent', () => {
     expect(checkout.finalizarCarrito).toHaveBeenCalledWith(42);
     expect(checkout.registrarPedido).toHaveBeenCalledWith({
       numeroPedido: 'TC-000042',
+      lineas: carrito.lineas,
+      cantidadTotal: 2,
       total: 2000,
       envio,
+      fecha: expect.any(Date),
+      pago: { marca: 'VISA', ultimos4: '1111' },
     });
     expect(checkout.vaciarContadorCarrito).toHaveBeenCalled();
   });

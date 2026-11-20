@@ -1,6 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of } from 'rxjs';
+import { Product } from '../productCard/productCard.component';
 import { PedidoDTO, PedidoService } from './pedido.service';
+import { ProductService } from './product.service';
 
 export interface DatosEnvio {
   nombre: string;
@@ -16,26 +18,39 @@ export interface LineaCheckout {
   precio: number;
   cantidad: number;
   subtotal: number;
+  /** Imagen del catálogo; vacía si no se pudo resolver. */
+  imagen: string;
 }
 
-/** Vista resumida del pedido en estado "carrito" para las pantallas de checkout. */
-export interface CarritoCheckout {
-  idPedido: number;
+/** Totales y líneas que muestran el resumen de compra y el comprobante. */
+export interface ResumenCompra {
   lineas: LineaCheckout[];
   cantidadTotal: number;
   total: number;
 }
 
-export interface PedidoConfirmado {
+/** Vista resumida del pedido en estado "carrito" para las pantallas de checkout. */
+export interface CarritoCheckout extends ResumenCompra {
+  idPedido: number;
+}
+
+export interface MedioPago {
+  marca: string;
+  ultimos4: string;
+}
+
+export interface PedidoConfirmado extends ResumenCompra {
   numeroPedido: string;
-  total: number;
   envio: DatosEnvio;
+  fecha: Date;
+  pago: MedioPago;
 }
 
 // Los datos de envío viven solo en memoria: recargar la página los borra a propósito.
 @Injectable({ providedIn: 'root' })
 export class CheckoutService {
   private readonly pedidos = inject(PedidoService);
+  private readonly productos = inject(ProductService);
 
   private readonly _datosEnvio = signal<DatosEnvio | null>(null);
   private readonly _ultimoPedido = signal<PedidoConfirmado | null>(null);
@@ -53,12 +68,21 @@ export class CheckoutService {
 
   /** Carga el carrito activo del usuario desde el backend (null si no hay o está vacío). */
   cargarCarrito(): Observable<CarritoCheckout | null> {
-    return this.pedidos
-      .obtenerMisPedidos()
-      .pipe(map((pedidos) => resumirCarrito(pedidos.find((p) => p.estado === 'carrito'))));
+    return forkJoin([
+      this.pedidos.obtenerMisPedidos(),
+      // Las imágenes son decorativas: si el catálogo falla, el checkout sigue funcionando.
+      this.productos.obtenerProductos().pipe(catchError(() => of([] as Product[]))),
+    ]).pipe(
+      map(([pedidos, catalogo]) =>
+        resumirCarrito(
+          pedidos.find((p) => p.estado === 'carrito'),
+          catalogo,
+        ),
+      ),
+    );
   }
 
-  /** Marca el carrito como completado en el backend y pone en cero el contador del header. */
+  /** Marca el carrito como completado en el backend. */
   finalizarCarrito(idPedido: number): Observable<PedidoDTO> {
     return this.pedidos.finalizarPedido(idPedido);
   }
@@ -73,7 +97,7 @@ export class CheckoutService {
   }
 }
 
-function resumirCarrito(pedido: PedidoDTO | undefined): CarritoCheckout | null {
+function resumirCarrito(pedido: PedidoDTO | undefined, catalogo: Product[]): CarritoCheckout | null {
   if (!pedido?.productos?.length) {
     return null;
   }
@@ -92,6 +116,7 @@ function resumirCarrito(pedido: PedidoDTO | undefined): CarritoCheckout | null {
         precio,
         cantidad,
         subtotal: precio * cantidad,
+        imagen: catalogo.find((p) => p.title === item.producto)?.imageUrl ?? '',
       });
     }
   }

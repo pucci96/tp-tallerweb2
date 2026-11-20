@@ -9,11 +9,6 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts",
-    // Código de Node (backend viejo / generado) que no forma parte del frontend
-    "src/generated/**",
-    "src/index.ts",
-    "src/db.ts",
-    "src/config/**"
+    "src/**/*.spec.ts"
   ]
 }

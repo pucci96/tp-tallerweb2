@@ -1,8 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { PedidoService } from '../services/pedido.service';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,9 @@ export class LoginComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute,
+    private pedidoService: PedidoService
   ) { }
 
   togglePasswordVisibility(): void {
@@ -48,10 +51,23 @@ export class LoginComponent {
 
     this.authService.login(this.email.trim().toLowerCase(), this.password).subscribe({
       next: (respuesta) => {
+        // AuthService ya guardó la sesión y mergeó el carrito del invitado (tap + switchMap).
         this.authService.guardarSesion(respuesta);
+
+        // Refresca el contador del header con el carrito recién subido al backend.
+        this.pedidoService.cargarContadorCarrito();
+
         this.isSubmitting.set(false);
         this.isSuccess.set(true);
-        setTimeout(() => this.router.navigate(['/']), 800);
+
+        // Volvemos a donde estaba el invitado (p. ej. /carrito) si vino un returnUrl.
+        // Se exige que empiece con "/" y no con "//" para no salir del sitio.
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        const destino =
+          returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//')
+            ? returnUrl
+            : '/';
+        setTimeout(() => this.router.navigateByUrl(destino), 800);
       },
       error: (error) => {
         this.isSubmitting.set(false);

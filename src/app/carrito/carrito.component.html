@@ -28,15 +28,15 @@
   } @else {
     <!-- Contenedor general del carrito -->
     <div class="carrito-content-wrapper">
-      
+
       <!-- 1. Listado de Productos (Arriba en mobile, Izquierda en PC) -->
       <div class="productos-list">
         <div class="list-card">
           <h3 class="section-title">Productos en tu carrito ({{ carrito.productos.length }})</h3>
-          
+
           @for (item of carrito.productos; track item.id) {
             <div class="cart-item">
-              
+
               <!-- Imagen del producto -->
               <div class="item-image-box">
                 <img [src]="$any(item).imageUrl || 'assets/placeholder.png'" [alt]="item.producto" class="item-img" />
@@ -51,8 +51,8 @@
 
               <!-- Controles de Cantidad -->
               <div class="item-quantity-controls">
-                <button 
-                  class="qty-btn" 
+                <button
+                  class="qty-btn"
                   [disabled]="item.cantidad <= 1"
                   [class.disabled]="item.cantidad <= 1"
                   (click)="cambiarCantidad(item, -1)">-</button>
@@ -97,10 +97,24 @@
             <strong>$ {{ carrito.total | number:'1.0-0' }} ARS</strong>
           </div>
 
-          <a class="btn-checkout" routerLink="/checkout">
-            Continuar con la compra ({{ carrito.productos.length }})
-          </a>
-          
+          @if (!auth.estaLogueado()) {
+            <!-- Invitado: el carrito queda guardado, pero la compra exige cuenta -->
+            <div class="guest-checkout">
+              <p class="guest-msg">
+                Iniciá sesión o creá una cuenta para finalizar la compra.
+                Tus productos quedan guardados.
+              </p>
+              <a routerLink="/login" [queryParams]="{ returnUrl: '/carrito' }"
+                 class="btn-checkout">Iniciar sesión</a>
+              <a routerLink="/registro" [queryParams]="{ returnUrl: '/carrito' }"
+                 class="btn-register">Crear cuenta</a>
+            </div>
+          } @else {
+            <a class="btn-checkout" routerLink="/checkout">
+              Continuar con la compra ({{ carrito.productos.length }})
+            </a>
+          }
+
           <div class="security-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: #198754;">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>

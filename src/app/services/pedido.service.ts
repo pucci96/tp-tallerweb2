@@ -1,7 +1,18 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, switchMap } from 'rxjs';
+import { Observable, tap, switchMap, map, of } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
+import { CarritoGuestService, ItemGuest } from './carrito-guest.service';
+
+export interface ProductoParaCarrito {
+  id: number;
+  nombre: string;
+  categoria: string;
+  subcategoria: string;
+  precio: number;
+  imageUrl: string;
+}
 
 export interface PedidoProductoDTO {
   id: number;
@@ -38,12 +49,84 @@ export interface AgregarProductoDTO {
 })
 export class PedidoService {
   private http = inject(HttpClient);
+  private auth = inject(AuthService);
+  private carritoGuest = inject(CarritoGuestService);
   private apiUrl = `${environment.apiUrl}/pedidos`;
 
-  // SIGNAL GLOBAL para el contador del ícono del carrito en tiempo real
   cantidadCarrito = signal<number>(0);
 
-  /** Carga inicial para contar cuántos productos tiene el carrito activo al iniciar sesión o la vista */
+  constructor() {
+    // Cerrar sesión (header, perfil o interceptor 401) => contador en 0.
+    // Se suscribe por evento para no crear el ciclo AuthService -> PedidoService.
+    this.auth.sesionCerrada$.subscribe(() => this.cantidadCarrito.set(0));
+  }
+
+  esGuest(): boolean {
+    return !this.auth.estaLogueado();
+  }
+
+  agregarAlCarrito(producto: ProductoParaCarrito, cantidad: number): Observable<void> {
+    if (this.esGuest()) {
+      this.carritoGuest.agregar({
+        id_producto: producto.id,
+        producto: producto.nombre,
+        categoria: producto.categoria,
+        subcategoria: producto.subcategoria,
+        precio: producto.precio,
+        imageUrl: producto.imageUrl,
+        cantidad,
+      });
+      this.cantidadCarrito.set(this.carritoGuest.cantidad());
+      return of(void 0);
+    }
+
+    return this.obtenerMisPedidos().pipe(
+      switchMap((pedidos) => {
+        const activo = pedidos.find((p) => p.estado === 'carrito');
+        return activo ? of(activo) : this.crearPedido({ estado: 'carrito' });
+      }),
+      switchMap((pedido) => this.agregarProducto(pedido.id, { id_producto: producto.id, cantidad })),
+      map(() => void 0)
+    );
+  }
+
+  inicializarContador(): void {
+    if (this.esGuest()) {
+      this.cantidadCarrito.set(this.carritoGuest.cantidad());
+      return;
+    }
+
+    // Sesión activa con ítems locales (F5, sesión restaurada, otro dispositivo):
+    // es el caso en que el merge no corría, porque solo vivía dentro de login().
+    // Primero se suben al backend y recién ahí se sincroniza el contador.
+    if (this.carritoGuest.cantidad() > 0) {
+      this.auth.mergeCarritoGuest().subscribe({
+        next: () => this.cargarContadorCarrito(),
+      });
+      return;
+    }
+
+    this.cargarContadorCarrito();
+  }
+
+  itemsGuest(): ItemGuest[] {
+    return this.carritoGuest.items();
+  }
+
+  cantidadGuest(): number {
+    return this.carritoGuest.cantidad();
+  }
+
+  cambiarCantidadGuest(id_producto: number, delta: number): void {
+    this.carritoGuest.cambiarCantidad(id_producto, delta);
+    this.cantidadCarrito.set(this.carritoGuest.cantidad());
+  }
+
+  quitarGuest(id_producto: number): void {
+    this.carritoGuest.quitar(id_producto);
+    this.cantidadCarrito.set(this.carritoGuest.cantidad());
+  }
+
   cargarContadorCarrito() {
     this.obtenerMisPedidos().subscribe({
       next: (pedidos) => {
@@ -59,7 +142,6 @@ export class PedidoService {
     });
   }
 
-  /** Recalcula y actualiza la signal global consultando los pedidos activos del usuario de forma directa */
   actualizarContadorGlobalDirecto() {
     this.obtenerMisPedidos().subscribe({
       next: (pedidos) => {
@@ -75,22 +157,18 @@ export class PedidoService {
     });
   }
 
-  /** Obtiene todos los pedidos realizados / carritos del usuario logueado. */
   obtenerMisPedidos(): Observable<PedidoDTO[]> {
     return this.http.get<PedidoDTO[]>(this.apiUrl);
   }
 
-  /** Obtiene un pedido específico por su ID. */
   obtenerPedido(idPedido: number): Observable<PedidoDTO> {
     return this.http.get<PedidoDTO>(`${this.apiUrl}/${idPedido}`);
   }
 
-  /** Crea un nuevo pedido (por defecto en estado "carrito"). */
   crearPedido(data?: CrearPedidoDTO): Observable<PedidoDTO> {
     return this.http.post<PedidoDTO>(this.apiUrl, data ?? { estado: 'carrito' });
   }
 
-  /** Agrega un producto a un pedido en estado carrito e incrementa la signal global de forma reactiva. */
   agregarProducto(idPedido: number, data: AgregarProductoDTO): Observable<any> {
     return this.http.post<PedidoProductoDTO>(`${this.apiUrl}/${idPedido}/productos`, data).pipe(
       tap(() => {
@@ -103,7 +181,6 @@ export class PedidoService {
     return this.http.put<PedidoDTO>(`${environment.apiUrl}/pedidos/${idPedido}`, { estado: 'completado' });
   }
 
-  /** Elimina un producto específico de un pedido (Petición DELETE al backend) */
   eliminarProductoDelPedido(idPedido: number, idItemPedido: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${idPedido}/productos/${idItemPedido}`);
   }

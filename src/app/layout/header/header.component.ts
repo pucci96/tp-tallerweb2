@@ -20,10 +20,8 @@ export class HeaderComponent implements OnInit { // Agregá implements OnInit
   public menuAbierto = false;
 
   ngOnInit(): void {
-    // 3. Apenas arranca o se recarga la página (F5), consultamos el carrito activo del usuario
-    if (this.auth.usuarioActual()) {
-      this.pedidoService.cargarContadorCarrito();
-    }
+    // Cuenta desde el backend si hay sesión, o desde localStorage si somos invitados.
+    this.pedidoService.inicializarContador();
   }
 
   toggleMenu(): void {

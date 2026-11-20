@@ -77,7 +77,7 @@ export class PedidoService {
     }
 
     // 3. Borramos TODOS los registros de este mismo producto en el pedido de forma masiva
-    // (Asegurate de que tu repositorio tenga un método o hacelo directo con prisma si tenés acceso, 
+    // (Asegurate de que tu repositorio tenga un método o hacelo directo con prisma si tenés acceso,
     // o recorremos los IDs asegurando el funcionamiento asíncrono con Promise.all)
     const idsAEliminar = pedido.productos
       .filter((p) => p.producto === productoEnPedido.producto)

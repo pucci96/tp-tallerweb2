@@ -15,11 +15,11 @@
   margin-bottom: 1rem;
 }
 .breadcrumb a {
-  color: #2563eb;
+  color: #6b7280;
   text-decoration: none;
 }
 .breadcrumb span {
-  color: #6b7280;
+  color: #2563eb;
 }
 .stock-status {
   display: flex;

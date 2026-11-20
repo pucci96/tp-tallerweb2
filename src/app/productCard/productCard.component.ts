@@ -61,37 +61,17 @@ export class ProductCardComponent {
   agregarAlCarrito() {
     if (this.stockActual() <= 0) return;
 
-    this.pedidoService.obtenerMisPedidos().subscribe({
-      next: (pedidos) => {
-        let carritoActivo = pedidos.find(p => p.estado === 'carrito');
-
-        if (carritoActivo) {
-          this.enviarProductoAlPedido(carritoActivo.id);
-        } else {
-          this.pedidoService.crearPedido({ estado: 'carrito' }).subscribe({
-            next: (nuevoPedido) => {
-              this.enviarProductoAlPedido(nuevoPedido.id);
-            },
-            error: () => this.mostrarToast('Error al crear el carrito', 'danger')
-          });
-        }
-      },
-      error: () => {
-        this.pedidoService.crearPedido({ estado: 'carrito' }).subscribe({
-          next: (nuevoPedido) => {
-            this.enviarProductoAlPedido(nuevoPedido.id);
-          },
-          error: () => this.mostrarToast('No se pudo inicializar el pedido', 'danger')
-        });
-      }
-    });
-  }
-
-  private enviarProductoAlPedido(idPedido: number) {
-    this.pedidoService.agregarProducto(idPedido, { id_producto: this.product.id, cantidad: 1 }).subscribe({
+    this.pedidoService.agregarAlCarrito({
+      id: this.product.id,
+      nombre: this.product.title,
+      categoria: this.product.category,
+      subcategoria: '',
+      precio: this.product.price,
+      imageUrl: this.product.imageUrl,
+    }, 1).subscribe({
       next: () => {
         this.stockActual.update(stock => stock - 1);
-        this.mostrarToast('¡Producto agregado al carrito con éxito!', 'success'); // <-- Acá salta de una
+        this.mostrarToast('¡Producto agregado al carrito con éxito!', 'success');
       },
       error: (err) => {
         const errorMsg = err.error?.mensaje || 'No hay suficiente stock disponible.';

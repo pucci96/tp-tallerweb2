@@ -16,12 +16,6 @@ const MAX_RELACIONADOS = 4;
 /** Largo máximo de un comentario (igual que en el backend). */
 export const MAX_LARGO_COMENTARIO = 500;
 
-export interface ProductThumb {
-  label: string;
-  src: string;
-  alt: string;
-}
-
 @Component({
   selector: 'app-detalles-producto',
   standalone: true,
@@ -210,41 +204,11 @@ export class DetallesProductoComponent {
   readonly originalPrice = 112000;
   readonly currency = 'ARS';
 
-  readonly thumbnails: ProductThumb[] = [
-    {
-      label: 'Perspectiva',
-      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCx0xoXnmePZREHBSybWNZN7Zt0hIsGlCcO7yy38WH7p3fq8-UbLaywI5c-KjpL9vyomF6vilvfTcSgKBthjWjOVKGBGcuye13Tg0aJcPtvLGsePImtS1nyHiYKUH8Rqthc5vf7YTfJYXiYVjKEPkbIIyqIOnW7qxf9MLI4-Iz77VnMp6F6glaNBxPLbogWQekWHxlPTTHZYQQMGVV_lemo-PrnOsY7ff9UY_gqGX4',
-      alt: 'Modern sleek black mechanical gaming keyboard with vibrant custom per-key RGB backlighting'
-    },
-    {
-      label: 'Cenital',
-      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBAOZbqYzGonlOkeq-dxqrKaDk2narY_31cyGeFt2LF8UjLvW3T7uuEcjtj_8mxf9PXfW0KoWUz0vPemQekX0QkTVyzmg6zS7eugZBZr7W9v-nphGF7TmGCJy5hfi4GHLD2FLnJAOPrP7f-U8Qe3_2OK0qIgQBgfSgxIs5A3Ed1Y4mx94Qk0R2jKKa5aZt6tT8Gr5wdjLxdHRpair2OJs3nwiL3WP16WHz4G_ariVk',
-      alt: 'Top down flat-lay view of an 80 percent tenkeyless compact mechanical keyboard'
-    },
-    {
-      label: 'Switches',
-      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDESOk1h784lY_281nozrwvAe19Yg9wWbwH_Wqvvip8GOFR52Xd0GHNnghpWOxxGaSCxxbXNJifH31exK-zoIgGbulUH7EcVF-vyLDj28lbHD86ZtLPTtgkLDB6ecsS0lF-X1bg5mJLlwD0OGb3fyUNoJRo3TC9zVPMggy4RB8wlQkh6qgRvtEKUVRZ3lV22djMIA2A2PS018-Vee3FqyTCooXGyR8C_eJ9fjzwq7U',
-      alt: 'Macro extreme close-up of mechanical red linear switches'
-    },
-    {
-      label: 'Cable Type-C',
-      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBCvvDu3BFai8TyDvctmyW9Em-Ng4d4ue8OkgGVJeTQJYzWA7i1iAHolA2gCCM6N8RY1BtZNX0C4uDllJarnbbW17Rfnqr80A8RdrVT7gOhZFiDz5HITCqw5aEK03QtpfqbDsXmO2P3bl6gOcZUop1eiDEmsvsD2veZVQpYu1tj5SvA3-O8puS9wqskqameh1j8eJj6GysQtYJ1kP-ntNYX2lKH97cThGJKkfdRPCM',
-      alt: 'Side profile ergonomic typing angle showing aluminum bevel'
-    },
-    {
-      label: 'Setup RGB',
-      src: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjxVArcfYTPCgLBH_YFFMGpgMH7pjULlg1TgLnJMXWgvqrz7bGWOuz7SLvKr2Ddxk4PzT8sUGB9G1pfFCdPAkHW6CSZktAo0yoqAU1iTQpMfbp3auOt1seZIP3LAI4u6XrIDAoPbI2YvM5FZTpWsxn0RuFHrgdxb6XM2K88postikMRJH8BoI2xcUndq4VC7LGmfEBvtsEqkDQxLyk7xHISYIztSvYm4WPDK5LpZs',
-      alt: 'Gaming battlestation environment at night with keyboard glowing with teal and magenta RGB'
-    }
-  ];
-
   /*Estado de la interfaz (señales, igual que LoginComponent)*/
   readonly quantity = signal(1);
-  readonly selectedThumbnail = signal(0);
   readonly showToast = signal(false);
   readonly showShippingFeedback = signal(false);
   readonly isAddingToCart = signal(false);
-  readonly isFavorite = signal(false);
 
   readonly transferPrice = computed(() => Math.round((this.producto()?.precio ?? 0) * 0.9));
   /** No se puede elegir más cantidad que el stock disponible. */
@@ -257,60 +221,31 @@ export class DetallesProductoComponent {
     this.quantity.set(next);
   }
 
-  selectThumbnail(index: number): void {
-    this.selectedThumbnail.set(index);
-  }
-
   triggerAddToCart(): void {
     const productoActual = this.producto();
     if (!productoActual || this.isAddingToCart() || this.sinStock()) return;
 
     this.isAddingToCart.set(true);
-    const cantidadSeleccionada = this.quantity();
 
-    // 1. Buscamos si el usuario ya tiene un pedido en estado 'carrito'
-    this.pedidoService.obtenerMisPedidos().subscribe({
-      next: (pedidos) => {
-        let carritoActivo = pedidos.find(p => p.estado === 'carrito');
+    this.pedidoService.agregarAlCarrito({
+      id: productoActual.id,
+      nombre: productoActual.nombre,
+      categoria: productoActual.categoria?.nombre ?? '',
+      subcategoria: productoActual.subcategoria?.nombre ?? '',
+      precio: productoActual.precio,
+      imageUrl: productoActual.imagen ?? '',
+    }, this.quantity()).subscribe({
+      next: () => {
+        this.isAddingToCart.set(false);
+        this.showToast.set(true);
 
-        const ejecutarAgregar = (idPedido: number) => {
-          this.pedidoService.agregarProducto(idPedido, {
-            id_producto: productoActual.id,
-            cantidad: cantidadSeleccionada
-          }).subscribe({
-            next: () => {
-              this.isAddingToCart.set(false);
-              this.showToast.set(true);
-              
-              // Ocultar toast automáticamente a los 4 segundos
-              setTimeout(() => {
-                this.showToast.set(false);
-              }, 4000);
-            },
-            error: (err) => {
-              console.error('Error al agregar el producto al carrito:', err);
-              this.isAddingToCart.set(false);
-            }
-          });
-        };
-
-        if (carritoActivo) {
-          ejecutarAgregar(carritoActivo.id);
-        } else {
-          // Si no tiene carrito activo, lo creamos primero y luego agregamos el producto
-          this.pedidoService.crearPedido().subscribe({
-            next: (nuevoCarrito) => {
-              ejecutarAgregar(nuevoCarrito.id);
-            },
-            error: (err) => {
-              console.error('Error al crear el carrito:', err);
-              this.isAddingToCart.set(false);
-            }
-          });
-        }
+        // Ocultar toast automáticamente a los 4 segundos
+        setTimeout(() => {
+          this.showToast.set(false);
+        }, 4000);
       },
       error: (err) => {
-        console.error('Error al obtener los pedidos:', err);
+        console.error('Error al agregar el producto al carrito:', err);
         this.isAddingToCart.set(false);
       }
     });

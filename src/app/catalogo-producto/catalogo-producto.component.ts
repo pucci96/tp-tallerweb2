@@ -47,7 +47,7 @@ export class CatalogoProductoComponent implements OnInit {
     this.cargarDatos();
     
     // contador del carrito apenas entra al catálogo
-    this.pedidoService.cargarContadorCarrito();
+    this.pedidoService.inicializarContador();
   }
 
 cargarDatos(): void {

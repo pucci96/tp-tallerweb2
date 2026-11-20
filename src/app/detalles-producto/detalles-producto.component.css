@@ -135,7 +135,7 @@
 }
 
 .breadcrumb-link {
-  color: black;
+  color: #6b7280;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -143,12 +143,6 @@
 
 .breadcrumb-link:hover {
   text-decoration: underline;
-}
-
-.breadcrumb-icon {
-  width: 18px;
-  height: 18px;
-  display: inline-block;
 }
 
 .breadcrumb-separator {

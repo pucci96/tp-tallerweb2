@@ -1,0 +1,115 @@
+.resultado {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--secondary-color);
+}
+
+.hero-nota {
+  font-size: 0.85rem;
+}
+
+.hero-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: #d1e7dd;
+  color: var(--tertiary-color);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.hero-tag,
+.estado {
+  padding: 0.2rem 0.75rem;
+  border-radius: 999px;
+  background: #d1e7dd;
+  color: #0f5132;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.estado {
+  text-transform: none;
+  font-size: 0.8rem;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin: 0;
+  padding: 1.25rem;
+}
+
+.datos dt {
+  margin-bottom: 0.25rem;
+  color: var(--secondary-color);
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.datos dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.order-number {
+  font-size: 1.25rem;
+}
+
+.domicilio {
+  gap: 0.25rem;
+  font-style: normal;
+}
+
+.acciones {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+@media (max-width: 600px) {
+  .acciones {
+    flex-direction: column-reverse;
+  }
+
+  .acciones a {
+    justify-content: center;
+  }
+}
+
+.btn-secundario {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  border-radius: 10px;
+  background: #e9ecef;
+  color: var(--neutral-dark);
+  font-weight: 600;
+  text-decoration: none;
+}

@@ -1,0 +1,49 @@
+@if (pedido(); as p) {
+  <section class="checkout-page resultado">
+    <div class="panel hero">
+      <div class="hero-icon" aria-hidden="true">✓</div>
+      <span class="hero-tag">Operación aprobada</span>
+      <h1>¡Pedido realizado con éxito!</h1>
+      <p>Gracias por tu compra, {{ p.envio.nombre }}. Te enviamos la confirmación a <strong>{{ p.envio.email }}</strong>.</p>
+      <p class="hero-nota">Simulación académica: no se realizó ningún cargo real.</p>
+    </div>
+
+    <dl class="panel datos">
+      <div>
+        <dt>Número de pedido</dt>
+        <dd class="order-number">{{ p.numeroPedido }}</dd>
+      </div>
+      <div>
+        <dt>Fecha y hora</dt>
+        <dd>{{ p.fecha | date: 'dd/MM/yyyy HH:mm' }} hs</dd>
+      </div>
+      <div>
+        <dt>Estado</dt>
+        <dd><span class="estado">Pago acreditado</span></dd>
+      </div>
+      <div>
+        <dt>Forma de pago</dt>
+        <dd>{{ p.pago.marca }} •••• {{ p.pago.ultimos4 }}</dd>
+      </div>
+    </dl>
+
+    <div class="checkout-grid">
+      <div class="panel">
+        <div class="panel-head"><h2>Destinatario y domicilio</h2></div>
+        <address class="panel-body domicilio">
+          <span><strong>{{ p.envio.nombre }} {{ p.envio.apellido }}</strong></span>
+          <span>{{ p.envio.direccion }}</span>
+          <span>{{ p.envio.ciudad }} ({{ p.envio.codigoPostal }})</span>
+          <span>{{ p.envio.email }}</span>
+        </address>
+      </div>
+
+      <app-checkout-resumen [resumen]="p" titulo="Artículos en la orden" />
+    </div>
+
+    <div class="panel acciones">
+      <a routerLink="/mis-pedidos" class="btn-secundario">Ver mis pedidos</a>
+      <a routerLink="/productos" class="btn-primary">Seguir comprando</a>
+    </div>
+  </section>
+}

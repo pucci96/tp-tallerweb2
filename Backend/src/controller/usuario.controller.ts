@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UsuarioService } from '../service/usuario.service';
 import { usuarioDelToken } from '../middleware/auth.middleware';
 import { HttpError, parseId } from '../utils/http-error';
+import { esDuenioOAdmin, esRolAdmin } from '../utils/autorizacion';
 
 // Los errores lanzados acá (o en el service) los maneja error.middleware.ts.
 export class UsuarioController {
@@ -10,7 +11,7 @@ export class UsuarioController {
   /** Un usuario solo puede ver sus propios datos, salvo que sea ADMIN. */
   private verificarAcceso(req: Request, id_usuario: number): void {
     const token = usuarioDelToken(req);
-    if (token.id_usuario !== id_usuario && token.rol !== 'ADMIN') {
+    if (!esDuenioOAdmin(id_usuario, token.id_usuario, esRolAdmin(token.rol))) {
       throw new HttpError(403, 'No tenés permisos para ver los datos de otro usuario');
     }
   }

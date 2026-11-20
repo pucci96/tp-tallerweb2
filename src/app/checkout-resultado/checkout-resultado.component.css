@@ -93,6 +93,16 @@
   padding: 1rem 1.25rem;
 }
 
+@media (max-width: 600px) {
+  .acciones {
+    flex-direction: column-reverse;
+  }
+
+  .acciones a {
+    justify-content: center;
+  }
+}
+
 .btn-secundario {
   display: inline-flex;
   align-items: center;

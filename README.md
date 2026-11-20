@@ -23,7 +23,7 @@ Todos los comandos se ejecutan **desde la raíz del proyecto**.
 npm install
 
 # 2. Crear el archivo de variables de entorno
-cp .env.example .env          # en Windows (cmd):  copy .env.example .env
+cp .env.template .env         # en Windows (cmd):  copy .env.template .env
 
 # 3. Levantar Postgres, crear las tablas y cargar datos de prueba
 npm run setup
@@ -160,7 +160,7 @@ src/app/                 → frontend Angular (componentes, servicios, guards, i
 
 | Error | Solución |
 |---|---|
-| `Falta la variable de entorno DATABASE_URL` | No existe el `.env` en la raíz: `cp .env.example .env` |
+| `Falta la variable de entorno DATABASE_URL` | No existe el `.env` en la raíz: `cp .env.template .env` |
 | `Can't reach database server at localhost:5432` | Docker apagado: abrir Docker Desktop y `npm run db:up`. Sin Docker: iniciar el servicio de PostgreSQL |
 | `Authentication failed against database server` | Usuario o contraseña incorrectos en `DATABASE_URL` del `.env` |
 | `Database "prisma" does not exist` | Sin Docker: falta crear la base (`createdb -U postgres prisma`) |

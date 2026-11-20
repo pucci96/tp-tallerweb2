@@ -8,7 +8,7 @@ function requerida(nombre: string): string {
   const valor = process.env[nombre];
   if (!valor) {
     throw new Error(
-      `Falta la variable de entorno ${nombre}. Copiá .env.example como .env en la raíz del proyecto.`
+      `Falta la variable de entorno ${nombre}. Copiá .env.template como .env en la raíz del proyecto.`
     );
   }
   return valor;

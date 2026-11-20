@@ -1266,40 +1266,6 @@ a.related-card {
   color: #181c20;
 }
 
-.selector-estrellas {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.selector-estrella {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  line-height: 0;
-}
-
-.selector-estrella svg {
-  width: 28px;
-  height: 28px;
-  fill: #d9dde5;
-  transition: fill 0.15s ease, transform 0.15s ease;
-}
-
-.selector-estrella.activa svg {
-  fill: #f59e0b;
-}
-
-.selector-estrella:hover svg {
-  transform: scale(1.1);
-}
-
-.selector-estrella:focus-visible {
-  outline: 2px solid #0057cd;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
 .opinion-textarea {
   width: 100%;
   box-sizing: border-box;
@@ -1350,8 +1316,7 @@ a.related-card {
   background: #0b5ed7;
 }
 
-.opinion-btn:disabled,
-.selector-estrella:disabled {
+.opinion-btn:disabled {
   opacity: 0.65;
   cursor: not-allowed;
 }

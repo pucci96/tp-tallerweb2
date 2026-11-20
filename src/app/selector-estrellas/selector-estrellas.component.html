@@ -1,0 +1,16 @@
+<div class="selector-estrellas" (mouseleave)="hover.set(0)">
+  @for (n of estrellas; track n) {
+    <button
+      type="button"
+      class="selector-estrella"
+      [class.activa]="n <= visible()"
+      (click)="elegir(n)"
+      (mouseenter)="hover.set(n)"
+      [attr.aria-label]="n + (n === 1 ? ' estrella' : ' estrellas')"
+      [attr.aria-pressed]="n === calificacion()"
+      [disabled]="deshabilitado()"
+    >
+      <svg viewBox="0 0 24 24"><path d="M12 2L14.8 8.63L22 9.25L16.55 13.97L18.18 21L12 17.27L5.83 21L7.45 13.97L2 9.25L9.2 8.63L12 2Z"/></svg>
+    </button>
+  }
+</div>

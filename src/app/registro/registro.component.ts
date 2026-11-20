@@ -1,7 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -28,7 +27,8 @@ export class RegistroComponent {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) { }
 
   togglePasswordVisibility(): void {
@@ -129,7 +129,15 @@ export class RegistroComponent {
       next: () => {
         this.isSubmitting.set(false);
         this.isSuccess.set(true);
-        setTimeout(() => this.router.navigate(['/login']), 1500);
+        // No creamos sesión acá: se loguea a mano. Arrastramos el returnUrl
+        // para que, tras el login, vuelva al punto donde estaba (p. ej. /carrito).
+        setTimeout(() => {
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          this.router.navigate(
+            ['/login'],
+            returnUrl ? { queryParams: { returnUrl } } : undefined
+          );
+        }, 1500);
       },
       error: (error) => {
         this.isSubmitting.set(false);

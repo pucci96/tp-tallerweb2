@@ -97,9 +97,23 @@
             <strong>$ {{ carrito.total | number:'1.0-0' }} ARS</strong>
           </div>
 
-          <button class="btn-checkout" (click)="finalizarCompra()">
-            Continuar con la compra ({{ carrito.productos.length }})
-          </button>
+          @if (!auth.estaLogueado()) {
+            <!-- Invitado: el carrito queda guardado, pero la compra exige cuenta -->
+            <div class="guest-checkout">
+              <p class="guest-msg">
+                Iniciá sesión o creá una cuenta para finalizar la compra.
+                Tus productos quedan guardados.
+              </p>
+              <a routerLink="/login" [queryParams]="{ returnUrl: '/carrito' }"
+                 class="btn-checkout">Iniciar sesión</a>
+              <a routerLink="/registro" [queryParams]="{ returnUrl: '/carrito' }"
+                 class="btn-register">Crear cuenta</a>
+            </div>
+          } @else {
+            <button class="btn-checkout" (click)="finalizarCompra()">
+              Continuar con la compra ({{ carrito.productos.length }})
+            </button>
+          }
           
           <div class="security-badge">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px; color: #198754;">

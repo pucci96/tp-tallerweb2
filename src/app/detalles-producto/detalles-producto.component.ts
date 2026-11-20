@@ -226,51 +226,26 @@ export class DetallesProductoComponent {
     if (!productoActual || this.isAddingToCart() || this.sinStock()) return;
 
     this.isAddingToCart.set(true);
-    const cantidadSeleccionada = this.quantity();
 
-    // 1. Buscamos si el usuario ya tiene un pedido en estado 'carrito'
-    this.pedidoService.obtenerMisPedidos().subscribe({
-      next: (pedidos) => {
-        let carritoActivo = pedidos.find(p => p.estado === 'carrito');
+    this.pedidoService.agregarAlCarrito({
+      id: productoActual.id,
+      nombre: productoActual.nombre,
+      categoria: productoActual.categoria?.nombre ?? '',
+      subcategoria: productoActual.subcategoria?.nombre ?? '',
+      precio: productoActual.precio,
+      imageUrl: productoActual.imagen ?? '',
+    }, this.quantity()).subscribe({
+      next: () => {
+        this.isAddingToCart.set(false);
+        this.showToast.set(true);
 
-        const ejecutarAgregar = (idPedido: number) => {
-          this.pedidoService.agregarProducto(idPedido, {
-            id_producto: productoActual.id,
-            cantidad: cantidadSeleccionada
-          }).subscribe({
-            next: () => {
-              this.isAddingToCart.set(false);
-              this.showToast.set(true);
-
-              // Ocultar toast automáticamente a los 4 segundos
-              setTimeout(() => {
-                this.showToast.set(false);
-              }, 4000);
-            },
-            error: (err) => {
-              console.error('Error al agregar el producto al carrito:', err);
-              this.isAddingToCart.set(false);
-            }
-          });
-        };
-
-        if (carritoActivo) {
-          ejecutarAgregar(carritoActivo.id);
-        } else {
-          // Si no tiene carrito activo, lo creamos primero y luego agregamos el producto
-          this.pedidoService.crearPedido().subscribe({
-            next: (nuevoCarrito) => {
-              ejecutarAgregar(nuevoCarrito.id);
-            },
-            error: (err) => {
-              console.error('Error al crear el carrito:', err);
-              this.isAddingToCart.set(false);
-            }
-          });
-        }
+        // Ocultar toast automáticamente a los 4 segundos
+        setTimeout(() => {
+          this.showToast.set(false);
+        }, 4000);
       },
       error: (err) => {
-        console.error('Error al obtener los pedidos:', err);
+        console.error('Error al agregar el producto al carrito:', err);
         this.isAddingToCart.set(false);
       }
     });

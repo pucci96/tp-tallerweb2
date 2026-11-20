@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import {HomeComponent} from './home/home.component';
-import {PerfilComponent} from './perfil/perfil.component';
+import { HomeComponent } from './home/home.component';
+import { PerfilComponent } from './perfil/perfil.component';
 import { LoginComponent } from './login/login.component';
 import { RegistroComponent } from './registro/registro.component';
 import { DetallesProductoComponent } from './detalles-producto/detalles-producto.component';
@@ -11,67 +11,70 @@ import { CarritoComponent } from './carrito/carrito.component';
 import { MisPedidos } from './components/mis-pedidos/mis-pedidos'; // Ajustá la ruta según la carpeta donde lo hayas guardado
 import { adminGuard } from './guards/admin-guard';
 import { authGuard } from './guards/auth-guard';
+import { guestGuard } from './guards/guest-guard';
 
 export const routes: Routes = [
-{
-    path:'',
+  {
+    path: '',
     component: HomeComponent
-},
-{ 
-    path: 'productos', 
-    component: CatalogoProductoComponent },
-{
+  },
+  {
+    path: 'productos',
+    component: CatalogoProductoComponent
+  },
+  {
     path: 'home',
     component: HomeComponent
-},
-{
+  },
+  {
     path: 'perfil',
     component: PerfilComponent,
     canActivate: [authGuard]
-},
-{
-    path: 'carrito', 
-    component: CarritoComponent,
+  },
+  {
+    path: 'carrito',
+    component: CarritoComponent
+  },
+
+  {
+    path: 'mis-pedidos',
+    component: MisPedidos,
     canActivate: [authGuard]
   },
 
   {
-    path: 'mis-pedidos', 
-    component: MisPedidos,
-    canActivate: [authGuard]
-},
-
-{
     path: 'login',
-    component: LoginComponent
-},
-{
+    component: LoginComponent,
+    canActivate: [guestGuard]
+  },
+  {
     path: 'registro',
-    component: RegistroComponent
-},
-{
+    component: RegistroComponent,
+    canActivate: [guestGuard]
+  },
+  {
     path: 'productos/:id',
     component: DetallesProductoComponent
-},
-{ 
-    path: 'admin/productos', 
-    component: AdminProductosListComponent, 
-    canActivate: [adminGuard] 
   },
-  { 
-    path: 'admin/productos/nuevo', 
-    component: AdminProductoFormComponent, 
-    canActivate: [adminGuard] 
+  {
+    path: 'admin/productos',
+    component: AdminProductosListComponent,
+    canActivate: [adminGuard]
   },
-  { 
-    path: 'admin/productos/editar/:id', 
-    component: AdminProductoFormComponent, 
-    canActivate: [adminGuard] 
+  {
+    path: 'admin/productos/nuevo',
+    component: AdminProductoFormComponent,
+    canActivate: [adminGuard]
   },
-{
+  {
+    path: 'admin/productos/editar/:id',
+    component: AdminProductoFormComponent,
+    canActivate: [adminGuard]
+  },
+  {
     path: '**',
-    redirectTo:'home'
-}
+    redirectTo: 'home'
+  }
 
 
 ];

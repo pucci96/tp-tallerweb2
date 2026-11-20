@@ -1,7 +1,8 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, switchMap, map, of, catchError, forkJoin, finalize, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { CarritoGuestService } from './carrito-guest.service';
 
 export interface UsuarioSesion {
   id: number;
@@ -17,10 +18,6 @@ interface LoginResponse {
   usuario: UsuarioSesion;
 }
 
-/**
- * Datos editables desde el perfil. El email no se puede cambiar.
- * La contraseña solo cambia si se mandan la actual y la nueva.
- */
 export interface ActualizarPerfilDatos {
   nombre: string;
   apellido: string;
@@ -37,16 +34,88 @@ interface RegistroDatos {
   password: string;
 }
 
+interface PedidoMerge {
+  id: number;
+  estado: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = environment.apiUrl + '/usuarios';
 
   readonly usuarioActual = signal<UsuarioSesion | null>(this.leerSesion());
 
-  constructor(private http: HttpClient) { }
+  private http = inject(HttpClient);
+  private carritoGuest = inject(CarritoGuestService);
+
+  /**
+   * Se emite al cerrar la sesión. Lo escucha PedidoService para poner el contador
+   * del header en 0, así no hay que inyectar PedidoService acá y se evita la
+   * dependencia circular AuthService → PedidoService → AuthService.
+   * Cubre los 3 puntos que cierran sesión: header, perfil e interceptor (401).
+   */
+  readonly sesionCerrada$ = new Subject<void>();
+
+  private mergeEnCurso = false;
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password });
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap((respuesta) => this.guardarSesion(respuesta)),
+      switchMap((respuesta) => this.mergeCarritoGuest().pipe(map(() => respuesta)))
+    );
+  }
+
+  mergeCarritoGuest(): Observable<unknown> {
+    const items = this.carritoGuest.items();
+    if (!items.length) {
+      return of(null);
+    }
+    if (this.mergeEnCurso) {
+      return of(null);
+    }
+
+    this.mergeEnCurso = true;
+    const url = `${environment.apiUrl}/pedidos`;
+
+    return this.http.get<PedidoMerge[]>(url).pipe(
+      switchMap((pedidos) => {
+        const existente = pedidos.find((p) => p.estado === 'carrito');
+        return existente ? of(existente) : this.http.post<PedidoMerge>(url, { estado: 'carrito' });
+      }),
+      switchMap((carrito) =>
+        forkJoin(
+          items.map((item) =>
+            this.http
+              .post(`${url}/${carrito.id}/productos`, {
+                id_producto: item.id_producto,
+                cantidad: item.cantidad,
+              })
+              .pipe(
+                map(() => item.id_producto),
+                catchError(() => of(null))
+              )
+          )
+        )
+      ),
+      tap((resultados) => {
+        const subidos = resultados.filter((id): id is number => id !== null);
+        this.carritoGuest.quitarRango(subidos);
+
+        const fallidos = resultados.length - subidos.length;
+        if (fallidos > 0) {
+          console.warn(
+            `${fallidos} producto(s) del carrito no se pudieron agregar (quizás sin stock).`
+          );
+        }
+      }),
+      catchError((error) => {
+        console.error('No se pudo mergear el carrito del invitado:', error);
+        return of(null);
+      }),
+      finalize(() => {
+        this.mergeEnCurso = false;
+      })
+    );
   }
 
   registrar(datos: RegistroDatos): Observable<UsuarioSesion> {
@@ -66,22 +135,16 @@ export class AuthService {
     return this.http.post<UsuarioSesion>(`${this.apiUrl}/registrar`, body);
   }
 
-  /** Datos del usuario logueado, actualizados desde el backend. */
   obtenerMisDatos(): Observable<UsuarioSesion> {
     return this.http.get<UsuarioSesion>(`${this.apiUrl}/me`);
   }
 
-  /**
-   * Guarda los cambios del perfil y actualiza la sesión con la respuesta,
-   * así el header (y cualquier vista que use usuarioActual) muestra los datos nuevos.
-   */
   actualizarMisDatos(datos: ActualizarPerfilDatos): Observable<UsuarioSesion> {
     return this.http
       .put<UsuarioSesion>(`${this.apiUrl}/me`, datos)
       .pipe(tap((usuario) => this.actualizarUsuarioSesion(usuario)));
   }
 
-  /** Reemplaza los datos del usuario en la sesión, sin tocar el token. */
   private actualizarUsuarioSesion(usuario: UsuarioSesion): void {
     localStorage.setItem('usuario', JSON.stringify(usuario));
     localStorage.setItem('user_role', usuario.rol);
@@ -100,6 +163,8 @@ export class AuthService {
     localStorage.removeItem('usuario');
     localStorage.removeItem('user_role');
     this.usuarioActual.set(null);
+    this.carritoGuest.vaciar();
+    this.sesionCerrada$.next();
   }
 
   estaLogueado(): boolean {
@@ -119,7 +184,6 @@ export class AuthService {
       const guardado = localStorage.getItem('usuario');
       return guardado ? JSON.parse(guardado) : null;
     } catch {
-      // Sesión corrupta en localStorage: se ignora en lugar de romper la app.
       return null;
     }
   }

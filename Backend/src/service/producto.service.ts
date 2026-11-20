@@ -113,7 +113,6 @@ export class ProductoService {
       categoria: { id: p.categoria.id, nombre: p.categoria.nombre },
       subcategoria: { id: p.subcategoria.id, nombre: p.subcategoria.nombre },
       especificaciones: resto.map((d) => ({ nombre: d.nombre, descripcion: d.descripcion })),
-      estilos: p.estilo.map((e) => ({ nombre: e.nombre, descripcion: e.descripcion })),
     };
   }
 

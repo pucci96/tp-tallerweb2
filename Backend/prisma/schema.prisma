@@ -59,7 +59,6 @@ model Producto {
     precio          Decimal
     categoria       Categoria @relation(fields: [id_categoria], references: [id], map:"deProductoACategoria")
     subcategoria    Subcategoria @relation(fields: [id_subcategoria], references: [id])
-    estilo          Producto_estilo[]
     detalle         Producto_detalles[]
     imagen           String?
     destacado     Boolean      @default(false)
@@ -80,14 +79,6 @@ model Comentario {
     usuario         Usuario  @relation(fields: [id_usuario], references: [id], onDelete: Cascade)
 
     @@unique([id_producto, id_usuario])
-}
-
-model Producto_estilo {
-    id              Int     @id @default(autoincrement())
-    id_producto     Int 
-    producto        Producto @relation(fields: [id_producto], references: [id])
-    nombre          String
-    descripcion     String
 }
 
 model Producto_detalles {

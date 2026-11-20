@@ -39,7 +39,6 @@ export class ProductoRepository {
       where: { id },
       include: {
         ...incluirRelaciones,
-        estilo: { orderBy: { id: 'asc' } },
       },
     });
   }
@@ -103,7 +102,6 @@ export class ProductoRepository {
     // Los pedidos guardan una copia del nombre/precio, así que no se ven afectados.
     return prisma.$transaction([
       prisma.producto_detalles.deleteMany({ where: { id_producto: id } }),
-      prisma.producto_estilo.deleteMany({ where: { id_producto: id } }),
       prisma.producto.delete({ where: { id } }),
     ]);
   }

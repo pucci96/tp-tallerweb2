@@ -146,6 +146,21 @@ export class PedidoService {
       await this.pedidoRepo.crearPedido(idUsuario, 'carrito');
     }
 
+    // 3. Decrementamos el stock de los productos que se compraron
+    for (const producto of pedidoActualizado.productos) {
+      const productoEnStock = await this.pedidoRepo.obtenerProductoParaPedido(producto.id);
+      if (!productoEnStock) {
+        throw new HttpError(500, `El producto ${producto.producto} ya no existe en la base de datos`);
+      }
+      if (producto.cantidad > productoEnStock.stock) {
+        throw new HttpError(
+          400,
+          `No hay stock suficiente para el producto ${producto.producto} (disponible: ${productoEnStock.stock})`
+        );
+      }
+      await this.pedidoRepo.decrementarStock(producto.id, producto.cantidad);
+    }
+
     return this.mapearPedido(pedidoActualizado);
   }
 }

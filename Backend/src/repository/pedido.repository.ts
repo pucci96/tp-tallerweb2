@@ -43,6 +43,13 @@ export class PedidoRepository {
     return prisma.pedido_productos.create({ data });
   }
 
+  async decrementarStock(idProducto: number, cantidad: number) {
+    return prisma.producto.update({
+      where: { id: idProducto },
+      data: { stock: { decrement: cantidad } },
+    });
+  }
+
   async eliminarProductoDelPedido(idItemPedido: number) {
     return prisma.pedido_productos.delete({
       where: { id: idItemPedido },

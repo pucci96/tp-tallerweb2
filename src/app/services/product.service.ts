@@ -62,6 +62,16 @@ export interface NuevoComentario {
   calificacion: number;
   texto: string;
 }
+export interface GuardarProductoAdminDTO {
+  nombre: string;
+  precio: number;
+  stock: number;
+  id_categoria: number;
+  id_subcategoria: number;
+  imagen: string;
+  descripcion: string;
+  destacado: boolean;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -103,4 +113,18 @@ export class ProductService {
   eliminar(id: number): Observable<{ mensaje: string }> {
     return this.http.delete<{ mensaje: string }>(`${this.apiUrl}/admin/${id}`);
   }
+  obtenerAdminPorId(id: number): Observable<ProductoAdmin> {
+    return this.http.get<ProductoAdmin>(`${this.apiUrl}/admin/${id}`);
+  }
+
+  /** Crea un nuevo producto desde el panel admin. */
+  crearAdmin(payload: GuardarProductoAdminDTO): Observable<ProductoAdmin> {
+    return this.http.post<ProductoAdmin>(`${this.apiUrl}/admin`, payload);
+  }
+
+  /** Actualiza un producto existente desde el panel admin. */
+  actualizarAdmin(id: number, payload: GuardarProductoAdminDTO): Observable<ProductoAdmin> {
+    return this.http.put<ProductoAdmin>(`${this.apiUrl}/admin/${id}`, payload);
+  }
+
 }

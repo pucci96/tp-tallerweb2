@@ -4,8 +4,8 @@
     <h2>{{ esModoEdicion ? 'Editar Producto #' + productoId : 'Crear Nuevo Producto' }}</h2>
   </div>
 
-  @if (mensajeError) {
-    <div class="error-banner">{{ mensajeError }}</div>
+  @if (mensajeError()) {
+    <div class="error-banner">{{ mensajeError() }}</div>
   }
 
   <form [formGroup]="productoForm" (ngSubmit)="guardar()" class="main-form">
@@ -71,8 +71,8 @@
 
     <div class="form-actions">
       <a routerLink="/admin/productos" class="btn-cancel">Cancelar</a>
-      <button type="submit" class="btn-submit" [disabled]="cargando">
-        {{ cargando ? 'Guardando...' : (esModoEdicion ? 'Actualizar Producto' : 'Guardar Producto') }}
+      <button type="submit" class="btn-submit" [disabled]="cargando()">
+        {{ cargando() ? 'Guardando...' : (esModoEdicion ? 'Actualizar Producto' : 'Guardar Producto') }}
       </button>
     </div>
   </form>

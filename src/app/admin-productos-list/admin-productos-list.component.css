@@ -61,12 +61,12 @@
 
 .admin-table th:nth-child(1),
 .admin-table td:nth-child(1) {
-  width: 38%; /* Producto */
+  width: 42%; /* Producto */
 }
 
 .admin-table th:nth-child(2),
 .admin-table td:nth-child(2) {
-  width: 24%; /* Categoría */
+  width: 19%; /* Categoría */
 }
 
 .admin-table th:nth-child(3),
@@ -76,12 +76,12 @@
 
 .admin-table th:nth-child(4),
 .admin-table td:nth-child(4) {
-  width: 10%; /* Stock */
+  width: 9%; /* Stock */
 }
 
 .admin-table th:nth-child(5),
 .admin-table td:nth-child(5) {
-  width: 16%; /* Acciones */
+  width: 18%; /* Acciones */
 }
 
 .cell-product {
@@ -97,10 +97,13 @@
 }
 
 .cell-product strong {
-  display: block;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; 
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  line-height: 1.3;
+  color: #111827;
 }
 .admin-table th {
   background: #f9fafb;
@@ -425,6 +428,8 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+
 
 @keyframes fadeIn {
   from { opacity: 0; }

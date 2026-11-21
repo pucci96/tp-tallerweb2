@@ -1,10 +1,10 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { PedidoService, PedidoDTO } from '../services/pedido.service';
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
+import { ProductService } from '../services/product.service';
 
 @Component({
   selector: 'app-carrito',
@@ -15,15 +15,13 @@ import { environment } from '../../environments/environment';
 })
 export class CarritoComponent implements OnInit {
   private pedidoService = inject(PedidoService);
-  private http = inject(HttpClient);
+  private productService = inject(ProductService);
   private cdr = inject(ChangeDetectorRef);
   protected readonly auth = inject(AuthService);
   private router = inject(Router);
 
   carrito: PedidoDTO | null = null;
   cargando: boolean = true;
-
-
   mensajeAlerta: string | null = null;
 
   ngOnInit(): void {
@@ -77,14 +75,13 @@ export class CarritoComponent implements OnInit {
     this.cargando = true;
 
     // 1. Obtenemos el catálogo general de productos para rescatar sus imágenes reales
-    this.http.get<any[]>(`${environment.apiUrl}/productos`).subscribe({
-      next: (productosCatalogo) => {
-        // 2. Obtenemos los pedidos del usuario
+   this.productService.obtenerProductos().subscribe({
+      next: (productosCatalogo: any[]) => {
+        // 2. Obtenemos los pedidos del usuario desde PedidoService
         this.pedidoService.obtenerMisPedidos().subscribe({
           next: (pedidos) => {
             const carritoCrudo = pedidos.find(p => p.estado === 'carrito') || null;
 
-            // Cruzamos los ítems del carrito con el catálogo para inyectarles la 'imageUrl'
             if (carritoCrudo && carritoCrudo.productos) {
               const productosMapeados = carritoCrudo.productos.map(itemPedido => {
                 const prodEnCatalogo = productosCatalogo.find(
@@ -96,7 +93,6 @@ export class CarritoComponent implements OnInit {
                 };
               });
 
-              // Agrupación precisa por ID o nombre único
               const productosAgrupadosMap = new Map<number | string, any>();
 
               for (const item of productosMapeados) {
@@ -106,7 +102,6 @@ export class CarritoComponent implements OnInit {
                   const existente = productosAgrupadosMap.get(claveUnica);
                   existente.cantidad += item.cantidad;
                   existente.subtotal = existente.precio * existente.cantidad;
-                  // Mantenemos el ID de línea más alto para conservar el orden arriba
                   if (item.id > existente.id) {
                     existente.id = item.id;
                   }
@@ -115,7 +110,6 @@ export class CarritoComponent implements OnInit {
                 }
               }
 
-              // Convertimos el Map de vuelta a array y ordenamos para que el último agregado quede arriba
               this.carrito = {
                 ...carritoCrudo,
                 productos: Array.from(productosAgrupadosMap.values()).sort((a, b) => b.id - a.id)
@@ -137,7 +131,6 @@ export class CarritoComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al cargar el catálogo de productos para las imágenes:', err);
-        // Si falla el catálogo, intentamos cargar el carrito igual
         this.pedidoService.obtenerMisPedidos().subscribe({
           next: (pedidos) => {
             this.carrito = pedidos.find(p => p.estado === 'carrito') || null;
@@ -155,7 +148,6 @@ export class CarritoComponent implements OnInit {
   }
 
   cambiarCantidad(item: any, delta: number): void {
-    // Invitado: se modifica el carrito local, sin tocar el backend.
     if (this.pedidoService.esGuest()) {
       this.pedidoService.cambiarCantidadGuest(item.id_producto ?? item.id, delta);
       this.refrescarLocal();
@@ -169,13 +161,11 @@ export class CarritoComponent implements OnInit {
     item.subtotal = item.precio * nuevaCantidad;
     this.recalcularTotal();
 
-    // Actualizamos el número del header al instante
     this.actualizarContadorGlobal();
     this.cdr.detectChanges();
   }
 
- eliminarProducto(idProductoOItem: number): void {
-    // Invitado: se quita del carrito local, sin tocar el backend.
+  eliminarProducto(idProductoOItem: number): void {
     if (this.pedidoService.esGuest()) {
       this.pedidoService.quitarGuest(idProductoOItem);
       this.mostrarToastML('¡Listo! Eliminaste el producto del carrito.');
@@ -185,27 +175,18 @@ export class CarritoComponent implements OnInit {
 
     if (!this.carrito || !this.carrito.productos) return;
 
-    // Buscamos si hay varios ítems en el carrito que correspondan al mismo producto (por id_producto)
-    const itemEncontrado = this.carrito.productos.find(p => p.id === idProductoOItem || p.id_producto === idProductoOItem);
+    const itemEncontrado = this.carrito.productos.find(
+      p => p.id === idProductoOItem || p.id_producto === idProductoOItem
+    );
     const idProductoReal = itemEncontrado ? (itemEncontrado.id_producto ?? itemEncontrado.id) : idProductoOItem;
 
-    // Hacemos una petición DELETE masiva o apuntamos al endpoint que limpia el producto entero del pedido
-    // Si tu backend soporta borrar por id_producto o si mandamos el id del ítem:
-    this.http.delete(`${environment.apiUrl}/pedidos/${this.carrito.id}/productos/producto/${idProductoReal}`).subscribe({
+    // Delegamos ambos DELETE (principal + fallback) a PedidoService
+    this.pedidoService.eliminarProductoCompleto(this.carrito.id, idProductoReal, idProductoOItem).subscribe({
       next: () => {
         this.cargarCarritoConImagenes();
         this.mostrarToastML('¡Listo! Eliminaste el producto del carrito.');
       },
-      error: (err) => {
-        console.error('Error al eliminar el producto:', err);
-        // Fallback por si el backend usa el id directo del renglón
-        this.http.delete(`${environment.apiUrl}/pedidos/${this.carrito!.id}/productos/${idProductoOItem}`).subscribe({
-          next: () => {
-            this.cargarCarritoConImagenes();
-            this.mostrarToastML('¡Listo! Eliminaste el producto del carrito.');
-          }
-        });
-      }
+      error: (err) => console.error('Error al eliminar el producto:', err)
     });
   }
 

@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { ProductCardComponent } from '../productCard/productCard.component';
-import { environment } from '../../environments/environment';
 import { PedidoService } from '../services/pedido.service'; 
+import { CategoriaService, Categoria } from '../services/categoria.service';
+import { ProductService } from '../services/product.service';
 
 @Component({
   selector: 'app-catalogo-producto',
@@ -15,18 +16,15 @@ import { PedidoService } from '../services/pedido.service';
   styleUrls: ['./catalogo-producto.component.css']
 })
 export class CatalogoProductoComponent implements OnInit {
-  private http = inject(HttpClient);
   private pedidoService = inject(PedidoService); 
+  private productService = inject(ProductService);
+  private categoriaService= inject(CategoriaService);
 
-  // Señales: en Angular 22 los componentes son OnPush por defecto, así que la vista
-  // solo se actualiza sola al llegar la respuesta HTTP si el dato es una señal.
+  
   readonly productos = signal<any[]>([]);
-  readonly categorias = signal<any[]>([]);
+  readonly categorias = signal<Categoria[]>([]);
 
-  /**
-   * Tope del filtro de precio: el precio del producto más caro, redondeado hacia
-   * arriba al múltiplo de PASO_PRECIO. Así el rango siempre abarca todo el catálogo.
-   */
+ 
   readonly PASO_PRECIO = 10000;
   readonly precioTope = computed(() => {
     const precios = this.productos().map((p) => Number(p.price ?? p.precio ?? 0));
@@ -51,17 +49,17 @@ export class CatalogoProductoComponent implements OnInit {
   }
 
 cargarDatos(): void {
-  this.http.get<any[]>(`${environment.apiUrl}/productos`).subscribe({
-    next: (data) => {
+  this.productService.obtenerProductos().subscribe({
+    next: (data)=>{
       this.productos.set(data);
-      this.precioMax = this.precioTope(); // al entrar no se oculta ningún producto por precio
+      this.precioMax = this.precioTope();
     },
-    error: (err) => console.error('Error en productos:', err)
+    error: (err) => console.error('error en producits', err)
   });
 
-  this.http.get<any[]>(`${environment.apiUrl}/categorias`).subscribe({
+  this.categoriaService.obtenerCategorias().subscribe({
     next: (data) => this.categorias.set(data),
-    error: (err) => console.error('Error en categorías:', err)
+    error: (err) => console.error('Error en categorias', err)
   });
 }
 

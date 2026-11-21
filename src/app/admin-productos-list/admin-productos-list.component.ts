@@ -76,7 +76,7 @@ readonly itemsPorPagina = 10;
           return coincideTexto && coincideCategoria && coincidePrecioMin && coincidePrecioMax && coincideStockMin && coincideStockMax;
         });
 
-        // 2. Ordenamiento (Precio o Stock)
+        //Ordenamiento (Precio o Stock)
         const ordenados = [...filtrados].sort((a, b) => {
           switch (f.orden) {
             case 'precio-asc':  return a.precio - b.precio;

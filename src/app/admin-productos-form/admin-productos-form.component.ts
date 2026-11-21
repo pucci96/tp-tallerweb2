@@ -1,9 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { CategoriaService, Categoria, Subcategoria } from '../services/categoria.service';
+import { ProductService, GuardarProductoAdminDTO } from '../services/product.service';
 
 @Component({
   selector: 'app-admin-producto-form',
@@ -14,19 +15,20 @@ import { environment } from '../../environments/environment';
 })
 export class AdminProductoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
-  private http = inject(HttpClient);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private apiUrl = environment.apiUrl;
+  private categoriaService = inject (CategoriaService);
+  private productService = inject (ProductService);
 
-  categorias: any[] = [];
-  todasLasSubcategorias: any[] = [];
-  subcategoriasFiltradas: any[] = [];
+  categorias: Categoria[] = [];
+  todasLasSubcategorias: Subcategoria[] = [];
+  subcategoriasFiltradas: Subcategoria[] = [];
 
   productoId: number | null = null;
   esModoEdicion: boolean = false;
-  cargando: boolean = false;
-  mensajeError: string = '';
+  readonly cargando =signal (false);
+  readonly mensajeError = signal('');
 
   productoForm: FormGroup = this.fb.group({
     nombre: ['', [Validators.required, Validators.minLength(3)]],
@@ -45,18 +47,15 @@ export class AdminProductoFormComponent implements OnInit {
   }
 
   cargarDatosIniciales(): void {
-    
-    this.http.get<any[]>(`${this.apiUrl}/categorias`).subscribe({
-      next: (data) => this.categorias = data,
+    this.categoriaService.obtenerCategorias().subscribe({
+      next: (data) => (this.categorias = data),
       error: (err) => console.error('Error cargando categorías:', err)
     });
 
-    
-    this.http.get<any[]>(`${this.apiUrl}/subcategorias`).subscribe({
+    this.categoriaService.obtenerSubcategorias().subscribe({
       next: (data) => {
         this.todasLasSubcategorias = data;
-        
-       
+
         const idParam = this.route.snapshot.paramMap.get('id');
         if (idParam) {
           this.productoId = Number(idParam);
@@ -97,8 +96,8 @@ export class AdminProductoFormComponent implements OnInit {
   }
 
   cargarDatosProducto(id: number): void {
-    this.cargando = true;
-    this.http.get<any>(`${this.apiUrl}/productos/admin/${id}`).subscribe({
+    this.cargando.set(true);
+    this.productService.obtenerAdminPorId(id).subscribe({
       next: (prod) => {
         this.productoForm.patchValue({
           nombre: prod.nombre,
@@ -117,11 +116,11 @@ export class AdminProductoFormComponent implements OnInit {
         this.productoForm.get('id_subcategoria')?.enable();
         this.productoForm.get('id_subcategoria')?.setValue(prod.id_subcategoria);
 
-        this.cargando = false;
+        this.cargando.set(false);
       },
       error: () => {
-        this.mensajeError = 'No se pudo cargar el producto para editar.';
-        this.cargando = false;
+        this.mensajeError.set('No se pudo cargar el producto para editar.');
+        this.cargando.set(false);
       }
     });
   }
@@ -132,11 +131,11 @@ export class AdminProductoFormComponent implements OnInit {
       return;
     }
 
-    this.cargando = true;
-    this.mensajeError = '';
+    this.cargando.set(true);
+    this.mensajeError.set('');
 
     const formVal = this.productoForm.getRawValue(); // getRawValue incluye controles disabled
-    const payload = {
+    const payload: GuardarProductoAdminDTO = {
       nombre: formVal.nombre,
       precio: Number(formVal.precio),
       stock: Number(formVal.stock),
@@ -148,17 +147,17 @@ export class AdminProductoFormComponent implements OnInit {
     };
 
     const peticion = (this.esModoEdicion && this.productoId)
-      ? this.http.put(`${this.apiUrl}/productos/admin/${this.productoId}`, payload)
-      : this.http.post(`${this.apiUrl}/productos/admin`, payload);
+      ? this.productService.actualizarAdmin(this.productoId, payload)
+      : this.productService.crearAdmin(payload);
 
     peticion.subscribe({
       next: () => {
-        this.cargando = false;
+        this.cargando.set(false);
         this.router.navigate(['/admin/productos']);
       },
       error: (err) => {
-        this.cargando = false;
-        this.mensajeError = err.error?.error || 'Error al guardar el producto.';
+        this.cargando.set(false);
+        this.mensajeError.set(err.error?.error || 'Error al guardar el producto.');
         console.error('Error al guardar:', err);
       }
     });

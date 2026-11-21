@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, switchMap, map, of } from 'rxjs';
+import { Observable, tap, switchMap, map, of, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { CarritoGuestService, ItemGuest } from './carrito-guest.service';
@@ -183,5 +183,10 @@ export class PedidoService {
 
   eliminarProductoDelPedido(idPedido: number, idItemPedido: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${idPedido}/productos/${idItemPedido}`);
+  }
+  eliminarProductoCompleto(idPedido: number, idProductoReal: number, idItemFallback: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${idPedido}/productos/producto/${idProductoReal}`).pipe(
+      catchError(() => this.eliminarProductoDelPedido(idPedido, idItemFallback))
+    );
   }
 }

@@ -1,10 +1,11 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { PedidoService, PedidoDTO } from '../services/pedido.service';
+import { PedidoService, PedidoConImagenes, PedidoProductoConImagen } from '../services/pedido.service';
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
 import { ProductService } from '../services/product.service';
+import { Product } from '../productCard/productCard.component';
 
 @Component({
   selector: 'app-carrito',
@@ -20,7 +21,7 @@ export class CarritoComponent implements OnInit {
   protected readonly auth = inject(AuthService);
   private router = inject(Router);
 
-  carrito: PedidoDTO | null = null;
+  carrito: PedidoConImagenes | null = null;
   cargando: boolean = true;
   mensajeAlerta: string | null = null;
 
@@ -35,7 +36,7 @@ export class CarritoComponent implements OnInit {
   }
 
   /*convierte el carrito guest al estilo del back*/
-  private armarCarritoLocal(): PedidoDTO | null {
+  private armarCarritoLocal(): PedidoConImagenes | null {
     const items = this.pedidoService.itemsGuest();
     if (!items.length) {
       return null;
@@ -61,7 +62,7 @@ export class CarritoComponent implements OnInit {
       estado: 'carrito',
       total: productos.reduce((acc, p) => acc + p.subtotal, 0),
       productos,
-    } as PedidoDTO;
+    };
   }
 
   /** Reconstruye la vista del carrito local y actualiza el contador del header. */
@@ -76,7 +77,7 @@ export class CarritoComponent implements OnInit {
 
     // 1. Obtenemos el catálogo general de productos para rescatar sus imágenes reales
    this.productService.obtenerProductos().subscribe({
-      next: (productosCatalogo: any[]) => {
+      next: (productosCatalogo: Product[]) => {
         // 2. Obtenemos los pedidos del usuario desde PedidoService
         this.pedidoService.obtenerMisPedidos().subscribe({
           next: (pedidos) => {
@@ -85,21 +86,22 @@ export class CarritoComponent implements OnInit {
             if (carritoCrudo && carritoCrudo.productos) {
               const productosMapeados = carritoCrudo.productos.map(itemPedido => {
                 const prodEnCatalogo = productosCatalogo.find(
-                  p => p.title === itemPedido.producto || p.nombre === itemPedido.producto
+                  p => p.title === itemPedido.producto
                 );
                 return {
                   ...itemPedido,
-                  imageUrl: prodEnCatalogo ? (prodEnCatalogo.imageUrl || prodEnCatalogo.imagen) : 'assets/placeholder.png'
+                  imageUrl: prodEnCatalogo ? (prodEnCatalogo.imageUrl) : 'assets/placeholder.png'
                 };
               });
 
-              const productosAgrupadosMap = new Map<number | string, any>();
+              const productosAgrupadosMap = new Map<number | string, PedidoProductoConImagen>();
 
               for (const item of productosMapeados) {
                 const claveUnica = item.id_producto ?? item.producto;
 
-                if (productosAgrupadosMap.has(claveUnica)) {
-                  const existente = productosAgrupadosMap.get(claveUnica);
+                const existente = productosAgrupadosMap.get(claveUnica);
+
+                if (existente) {
                   existente.cantidad += item.cantidad;
                   existente.subtotal = existente.precio * existente.cantidad;
                   if (item.id > existente.id) {
@@ -147,7 +149,7 @@ export class CarritoComponent implements OnInit {
     });
   }
 
-  cambiarCantidad(item: any, delta: number): void {
+  cambiarCantidad(item: PedidoProductoConImagen, delta: number): void {
     if (this.pedidoService.esGuest()) {
       this.pedidoService.cambiarCantidadGuest(item.id_producto ?? item.id, delta);
       this.refrescarLocal();

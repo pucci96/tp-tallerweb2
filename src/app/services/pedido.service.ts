@@ -26,6 +26,11 @@ export interface PedidoProductoDTO {
   subtotal: number;
 }
 
+/** Item del carrito en la vista: el item del pedido más la imagen tomada del catálogo. */
+export interface PedidoProductoConImagen extends PedidoProductoDTO {
+  imageUrl?: string;
+}
+
 export interface PedidoDTO {
   id: number;
   id_usuario: number;
@@ -33,6 +38,11 @@ export interface PedidoDTO {
   estado: string;
   total: number;
   productos: PedidoProductoDTO[];
+}
+
+/** Pedido con sus items enriquecidos con imagen (vista del carrito). */
+export interface PedidoConImagenes extends Omit<PedidoDTO, 'productos'> {
+  productos: PedidoProductoConImagen[];
 }
 
 export interface CrearPedidoDTO {
@@ -169,7 +179,7 @@ export class PedidoService {
     return this.http.post<PedidoDTO>(this.apiUrl, data ?? { estado: 'carrito' });
   }
 
-  agregarProducto(idPedido: number, data: AgregarProductoDTO): Observable<any> {
+  agregarProducto(idPedido: number, data: AgregarProductoDTO): Observable<PedidoProductoDTO> {
     return this.http.post<PedidoProductoDTO>(`${this.apiUrl}/${idPedido}/productos`, data).pipe(
       tap(() => {
         this.cantidadCarrito.update(count => count + (data.cantidad ?? 1));
@@ -181,11 +191,11 @@ export class PedidoService {
     return this.http.put<PedidoDTO>(`${environment.apiUrl}/pedidos/${idPedido}`, { estado: 'completado' });
   }
 
-  eliminarProductoDelPedido(idPedido: number, idItemPedido: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${idPedido}/productos/${idItemPedido}`);
+  eliminarProductoDelPedido(idPedido: number, idItemPedido: number): Observable<PedidoDTO> {
+    return this.http.delete<PedidoDTO>(`${this.apiUrl}/${idPedido}/productos/${idItemPedido}`);
   }
-  eliminarProductoCompleto(idPedido: number, idProductoReal: number, idItemFallback: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${idPedido}/productos/producto/${idProductoReal}`).pipe(
+  eliminarProductoCompleto(idPedido: number, idProductoReal: number, idItemFallback: number): Observable<PedidoDTO> {
+    return this.http.delete<PedidoDTO>(`${this.apiUrl}/${idPedido}/productos/producto/${idProductoReal}`).pipe(
       catchError(() => this.eliminarProductoDelPedido(idPedido, idItemFallback))
     );
   }

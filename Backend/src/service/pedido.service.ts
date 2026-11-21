@@ -55,7 +55,7 @@ export class PedidoService {
   }
 
   async crearPedido(idUsuario: number, data: CrearPedidoDTO | undefined): Promise<PedidoDTO> {
-    const estado = typeof data?.estado === 'string' && data.estado.trim() ? data.estado.trim() : 'carrito';
+    const estado = 'carrito'; // Siempre se crea un pedido en estado "carrito"
     return this.mapearPedido(await this.pedidoRepo.crearPedido(idUsuario, estado));
   }
 
@@ -137,14 +137,27 @@ export class PedidoService {
     nuevoEstado: string
   ): Promise<PedidoDTO> {
     await this.pedidoPropio(idPedido, idUsuario, esAdmin);
-    const estadoLimpio = typeof nuevoEstado === 'string' && nuevoEstado.trim() ? nuevoEstado.trim() : 'completado';
+    const estadoLimpio = 'completado';
 
     // 1. Actualizamos el pedido actual a 'completado'
     const pedidoActualizado = await this.pedidoRepo.actualizarEstadoPedido(idPedido, estadoLimpio);
 
     // 2. Creamos un nuevo pedido en blanco con estado 'carrito' para la siguiente compra
-    if (estadoLimpio === 'completado') {
-      await this.pedidoRepo.crearPedido(idUsuario, 'carrito');
+    await this.pedidoRepo.crearPedido(idUsuario, 'carrito');
+
+    // 3. Decrementamos el stock de los productos que se compraron
+    for (const producto of pedidoActualizado.productos) {
+      const productoEnStock = await this.pedidoRepo.obtenerProductoPorNombre(producto.producto);
+      if (!productoEnStock) {
+        throw new HttpError(500, `El producto ${producto.producto} ya no existe en la base de datos`);
+      }
+      if (producto.cantidad > productoEnStock.stock) {
+        throw new HttpError(
+          400,
+          `No hay stock suficiente para el producto ${producto.producto} (disponible: ${productoEnStock.stock})`
+        );
+      }
+      await this.pedidoRepo.decrementarStock(productoEnStock.id, producto.cantidad);
     }
 
     return this.mapearPedido(pedidoActualizado);

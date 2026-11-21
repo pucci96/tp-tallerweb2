@@ -41,6 +41,6 @@ export class ProductoController {
   eliminar = async (req: Request, res: Response) => {
     const id = parseId(req.params['id'], 'id de producto');
     await this.productoService.eliminar(id);
-    res.json({ mensaje: 'Producto eliminado correctamente' });
+    res.status(204).send();
   };
 }

@@ -38,11 +38,13 @@ export class PedidoController {
     res.json(await this.pedidoService.actualizarEstadoPedido(idPedido, id_usuario, rol === 'ADMIN', estado));
   };
 
+
   eliminarProducto = async (req: Request, res: Response) => {
     const { id_usuario, rol } = usuarioDelToken(req);
     const idPedido = parseId(req.params['id_pedido'], 'id de pedido');
     const idItemPedido = parseId(req.params['id_item'], 'id de item');
     
-    res.json(await this.pedidoService.eliminarProductoDelPedido(idPedido, idItemPedido, id_usuario, rol === 'ADMIN'));
+    await this.pedidoService.eliminarProductoDelPedido(idPedido, idItemPedido, id_usuario, rol === 'ADMIN');
+    res.status(204).send();
   };
 }

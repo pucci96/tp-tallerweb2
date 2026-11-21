@@ -32,6 +32,13 @@ export class PedidoRepository {
     });
   }
 
+  async obtenerProductoPorNombre(nombre: string) {
+    return prisma.producto.findUnique({
+      where: { nombre },
+      include: { categoria: true, subcategoria: true },
+    });
+  }
+
   async agregarProducto(data: {
     id_pedido: number;
     producto: string;
@@ -41,6 +48,13 @@ export class PedidoRepository {
     cantidad: number;
   }) {
     return prisma.pedido_productos.create({ data });
+  }
+
+  async decrementarStock(idProducto: number, cantidad: number) {
+    return prisma.producto.update({
+      where: { id: idProducto },
+      data: { stock: { decrement: cantidad } },
+    });
   }
 
   async eliminarProductoDelPedido(idItemPedido: number) {

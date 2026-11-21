@@ -1,14 +1,7 @@
 import { Injectable, signal, computed, effect } from '@angular/core';
 
-export interface ItemGuest {
-  id_producto: number;
-  producto: string;
-  categoria: string;
-  subcategoria: string;
-  precio: number;
-  imageUrl: string;
-  cantidad: number;
-}
+import { ItemGuest } from '../interfaces/carrito-guest';
+
 
 const STORAGE_KEY = 'carrito_guest';
 

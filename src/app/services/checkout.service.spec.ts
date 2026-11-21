@@ -1,8 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { CheckoutService, DatosEnvio } from './checkout.service';
-import { PedidoDTO, PedidoService } from './pedido.service';
+import { CheckoutService } from './checkout.service';
+import { PedidoService } from './pedido.service';
 import { ProductService } from './product.service';
+
+import { DatosEnvio } from '../interfaces/checkout';
+import { PedidoDTO } from '../interfaces/pedido';
 
 const envio: DatosEnvio = {
   nombre: 'Ana',

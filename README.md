@@ -156,6 +156,32 @@ Backend/
 src/app/                 → frontend Angular (componentes, servicios, guards, interceptor)
 ```
 
+### Estructura del frontend
+
+`src/app/` separa **pages/** (pantallas con ruta: una carpeta por pantalla con su `*.component.ts/.html/.css` y su spec) de **components/** (piezas reutilizables sin ruta propia). El resto (`interfaces/`, `services/`, `guards/`, `interceptors/`, `validators/`) queda al nivel de `src/app/`.
+
+```
+src/app/
+  app.ts / app.html / app.routes.ts / app.config.ts   → raíz de la app y ruteo
+  pages/           → pantallas ruteadas
+    home/  catalogo-producto/  detalles-producto/  carrito/
+    login/  registro/  perfil/  mis-pedidos/  page-not-found/
+    checkout/                  → checkout.routes.ts (rutas hijas lazy)
+    checkout-confirmacion/  checkout-pago/  checkout-resultado/
+    admin/                     → admin.routes.ts (rutas hijas lazy)
+    admin-productos-list/  admin-productos-form/
+  components/      → componentes reutilizables
+    layout/header/  layout/footer/
+    product-card/  selector-estrellas/  checkout-shared/
+  interfaces/      → modelos y DTOs (un archivo por entidad: producto, pedido, auth, ...)
+  services/        → llamadas HTTP y estado compartido (signals)
+  guards/          → protección de rutas (auth, guest, admin)
+  interceptors/    → interceptor HTTP (token JWT, 401)
+  validators/      → validadores de formularios reutilizables
+```
+
+Regla de capas: `componentes → services → HTTP`. Los componentes solo muestran datos y manejan eventos; no hacen HTTP ni tienen lógica de negocio. Los tipos viven en `interfaces/` (los services no los reexportan: se importan desde ahí).
+
 ## Problemas comunes
 
 | Error | Solución |

@@ -3,17 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export interface Subcategoria {
-  id: number;
-  nombre: string;
-  id_categoria?: number;
-}
+import { Categoria, Subcategoria } from '../interfaces/categoria';
 
-export interface Categoria {
-  id: number;
-  nombre: string;
-  subcategorias?: Subcategoria[];
-}
 
 @Injectable({
   providedIn: 'root',

@@ -1,87 +1,78 @@
-import { Component, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, signal, inject, computed } from '@angular/core';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { form, FormField, required, email, minLength } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [FormsModule, RouterModule],
+  imports: [FormField, RouterModule],
   templateUrl: './registro.component.html',
   styleUrls: ['./registro.component.css'],
 })
 
 export class RegistroComponent {
-  nombre = '';
-  apellido = '';
-  email = '';
-  direccion = '';
-  password = '';
-  terminos = false;
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
+  readonly model = signal({
+    nombre: '',
+    apellido: '',
+    email: '',
+    direccion: '',
+    password: '',
+    terminos: false,
+  });
+
+  // Signal Form: el schema define las validaciones por campo.
+  readonly f = form(this.model, (p) => {
+    required(p.nombre);
+    required(p.apellido);
+    required(p.email);
+    email(p.email);
+    required(p.direccion);
+    required(p.password);
+    minLength(p.password, 8);
+    required(p.terminos);
+  });
+
+  // signals de UI
   readonly isSubmitting = signal(false);
   readonly isSuccess = signal(false);
   readonly isError = signal(false);
   readonly showPassword = signal(false);
   readonly mensajeError = signal('');
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) { }
+  readonly password = computed(() => this.model().password);
+  readonly passwordScore = computed(() => {
+    const pw = this.password();
+    let score = 0;
+    if (pw.length >= 8) score += 40;
+    if (/[0-9]/.test(pw)) score += 20;
+    if (/[a-zA-Z]/.test(pw)) score += 20;
+    if (/[^a-zA-Z0-9]/.test(pw)) score += 20;
+    return score;
+  });
 
   togglePasswordVisibility(): void {
     this.showPassword.update((value) => !value);
   }
 
-  clearError(): void {
-    if (this.isError()) {
-      this.mensajeError.set('');
-      this.isError.set(false);
-    }
-  }
-
-  // Live validation helpers
-  isNombreValid(): boolean {
-    return this.nombre.trim().length > 0;
-  }
-
-  isApellidoValid(): boolean {
-    return this.apellido.trim().length > 0;
-  }
-
-  isEmailValid(): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email.trim());
-  }
-
-  isDireccionValid(): boolean {
-    return this.direccion.trim().length > 0;
-  }
-
   hasMinLength(): boolean {
-    return this.password.length >= 8;
+    return this.password().length >= 8;
   }
 
   hasNumber(): boolean {
-    return /[0-9]/.test(this.password);
+    return /[0-9]/.test(this.password());
   }
 
   hasLetter(): boolean {
-    return /[a-zA-Z]/.test(this.password);
+    return /[a-zA-Z]/.test(this.password());
   }
 
   hasSpecial(): boolean {
-    return /[^a-zA-Z0-9]/.test(this.password);
-  }
-
-  passwordScore(): number {
-    let score = 0;
-    if (this.hasMinLength()) score += 40;
-    if (this.hasNumber()) score += 20;
-    if (this.hasLetter()) score += 20;
-    if (this.hasSpecial()) score += 20;
-    return score;
+    return /[^a-zA-Z0-9]/.test(this.password());
   }
 
   passwordLabel(): string {
@@ -91,25 +82,11 @@ export class RegistroComponent {
     return 'Fuerte';
   }
 
-  isFormValid(): boolean {
-    return (
-      this.isNombreValid() &&
-      this.isApellidoValid() &&
-      this.isEmailValid() &&
-      this.isDireccionValid() &&
-      this.hasMinLength() &&
-      this.hasLetter() &&
-      this.hasNumber() &&
-      this.terminos === true
-    );
-  }
-
   handleRegisterSubmit(): void {
-    if (this.isSubmitting()) {
-      return;
-    }
+    if (this.isSubmitting()) return;
 
-    if (!this.isFormValid()) {
+    if (this.f().invalid()) {
+      this.f().markAsTouched();
       this.isError.set(true);
       return;
     }
@@ -119,18 +96,17 @@ export class RegistroComponent {
     this.isError.set(false);
     this.mensajeError.set('');
 
+    const datos = this.model();
     this.authService.registrar({
-      nombre: this.nombre.trim(),
-      apellido: this.apellido.trim(),
-      email: this.email.trim().toLowerCase(),
-      direccion: this.direccion.trim(),
-      password: this.password,
+      nombre: datos.nombre.trim(),
+      apellido: datos.apellido.trim(),
+      email: datos.email.trim().toLowerCase(),
+      direccion: datos.direccion.trim(),
+      password: datos.password,
     }).subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.isSuccess.set(true);
-        // No creamos sesión acá: se loguea a mano. Arrastramos el returnUrl
-        // para que, tras el login, vuelva al punto donde estaba (p. ej. /carrito).
         setTimeout(() => {
           const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
           this.router.navigate(

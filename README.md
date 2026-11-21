@@ -156,6 +156,23 @@ Backend/
 src/app/                 → frontend Angular (componentes, servicios, guards, interceptor)
 ```
 
+### Estructura del frontend
+
+`src/app/` se organiza por feature: cada pantalla es una carpeta con su componente (`*.component.ts/.html/.css`) y, si corresponde, su spec. Ejemplos: `home/`, `catalogo-producto/`, `carrito/`, `checkout-pago/`, `login/`, `admin-productos-list/`. `product-card/` y `checkout-shared/` agrupan componentes reutilizables.
+
+```
+src/app/
+  <feature>/       → componente de una pantalla (home, carrito, checkout-*, login, ...)
+  layout/          → header y footer
+  interfaces/      → modelos y DTOs (un archivo por entidad: producto, pedido, auth, ...)
+  services/        → llamadas HTTP y estado compartido (signals)
+  guards/          → protección de rutas (auth, guest, admin)
+  interceptors/    → interceptor HTTP (token JWT, 401)
+  validators/      → validadores de formularios reutilizables
+```
+
+Regla de capas: `componentes → services → HTTP`. Los componentes solo muestran datos y manejan eventos; no hacen HTTP ni tienen lógica de negocio. Los tipos viven en `interfaces/` (los services no los reexportan: se importan desde ahí).
+
 ## Problemas comunes
 
 | Error | Solución |

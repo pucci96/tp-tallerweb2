@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { DetallesProductoComponent } from './detalles-producto.component';
-import { ProductoDetalle } from '../services/product.service';
+import { ProductoDetalle } from '../interfaces/producto';
 
 describe('DetallesProductoComponent', () => {
   let component: DetallesProductoComponent;

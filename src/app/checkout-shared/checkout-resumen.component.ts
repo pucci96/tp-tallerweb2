@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DatosEnvio, ResumenCompra } from '../services/checkout.service';
+import { DatosEnvio, ResumenCompra } from '../interfaces/checkout';
 
 /** Resumen de productos y totales; muestra el domicilio de entrega si se le pasa el envío. */
 @Component({

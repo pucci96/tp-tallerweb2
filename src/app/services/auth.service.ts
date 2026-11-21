@@ -4,27 +4,14 @@ import { Observable, tap, switchMap, map, of, catchError, forkJoin, finalize, Su
 import { environment } from '../../environments/environment';
 import { CarritoGuestService } from './carrito-guest.service';
 
-export interface UsuarioSesion {
-  id: number;
-  email: string;
-  nombre: string;
-  apellido: string;
-  direccion: string;
-  rol: string;
-}
+import { ActualizarPerfilDatos, UsuarioSesion } from '../interfaces/auth';
+
 
 interface LoginResponse {
   token: string;
   usuario: UsuarioSesion;
 }
 
-export interface ActualizarPerfilDatos {
-  nombre: string;
-  apellido: string;
-  direccion: string;
-  passwordActual?: string;
-  passwordNueva?: string;
-}
 
 interface RegistroDatos {
   nombre: string;

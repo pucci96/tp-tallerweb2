@@ -1,11 +1,12 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { PedidoService, PedidoConImagenes, PedidoProductoConImagen } from '../services/pedido.service';
+import { PedidoService } from '../services/pedido.service';
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
 import { ProductService } from '../services/product.service';
-import { Product } from '../services/product.service';
+import { PedidoConImagenes, PedidoProductoConImagen } from '../interfaces/pedido';
+import { Product } from '../interfaces/producto';
 
 @Component({
   selector: 'app-carrito',

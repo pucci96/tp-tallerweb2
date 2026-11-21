@@ -2,7 +2,7 @@ import { Component, Input, signal, computed, inject, ChangeDetectorRef } from '@
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PedidoService } from '../services/pedido.service'; 
-import {  Product } from '../services/product.service';
+import { Product } from '../interfaces/producto';
 
 
 
@@ -11,8 +11,8 @@ import {  Product } from '../services/product.service';
   selector: 'app-product-card',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './productCard.component.html',
-  styleUrls: ['./productCard.component.css']
+  templateUrl: './product-card.component.html',
+  styleUrls: ['./product-card.component.css']
 })
 export class ProductCardComponent {
   private pedidoService = inject(PedidoService);

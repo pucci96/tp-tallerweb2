@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { AuthService, UsuarioSesion, ActualizarPerfilDatos } from '../services/auth.service';
+import { AuthService } from '../services/auth.service';
+import { ActualizarPerfilDatos, UsuarioSesion } from '../interfaces/auth';
 
 @Component({
   selector: 'app-perfil',

@@ -2,10 +2,12 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ProductCardComponent } from '../productCard/productCard.component';
+import { ProductCardComponent } from '../product-card/product-card.component';
 import { PedidoService } from '../services/pedido.service'; 
-import { CategoriaService, Categoria } from '../services/categoria.service';
-import { ProductService, Product } from '../services/product.service';
+import { CategoriaService } from '../services/categoria.service';
+import { ProductService } from '../services/product.service';
+import { Categoria } from '../interfaces/categoria';
+import { Product } from '../interfaces/producto';
 
 
 @Component({

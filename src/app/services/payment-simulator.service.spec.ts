@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
-import { DatosTarjeta, PAYMENT_DELAY_MS, PaymentSimulatorService } from './payment-simulator.service';
+import { PAYMENT_DELAY_MS, PaymentSimulatorService } from './payment-simulator.service';
+import { DatosTarjeta } from '../interfaces/pago';
 
 const tarjeta = (numero: string): DatosTarjeta => ({
   numero,

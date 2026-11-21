@@ -2,9 +2,12 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { AuthService, UsuarioSesion } from '../services/auth.service';
-import { CarritoCheckout, CheckoutService } from '../services/checkout.service';
+import { AuthService } from '../services/auth.service';
+import { CheckoutService } from '../services/checkout.service';
 import { CheckoutConfirmacionComponent } from './checkout-confirmacion.component';
+
+import { UsuarioSesion } from '../interfaces/auth';
+import { CarritoCheckout } from '../interfaces/checkout';
 
 const usuario: UsuarioSesion = {
   id: 7,

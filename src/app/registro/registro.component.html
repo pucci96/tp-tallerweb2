@@ -37,7 +37,7 @@
       <div class="alert-error">{{ mensajeError() || 'Revisá los campos obligatorios e intentá nuevamente.' }}</div>
       }
 
-      <form class="registro-form" (ngSubmit)="handleRegisterSubmit()">
+      <form class="registro-form">
         <!-- Row: Nombre & Apellido -->
         <div class="form-row">
           <!-- Nombre -->
@@ -347,7 +347,7 @@
 
         <!-- Submit -->
         <div class="submit-wrap">
-          <button type="submit" class="btn-submit" [disabled]="isSubmitting() || f().invalid()">
+          <button type="button" class="btn-submit" [disabled]="isSubmitting() || f().invalid()" (click)="handleRegisterSubmit()">
             <span>{{
               isSubmitting() && !isSuccess()
               ? 'Creando cuenta...'

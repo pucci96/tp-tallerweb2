@@ -1,9 +1,21 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Product } from '../productCard/productCard.component';
 import { environment } from '../../environments/environment';
 
+
+export interface Product {
+  id: number;
+  categoryId: number;
+  category: string;
+  imageUrl: string;
+  title: string;
+  description: string;
+  price: number;
+  stock: number;
+  destacado: boolean;
+  nombre:string;
+}
 /** Producto con todos los campos, como lo devuelve /productos/admin/... */
 export interface ProductoAdmin {
   id: number;

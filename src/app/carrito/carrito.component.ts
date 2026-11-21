@@ -5,7 +5,7 @@ import { PedidoService, PedidoConImagenes, PedidoProductoConImagen } from '../se
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
 import { ProductService } from '../services/product.service';
-import { Product } from '../productCard/productCard.component';
+import { Product } from '../services/product.service';
 
 @Component({
   selector: 'app-carrito',

@@ -1,19 +1,11 @@
 import { Component, Input, signal, computed, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PedidoService } from '../services/pedido.service'; //
+import { PedidoService } from '../services/pedido.service'; 
+import {  Product } from '../services/product.service';
 
-export interface Product {
-  id: number;
-  categoryId: number;
-  category: string;
-  imageUrl: string;
-  title: string;
-  description: string;
-  price: number;
-  stock: number;
-  destacado: boolean;
-}
+
+
 
 @Component({
   selector: 'app-product-card',
@@ -24,8 +16,7 @@ export interface Product {
 })
 export class ProductCardComponent {
   private pedidoService = inject(PedidoService);
-  private cdr = inject(ChangeDetectorRef); // <-- 1. Inyectamos el detector de cambios
-
+  private cdr = inject(ChangeDetectorRef);
   private _product = signal<Product | null>(null);
   stockActual = signal<number>(0);
 
@@ -48,13 +39,13 @@ export class ProductCardComponent {
     this.mensajeAlerta = mensaje;
     this.tipoAlerta = tipo;
     
-    // <-- 2. Forzamos a Angular a repintar la vista al instante para que el popup aparezca de inmediato
+    
     this.cdr.detectChanges();
 
     setTimeout(() => {
       this.mensajeAlerta = null;
       this.tipoAlerta = null;
-      this.cdr.detectChanges(); // <-- Forzamos también al ocultar
+      this.cdr.detectChanges(); 
     }, 3000);
   }
 

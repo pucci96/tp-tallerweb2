@@ -5,7 +5,8 @@ import { RouterLink } from '@angular/router';
 import { ProductCardComponent } from '../productCard/productCard.component';
 import { PedidoService } from '../services/pedido.service'; 
 import { CategoriaService, Categoria } from '../services/categoria.service';
-import { ProductService } from '../services/product.service';
+import { ProductService, Product } from '../services/product.service';
+
 
 @Component({
   selector: 'app-catalogo-producto',
@@ -17,16 +18,14 @@ import { ProductService } from '../services/product.service';
 export class CatalogoProductoComponent implements OnInit {
   private pedidoService = inject(PedidoService); 
   private productService = inject(ProductService);
-  private categoriaService= inject(CategoriaService);
-
-  
-  readonly productos = signal<any[]>([]);
+  private categoriaService= inject(CategoriaService); 
+  readonly productos = signal<Product[]>([]);
   readonly categorias = signal<Categoria[]>([]);
 
  
   readonly PASO_PRECIO = 10000;
   readonly precioTope = computed(() => {
-    const precios = this.productos().map((p) => Number(p.price ?? p.precio ?? 0));
+    const precios = this.productos().map((p) => Number(p.price ?? p.price ?? 0));
     const masCaro = Math.max(0, ...precios);
     return Math.max(this.PASO_PRECIO, Math.ceil(masCaro / this.PASO_PRECIO) * this.PASO_PRECIO);
   });
@@ -73,7 +72,7 @@ cargarDatos(): void {
     this.precioMax = this.precioTope();
   }
 
-  get productosFiltrados(): any[] {
+  get productosFiltrados(): Product[] {
   const productos = this.productos();
   if (productos.length === 0) {
     return [];
@@ -88,20 +87,20 @@ cargarDatos(): void {
         : true;
 
       
-      const catId = p.categoryId ?? p.categoriaId;
+      const catId = p.categoryId ?? p.categoryId;
       const coincideCategoria = this.categoriaSeleccionadaId !== null 
         ? catId === this.categoriaSeleccionadaId 
         : true;
 
      
-      const precio = Number(p.price ?? p.precio ?? 0);
+      const precio = Number(p.price ?? p.price ?? 0);
       const coincidePrecio = precio <= this.precioMax;
 
       return coincideBusqueda && coincideCategoria && coincidePrecio;
     })
     .sort((a, b) => {
-      const precioA = Number(a.price ?? a.precio ?? 0);
-      const precioB = Number(b.price ?? b.precio ?? 0);
+      const precioA = Number(a.price ?? a.price ?? 0);
+      const precioB = Number(b.price ?? b.price ?? 0);
       if (this.ordenSeleccionado === 'asc') return precioA - precioB;
       if (this.ordenSeleccionado === 'desc') return precioB - precioA;
       return 0;

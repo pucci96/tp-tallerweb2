@@ -1,6 +1,6 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, catchError, forkJoin, map, of } from 'rxjs';
-import { Product } from '../productCard/productCard.component';
+import {  Product } from '../services/product.service';
 import { PedidoDTO, PedidoService } from './pedido.service';
 import { ProductService } from './product.service';
 

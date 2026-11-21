@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProductService, ProductoDetalle, Comentario } from '../services/product.service';
 import { AuthService } from '../services/auth.service';
-import { Product } from '../productCard/productCard.component';
+import {  Product } from '../services/product.service';
 import { PedidoService } from '../services/pedido.service';
 import { SelectorEstrellasComponent } from '../selector-estrellas/selector-estrellas.component';
 

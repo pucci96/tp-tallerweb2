@@ -1,8 +1,9 @@
 import { Component, OnInit, OnDestroy, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ProductCardComponent, Product } from '../productCard/productCard.component';
+import { ProductCardComponent } from '../productCard/productCard.component';
 import { ProductService } from '../services/product.service';
+import {  Product } from '../services/product.service';
 
 interface Slide {
   id: number;

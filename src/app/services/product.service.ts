@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 
+/** Card de producto: mismo contrato que ProductoCardDTO del backend (GET /productos). */
 export interface Product {
   id: number;
   categoryId: number;
@@ -14,7 +15,6 @@ export interface Product {
   price: number;
   stock: number;
   destacado: boolean;
-  nombre:string;
 }
 /** Producto con todos los campos, como lo devuelve /productos/admin/... */
 export interface ProductoAdmin {

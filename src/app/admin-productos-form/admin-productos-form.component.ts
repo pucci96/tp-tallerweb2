@@ -2,7 +2,6 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { environment } from '../../environments/environment';
 import { CategoriaService, Categoria, Subcategoria } from '../services/categoria.service';
 import { ProductService, GuardarProductoAdminDTO } from '../services/product.service';
 
@@ -17,7 +16,6 @@ export class AdminProductoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
-  private apiUrl = environment.apiUrl;
   private categoriaService = inject (CategoriaService);
   private productService = inject (ProductService);
 

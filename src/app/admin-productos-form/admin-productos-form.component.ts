@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -14,6 +15,7 @@ import { ProductService, GuardarProductoAdminDTO } from '../services/product.ser
 })
 export class AdminProductoFormComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private categoriaService = inject (CategoriaService);
@@ -66,7 +68,7 @@ export class AdminProductoFormComponent implements OnInit {
   }
 
   escucharCambioCategoria(): void {
-    this.productoForm.get('id_categoria')?.valueChanges.subscribe((catId) => {
+    this.productoForm.get('id_categoria')?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((catId) => {
       const categoriaId = Number(catId);
       
       if (!categoriaId) {

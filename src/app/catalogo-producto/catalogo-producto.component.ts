@@ -18,14 +18,16 @@ import { ProductService, Product } from '../services/product.service';
 export class CatalogoProductoComponent implements OnInit {
   private pedidoService = inject(PedidoService); 
   private productService = inject(ProductService);
-  private categoriaService= inject(CategoriaService); 
+  private categoriaService= inject(CategoriaService);
+
+  
   readonly productos = signal<Product[]>([]);
   readonly categorias = signal<Categoria[]>([]);
 
  
   readonly PASO_PRECIO = 10000;
   readonly precioTope = computed(() => {
-    const precios = this.productos().map((p) => Number(p.price ?? p.price ?? 0));
+    const precios = this.productos().map((p) => p.price);
     const masCaro = Math.max(0, ...precios);
     return Math.max(this.PASO_PRECIO, Math.ceil(masCaro / this.PASO_PRECIO) * this.PASO_PRECIO);
   });
@@ -81,26 +83,26 @@ cargarDatos(): void {
   return productos
     .filter(p => {
      
-      const titulo = (p.title || p.nombre || '').toLowerCase();
+      const titulo = (p.title || '').toLowerCase();
       const coincideBusqueda = this.searchQuery 
         ? titulo.includes(this.searchQuery.toLowerCase()) 
         : true;
 
       
-      const catId = p.categoryId ?? p.categoryId;
+      const catId = p.categoryId;
       const coincideCategoria = this.categoriaSeleccionadaId !== null 
         ? catId === this.categoriaSeleccionadaId 
         : true;
 
      
-      const precio = Number(p.price ?? p.price ?? 0);
+      const precio = p.price;
       const coincidePrecio = precio <= this.precioMax;
 
       return coincideBusqueda && coincideCategoria && coincidePrecio;
     })
     .sort((a, b) => {
-      const precioA = Number(a.price ?? a.price ?? 0);
-      const precioB = Number(b.price ?? b.price ?? 0);
+      const precioA = a.price;
+      const precioB = b.price;
       if (this.ordenSeleccionado === 'asc') return precioA - precioB;
       if (this.ordenSeleccionado === 'desc') return precioB - precioA;
       return 0;

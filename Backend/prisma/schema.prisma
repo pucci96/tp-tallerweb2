@@ -54,7 +54,7 @@ model Producto {
     id              Int     @id @default(autoincrement())
     id_categoria    Int     
     id_subcategoria Int     
-    nombre          String
+    nombre          String  @unique
     stock           Int
     precio          Decimal
     categoria       Categoria @relation(fields: [id_categoria], references: [id], map:"deProductoACategoria")

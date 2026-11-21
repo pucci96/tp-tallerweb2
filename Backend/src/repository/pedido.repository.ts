@@ -32,6 +32,13 @@ export class PedidoRepository {
     });
   }
 
+  async obtenerProductoPorNombre(nombre: string) {
+    return prisma.producto.findUnique({
+      where: { nombre },
+      include: { categoria: true, subcategoria: true },
+    });
+  }
+
   async agregarProducto(data: {
     id_pedido: number;
     producto: string;

@@ -4,9 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ProductService, ProductoDetalle, Comentario } from '../services/product.service';
+import { ProductService } from '../services/product.service';
 import { AuthService } from '../services/auth.service';
-import {  Product } from '../services/product.service';
+import { Comentario, Product, ProductoDetalle } from '../interfaces/producto';
 import { PedidoService } from '../services/pedido.service';
 import { SelectorEstrellasComponent } from '../selector-estrellas/selector-estrellas.component';
 

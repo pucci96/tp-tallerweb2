@@ -1,17 +1,8 @@
 import { Injectable, InjectionToken, inject } from '@angular/core';
 import { Observable, defer, delay, of } from 'rxjs';
 
-export interface DatosTarjeta {
-  numero: string;
-  titular: string;
-  vencimiento: string;
-  cvv: string;
-}
+import { DatosTarjeta, ResultadoPago } from '../interfaces/pago';
 
-export interface ResultadoPago {
-  aprobado: boolean;
-  motivo?: string;
-}
 
 export const PAYMENT_DELAY_MS = new InjectionToken<number>('PAYMENT_DELAY_MS', {
   providedIn: 'root',

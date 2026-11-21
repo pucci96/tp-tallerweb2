@@ -1,7 +1,8 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'; // 1. Agregá ChangeDetectorRef acá
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PedidoDTO, PedidoService } from '../../services/pedido.service';
+import { PedidoService } from '../../services/pedido.service';
+import { PedidoDTO } from '../../interfaces/pedido';
 
 @Component({
   selector: 'app-mis-pedidos',

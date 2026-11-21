@@ -2,13 +2,11 @@ import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
-import { CarritoCheckout, CheckoutService, DatosEnvio } from '../services/checkout.service';
-import {
-  PAYMENT_DELAY_MS,
-  PaymentSimulatorService,
-  ResultadoPago,
-} from '../services/payment-simulator.service';
+import { CheckoutService } from '../services/checkout.service';
+import { PAYMENT_DELAY_MS, PaymentSimulatorService } from '../services/payment-simulator.service';
 import { CheckoutPagoComponent } from './checkout-pago.component';
+import { CarritoCheckout, DatosEnvio } from '../interfaces/checkout';
+import { ResultadoPago } from '../interfaces/pago';
 
 const envio: DatosEnvio = {
   nombre: 'Ana',

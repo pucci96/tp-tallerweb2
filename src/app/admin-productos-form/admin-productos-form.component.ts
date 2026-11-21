@@ -3,8 +3,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
-import { CategoriaService, Categoria, Subcategoria } from '../services/categoria.service';
-import { ProductService, GuardarProductoAdminDTO } from '../services/product.service';
+import { CategoriaService } from '../services/categoria.service';
+import { ProductService } from '../services/product.service';
+import { Categoria, Subcategoria } from '../interfaces/categoria';
+import { GuardarProductoAdminDTO } from '../interfaces/producto';
 
 @Component({
   selector: 'app-admin-producto-form',

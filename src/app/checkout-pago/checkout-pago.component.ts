@@ -5,10 +5,13 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CheckoutCabeceraComponent } from '../checkout-shared/checkout-cabecera.component';
 import { CheckoutResumenComponent } from '../checkout-shared/checkout-resumen.component';
-import { CarritoCheckout, CheckoutService, DatosEnvio, MedioPago } from '../services/checkout.service';
-import { PaymentSimulatorService, ResultadoPago } from '../services/payment-simulator.service';
+import { CheckoutService } from '../services/checkout.service';
+import { PaymentSimulatorService } from '../services/payment-simulator.service';
 import { noSoloEspacios } from '../validators/no-solo-espacios.validator';
 import { marcaTarjeta } from './marca-tarjeta';
+
+import { CarritoCheckout, DatosEnvio, MedioPago } from '../interfaces/checkout';
+import { ResultadoPago } from '../interfaces/pago';
 import {
   limpiarNumeroTarjeta,
   numeroTarjetaValidator,

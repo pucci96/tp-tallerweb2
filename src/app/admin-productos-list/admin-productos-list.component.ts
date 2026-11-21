@@ -2,8 +2,10 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Observable ,BehaviorSubject, combineLatest, map} from 'rxjs';
-import { ProductService, ProductoAdmin } from '../services/product.service';
+import { ProductService } from '../services/product.service';
 import { FormsModule } from '@angular/forms';
+
+import { ProductoAdmin } from '../interfaces/producto';
 
 export interface FiltrosAdmin {
   busqueda: string;

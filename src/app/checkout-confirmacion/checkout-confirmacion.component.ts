@@ -5,8 +5,10 @@ import { Router, RouterLink } from '@angular/router';
 import { CheckoutCabeceraComponent } from '../checkout-shared/checkout-cabecera.component';
 import { CheckoutResumenComponent } from '../checkout-shared/checkout-resumen.component';
 import { AuthService } from '../services/auth.service';
-import { CarritoCheckout, CheckoutService, DatosEnvio } from '../services/checkout.service';
+import { CheckoutService } from '../services/checkout.service';
 import { noSoloEspacios } from '../validators/no-solo-espacios.validator';
+
+import { CarritoCheckout, DatosEnvio } from '../interfaces/checkout';
 
 @Component({
   selector: 'app-checkout-confirmacion',

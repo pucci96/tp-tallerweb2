@@ -158,12 +158,21 @@ src/app/                 → frontend Angular (componentes, servicios, guards, i
 
 ### Estructura del frontend
 
-`src/app/` se organiza por feature: cada pantalla es una carpeta con su componente (`*.component.ts/.html/.css`) y, si corresponde, su spec. Ejemplos: `home/`, `catalogo-producto/`, `carrito/`, `checkout-pago/`, `login/`, `admin-productos-list/`. `product-card/` y `checkout-shared/` agrupan componentes reutilizables.
+`src/app/` separa **pages/** (pantallas con ruta: una carpeta por pantalla con su `*.component.ts/.html/.css` y su spec) de **components/** (piezas reutilizables sin ruta propia). El resto (`interfaces/`, `services/`, `guards/`, `interceptors/`, `validators/`) queda al nivel de `src/app/`.
 
 ```
 src/app/
-  <feature>/       → componente de una pantalla (home, carrito, checkout-*, login, ...)
-  layout/          → header y footer
+  app.ts / app.html / app.routes.ts / app.config.ts   → raíz de la app y ruteo
+  pages/           → pantallas ruteadas
+    home/  catalogo-producto/  detalles-producto/  carrito/
+    login/  registro/  perfil/  mis-pedidos/  page-not-found/
+    checkout/                  → checkout.routes.ts (rutas hijas lazy)
+    checkout-confirmacion/  checkout-pago/  checkout-resultado/
+    admin/                     → admin.routes.ts (rutas hijas lazy)
+    admin-productos-list/  admin-productos-form/
+  components/      → componentes reutilizables
+    layout/header/  layout/footer/
+    product-card/  selector-estrellas/  checkout-shared/
   interfaces/      → modelos y DTOs (un archivo por entidad: producto, pedido, auth, ...)
   services/        → llamadas HTTP y estado compartido (signals)
   guards/          → protección de rutas (auth, guest, admin)

@@ -1,0 +1,88 @@
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { CheckoutCabeceraComponent } from '../../components/checkout-shared/checkout-cabecera.component';
+import { CheckoutResumenComponent } from '../../components/checkout-shared/checkout-resumen.component';
+import { AuthService } from '../../services/auth.service';
+import { CheckoutService } from '../../services/checkout.service';
+import { noSoloEspacios } from '../../validators/no-solo-espacios.validator';
+
+import { CarritoCheckout, DatosEnvio } from '../../interfaces/checkout';
+
+@Component({
+  selector: 'app-checkout-confirmacion',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    CheckoutCabeceraComponent,
+    CheckoutResumenComponent,
+  ],
+  templateUrl: './checkout-confirmacion.component.html',
+  styleUrls: ['../../components/checkout-shared/checkout-shared.css', './checkout-confirmacion.component.css'],
+})
+export class CheckoutConfirmacionComponent implements OnInit {
+  private readonly checkout = inject(CheckoutService);
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
+
+  readonly cargando = signal(true);
+  readonly carrito = signal<CarritoCheckout | null>(null);
+
+  readonly form = inject(FormBuilder).nonNullable.group({
+    nombre: ['', [Validators.required, noSoloEspacios]],
+    apellido: ['', [Validators.required, noSoloEspacios]],
+    email: ['', [Validators.required, Validators.email]],
+    direccion: ['', [Validators.required, noSoloEspacios]],
+    ciudad: ['', [Validators.required, noSoloEspacios]],
+    codigoPostal: ['', [Validators.required, Validators.pattern(/^[A-Za-z0-9]{4,8}$/)]],
+  });
+
+  constructor() {
+    const previo = this.checkout.datosEnvio();
+    const usuario = this.auth.usuarioActual();
+    if (previo) {
+      this.form.setValue(previo);
+    } else if (usuario) {
+      this.form.patchValue({
+        nombre: usuario.nombre ?? '',
+        apellido: usuario.apellido ?? '',
+        email: usuario.email ?? '',
+        direccion: usuario.direccion ?? '',
+      });
+    }
+  }
+
+  ngOnInit(): void {
+    this.checkout.cargarCarrito().subscribe({
+      next: (carrito) => {
+        this.carrito.set(carrito);
+        this.cargando.set(false);
+      },
+      error: () => {
+        this.carrito.set(null);
+        this.cargando.set(false);
+      },
+    });
+  }
+
+  campoInvalido(campo: keyof DatosEnvio): boolean {
+    const control = this.form.controls[campo];
+    return control.invalid && (control.touched || control.dirty);
+  }
+
+  continuar(): void {
+    if (this.form.invalid || !this.carrito()) {
+      this.form.markAllAsTouched();
+      return;
+    }
+    const valores = this.form.getRawValue();
+    const datos = Object.fromEntries(
+      Object.entries(valores).map(([clave, valor]) => [clave, valor.trim()]),
+    ) as unknown as DatosEnvio;
+    this.checkout.guardarEnvio(datos);
+    this.router.navigate(['/checkout/pago']);
+  }
+}

@@ -21,11 +21,13 @@
   </header>
 
   <!-- Banner de alerta de éxito -->
-  <div class="alert-success" *ngIf="mensajeExito()">
+  @if (mensajeExito()) {
+  <div class="alert-success">
     <div class="alert-content">
       <div class="alert-icon">
         <svg viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
         </svg>
       </div>
       <div>
@@ -35,7 +37,7 @@
     </div>
     <button class="btn-close-alert" (click)="cerrarAlerta()" aria-label="Cerrar">✕</button>
   </div>
-
+  }
   <!-- Contenido en 2 columnas -->
   <div class="perfil-layout">
     <!-- Columna Izquierda: Tarjeta de Perfil y Menú -->
@@ -69,7 +71,7 @@
             <span>Mis datos</span>
           </div>
           @if (seccion() === 'datos') {
-            <span class="chevron">›</span>
+          <span class="chevron">›</span>
           }
         </button>
 
@@ -95,7 +97,8 @@
           </div>
         </a>
 
-        <button type="button" class="nav-item" [class.active]="seccion() === 'seguridad'" (click)="mostrarSeccion('seguridad')">
+        <button type="button" class="nav-item" [class.active]="seccion() === 'seguridad'"
+          (click)="mostrarSeccion('seguridad')">
           <div class="nav-label">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -104,7 +107,7 @@
             <span>Seguridad</span>
           </div>
           @if (seccion() === 'seguridad') {
-            <span class="chevron">›</span>
+          <span class="chevron">›</span>
           }
         </button>
 
@@ -129,7 +132,8 @@
       <!-- Sección "Mis datos": formulario de datos personales -->
       <div class="form-card">
         <h2 class="form-title">Mis datos personales</h2>
-        <p class="form-subtitle">Actualizá tus datos para agilizar el proceso de compra, emisión de factura y seguimiento de envíos.</p>
+        <p class="form-subtitle">Actualizá tus datos para agilizar el proceso de compra, emisión de factura y
+          seguimiento de envíos.</p>
 
         <!-- El formulario arranca inhabilitado; "Modificar mis datos" lo habilita -->
         <form (ngSubmit)="guardarCambios()" class="profile-form" [class.form-bloqueado]="!modoEdicion()">
@@ -139,8 +143,7 @@
               <label>Nombre <span class="required">*</span></label>
               <div class="input-wrapper">
                 <span class="input-icon"></span>
-                <input type="text" name="nombre" required
-                  [ngModel]="nombre()" (ngModelChange)="nombre.set($event)"
+                <input type="text" name="nombre" required [ngModel]="nombre()" (ngModelChange)="nombre.set($event)"
                   [disabled]="!modoEdicion()" />
               </div>
             </div>
@@ -149,9 +152,8 @@
               <label>Apellido <span class="required">*</span></label>
               <div class="input-wrapper">
                 <span class="input-icon"></span>
-                <input type="text" name="apellido" required
-                  [ngModel]="apellido()" (ngModelChange)="apellido.set($event)"
-                  [disabled]="!modoEdicion()" />
+                <input type="text" name="apellido" required [ngModel]="apellido()"
+                  (ngModelChange)="apellido.set($event)" [disabled]="!modoEdicion()" />
               </div>
             </div>
           </div>
@@ -171,37 +173,38 @@
             <label>Dirección de entrega <span class="required">*</span></label>
             <div class="input-wrapper">
               <span class="input-icon"></span>
-              <input type="text" name="direccion" required
-                [ngModel]="direccion()" (ngModelChange)="direccion.set($event)"
-                [disabled]="!modoEdicion()" />
+              <input type="text" name="direccion" required [ngModel]="direccion()"
+                (ngModelChange)="direccion.set($event)" [disabled]="!modoEdicion()" />
             </div>
-            <span class="helper-text"> Dirección principal predeterminada para el cálculo de flete vía Andreani / OCA.</span>
+            <span class="helper-text"> Dirección principal predeterminada para el cálculo de flete vía Andreani /
+              OCA.</span>
           </div>
 
           @if (mensajeError()) {
-            <p class="form-error" role="alert">{{ mensajeError() }}</p>
+          <p class="form-error" role="alert">{{ mensajeError() }}</p>
           }
 
           <!-- Botones de Acción -->
           <div class="form-actions">
             @if (modoEdicion()) {
-              <button type="button" class="btn-secondary" (click)="cancelarEdicion()" [disabled]="guardando()">Cancelar</button>
-              <button type="submit" class="btn-primary" [disabled]="guardando()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                  <polyline points="7 3 7 8 15 8"></polyline>
-                </svg>
-                {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
-              </button>
+            <button type="button" class="btn-secondary" (click)="cancelarEdicion()"
+              [disabled]="guardando()">Cancelar</button>
+            <button type="submit" class="btn-primary" [disabled]="guardando()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                <polyline points="7 3 7 8 15 8"></polyline>
+              </svg>
+              {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+            </button>
             } @else {
-              <button type="button" class="btn-primary" (click)="habilitarEdicion()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 20h9"></path>
-                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
-                </svg>
-                Modificar mis datos
-              </button>
+            <button type="button" class="btn-primary" (click)="habilitarEdicion()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+              </svg>
+              Modificar mis datos
+            </button>
             }
           </div>
         </form>
@@ -210,7 +213,8 @@
       <!-- Sección "Seguridad": cambio de contraseña -->
       <div class="form-card">
         <h2 class="form-title">Seguridad</h2>
-        <p class="form-subtitle">Cambiá tu contraseña. Para confirmar que sos vos, primero ingresá la contraseña actual.</p>
+        <p class="form-subtitle">Cambiá tu contraseña. Para confirmar que sos vos, primero ingresá la contraseña actual.
+        </p>
 
         <form (ngSubmit)="cambiarPassword()" class="profile-form">
           <div class="form-row">
@@ -219,10 +223,10 @@
               <div class="input-wrapper">
                 <span class="input-icon"></span>
                 <input name="passwordActual" autocomplete="current-password"
-                  [type]="mostrarPassword() ? 'text' : 'password'"
-                  [ngModel]="passwordActual()" (ngModelChange)="passwordActual.set($event)"
-                  [disabled]="guardando()" />
-                <button type="button" class="btn-toggle-eye" (click)="toggleMostrarPassword()" aria-label="Ver contraseñas">
+                  [type]="mostrarPassword() ? 'text' : 'password'" [ngModel]="passwordActual()"
+                  (ngModelChange)="passwordActual.set($event)" [disabled]="guardando()" />
+                <button type="button" class="btn-toggle-eye" (click)="toggleMostrarPassword()"
+                  aria-label="Ver contraseñas">
                   👁
                 </button>
               </div>
@@ -232,17 +236,15 @@
               <label>Contraseña nueva <span class="required">*</span></label>
               <div class="input-wrapper">
                 <span class="input-icon"></span>
-                <input name="passwordNueva" autocomplete="new-password"
-                  [type]="mostrarPassword() ? 'text' : 'password'"
-                  [ngModel]="passwordNueva()" (ngModelChange)="passwordNueva.set($event)"
-                  [disabled]="guardando()" />
+                <input name="passwordNueva" autocomplete="new-password" [type]="mostrarPassword() ? 'text' : 'password'"
+                  [ngModel]="passwordNueva()" (ngModelChange)="passwordNueva.set($event)" [disabled]="guardando()" />
               </div>
               <span class="helper-text">Al menos 8 caracteres, con letras y números.</span>
             </div>
           </div>
 
           @if (mensajeError()) {
-            <p class="form-error" role="alert">{{ mensajeError() }}</p>
+          <p class="form-error" role="alert">{{ mensajeError() }}</p>
           }
 
           <div class="form-actions">
@@ -268,7 +270,9 @@
         </div>
         <div class="info-banner-text">
           <strong>Privacidad y seguridad garantizada</strong>
-          <p>Tu información está protegida bajo estándares SSL/TLS y regulaciones de protección de datos personales de la República Argentina (Ley 25.326). Nunca compartimos tus claves ni tus datos de facturación con terceros no autorizados.</p>
+          <p>Tu información está protegida bajo estándares SSL/TLS y regulaciones de protección de datos personales de
+            la República Argentina (Ley 25.326). Nunca compartimos tus claves ni tus datos de facturación con terceros
+            no autorizados.</p>
         </div>
       </div>
 

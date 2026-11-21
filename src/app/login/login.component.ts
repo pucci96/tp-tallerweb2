@@ -1,5 +1,4 @@
-import { Component, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../services/auth.service';
@@ -8,7 +7,7 @@ import { PedidoService } from '../services/pedido.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -22,12 +21,10 @@ export class LoginComponent {
   readonly showPassword = signal(false);
   readonly mensajeError = signal('');
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private pedidoService: PedidoService
-  ) { }
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private pedidoService = inject(PedidoService);
 
   togglePasswordVisibility(): void {
     this.showPassword.update((value) => !value);
